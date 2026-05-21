@@ -1,4 +1,4 @@
-# mang-root 的个人博客
+# tance-mang的个人博客
 
 本仓库为个人技术博客的源码与静态资源文件，通过 GitHub Pages 进行托管与部署。
 
