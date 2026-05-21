@@ -5,7 +5,7 @@
 ---
 
 ## 访问地址
-[点击访问我的博客](https://mang-root.github.io)
+[点击访问我的博客]( https://tance-mang.github.io)
 
 ---
 
