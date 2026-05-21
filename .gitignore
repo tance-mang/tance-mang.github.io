@@ -1,0 +1,11 @@
+# 忽略 Claude 的记录文件夹
+.claude/
+
+# 其他 Hexo 常见忽略项（一起加上，避免上传多余文件）
+node_modules/
+public/
+.deploy*/
+*.log
+db.json
+.DS_Store
+Thumbs.db
