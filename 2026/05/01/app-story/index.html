@@ -3,210 +3,96 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>从小程序到安全驱动的 AP 应用开发复盘 | Tance Mang</title>
-  <meta name="description" content="网络安全 / Java / Python / 项目复盘 - 从 Python 转向 Java 的技术选型与安全实践">
+  <title>从小程序到安全驱动的 AP 应用开发复盘 — TANCE</title>
+  <meta name="description" content="一次比赛的技术选型转身，以及我对「安全」这件事的重新理解。">
   <link rel="stylesheet" href="/css/style.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="/" class="logo">
-        <span class="logo-bracket">&lt;</span>Tance<span class="logo-slash">/</span>Mang<span class="logo-bracket">&gt;</span>
-      </a>
-      <nav class="main-nav">
-        <a href="/" class="nav-link">Home</a>
-        <a href="/projects.html" class="nav-link">Projects</a>
-        <a href="/blog.html" class="nav-link active">Blog</a>
-        <a href="/about.html" class="nav-link">About</a>
-      </nav>
-      <button class="mobile-nav-toggle" aria-label="Toggle menu">
-        <span class="fa fa-bars"></span>
-      </button>
-    </div>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html">Create</a>
+      <a href="/observe.html" class="is-current">Observe</a>
+      <a href="/about.html">About</a>
+    </nav>
   </header>
 
-  <main>
-    <section class="page-head post-head">
-      <div class="container">
-        <div class="post-meta">
-          <time class="article-date" datetime="2026-05-01">2026-05-01</time>
-          <span class="dot">·</span>
-          <span class="tag tag-sm">网络安全</span>
-          <span class="tag tag-sm">Java</span>
-          <span class="tag tag-sm">Python</span>
-          <span class="tag tag-sm">项目复盘</span>
-        </div>
-        <h1 class="post-title">从小程序到安全驱动的 AP 应用开发复盘</h1>
-        <p class="post-subtitle">一次比赛的技术选型转身，与我对「安全」这件事的重新理解。</p>
-      </div>
-    </section>
+  <article class="post-shell">
+    <span class="post-eyebrow">02 / Observe · 复盘</span>
+    <h1 class="post-h1">从小程序到安全驱动的 AP 应用开发复盘</h1>
+    <div class="post-meta">
+      <time datetime="2026-05-01">2026 · 05 · 01</time>
+      <span class="sep">·</span>
+      <span>8 min</span>
+      <span class="sep">·</span>
+      <span>网络安全 / Java / Python</span>
+    </div>
 
-    <section class="section post-section">
-      <div class="container post-layout">
-        <article class="post-content article-entry">
-          <p>最近，我参加了一场开发类比赛。</p>
+    <div class="post-body">
+      <p>最近，我参加了一场开发类比赛。</p>
+      <p>最开始，我满怀期待、斗志满满，打算从零开始做一款小程序。可真正动手后才发现，事情远没有想象中顺利——需求不断变化、思路逐渐偏离最初的想法，越做越失落，甚至一度怀疑自己能不能完成作品。</p>
+      <p>更棘手的是，开发过程中遇到了各种平台限制，很多我想实现的功能根本无法落地。眼看着比赛即将结束，我在最后几天做了一个重要决定：<strong>放弃小程序，重新转向 AP 应用开发</strong>。</p>
+      <p>在重构项目的过程中，我突然想通一件事：</p>
+      <blockquote>任何产品，都必须突出核心主题；而我平时对网络安全特别感兴趣，那我的作品，为什么不能把「安全」当成核心亮点？</blockquote>
+      <p>于是，我开始接触学习网络安全相关知识，也真正意识到：<strong>一个让用户放心的产品，安全永远是底线。</strong></p>
 
-          <p>最开始，我满怀期待、斗志满满，打算从零开始做一款小程序。可真正动手后才发现，事情远没有想象中顺利——需求不断变化、思路逐渐偏离最初的想法，越做越失落，甚至一度怀疑自己能不能完成作品。</p>
+      <h2>一、为什么我从 Python 转向 Java</h2>
+      <p>最开始，我用的是 Python。上手快、写爬虫方便、效率高，我也确实用它完成了数据爬取、接口调用等功能，学到了很多实用技巧。</p>
+      <p>但随着深入了解安全知识，我发现一个关键问题：<strong>Python 的语言安全性相对较弱。</strong></p>
+      <ul>
+        <li>解释型语言，代码容易被反编译</li>
+        <li>内存管理、权限控制、安全沙箱机制不如静态语言严谨</li>
+        <li>做后端服务时，面对攻击的防护能力有限</li>
+      </ul>
+      <p>而我的项目需要对外提供服务，还要接入域名、服务器、AI API，涉及用户数据与接口调用，<strong>安全绝对不能妥协</strong>。所以我最终决定改用 Java 编写后端。</p>
+      <p>这次技术选型的转变，让我第一次真正理解：<strong>开发不只是实现功能，更是对安全、稳定、用户信任的负责。</strong></p>
 
-          <p>更棘手的是，开发过程中遇到了各种平台限制，很多我想实现的功能根本无法落地。眼看着比赛即将结束，我在最后几天做了一个重要决定：<strong>放弃小程序，重新转向 AP 应用开发</strong>。</p>
-
-          <p>在重构项目的过程中，我突然想通一件事：</p>
-
-          <blockquote>
-            任何产品，都必须突出核心主题；而我平时对网络安全特别感兴趣，那我的作品，为什么不能把「安全」当成核心亮点？
-          </blockquote>
-
-          <p>于是，我开始接触学习网络安全相关知识，也真正意识到：</p>
-
-          <p><strong>一个让用户放心的产品，安全永远是底线。</strong></p>
-
-          <h2>一、开发中的安全思考：为什么我从 Python 转向 Java？</h2>
-
-          <p>最开始，我用的是 Python 进行开发。Python 上手快、写爬虫方便、效率高，我也确实用它完成了数据爬取、接口调用等功能，学到了很多实用技巧。</p>
-
-          <p>但随着深入了解安全知识，我发现一个关键问题：<strong>Python 的语言安全性相对较弱。</strong></p>
-
-          <p>简单说：</p>
-          <ul>
-            <li>Python 是解释型语言，代码容易被反编译</li>
-            <li>内存管理、权限控制、安全沙箱机制不如静态语言严谨</li>
-            <li>做后端服务时，面对攻击的防护能力有限</li>
-          </ul>
-
-          <p>而我的项目需要对外提供服务，还要接入域名、服务器、AI API，涉及用户数据与接口调用，<strong>安全绝对不能妥协</strong>。所以，我最终决定：<strong>改用 Java 编写后端。</strong></p>
-
-          <p>Java 的优势非常明显：</p>
-          <ul>
-            <li>强类型语言，安全性更高</li>
-            <li>生态成熟，安全框架丰富</li>
-            <li>适合做稳定、可靠的后端服务</li>
-            <li>企业级开发主流，更符合工程规范</li>
-          </ul>
-
-          <p>这次技术选型的转变，让我第一次真正理解：<strong>开发不只是实现功能，更是对安全、稳定、用户信任的负责。</strong></p>
-
-          <h2>二、网络安全到底有多重要？我用实战明白了</h2>
-
-          <p>在这次开发中，我接触了很多以前不了解的安全知识点，也真正意识到网络安全离我们有多近：</p>
-
-          <h3>1. API 安全</h3>
-          <p>我接入了 AI 接口，才知道 API 如果不加验证、不加签名，很容易被恶意调用，造成费用损失、数据泄露。</p>
-
+      <h2>二、网络安全到底有多重要</h2>
+      <p>这次开发中，我接触了很多以前不了解的安全知识点：</p>
+      <h3>1. API 安全</h3>
+      <p>我接入了 AI 接口，才知道 API 如果不加验证、不加签名，很容易被恶意调用，造成费用损失、数据泄露。</p>
 <pre><code>// 简单的 HMAC 签名校验
 String sign = HmacSHA256.sign(payload + timestamp, secretKey);
 if (!sign.equals(request.getHeader("X-Sign"))) {
     throw new UnauthorizedException("Invalid signature");
 }</code></pre>
+      <h3>2. 数据传输安全</h3>
+      <p>用户数据在网络上传输时，如果不加密，就像明信片一样，任何人都能看到。所以必须使用 HTTPS、加密算法。</p>
+      <h3>3. 后端权限控制</h3>
+      <p>没有权限校验的接口，任何人都能随意篡改、删除数据。这就是为什么企业项目必须做登录验证、身份认证、权限隔离。</p>
+      <h3>4. 爬虫与反爬</h3>
+      <p>我用 Python 写过爬虫，也明白爬虫如果滥用，会对别人服务器造成伤害；反过来，自己的服务器也要做好反爬防护。</p>
 
-          <h3>2. 数据传输安全</h3>
-          <p>用户数据在网络上传输时，如果不加密，就像明信片一样，任何人都能看到。所以必须使用 HTTPS、加密算法。</p>
+      <h2>三、项目落地</h2>
+      <p>确定方向和技术栈后，我开始真正把项目跑起来：</p>
+      <ul>
+        <li>申请域名 · 配置服务器 · 部署后端服务</li>
+        <li>接入 AI API · 做接口调试 · 加固安全策略</li>
+      </ul>
+      <p>每一步都花了大量时间，也踩了无数坑。但正是这些琐碎、枯燥、反复调试的过程，让我从一个只会写点小代码的新手，慢慢变成能独立完成<strong>完整项目上线</strong>的开发者。</p>
 
-          <h3>3. 后端权限控制</h3>
-          <p>没有权限校验的接口，任何人都能随意篡改、删除数据。这就是为什么企业项目必须做登录验证、身份认证、权限隔离。</p>
-
-          <h3>4. 爬虫与反爬</h3>
-          <p>我用 Python 写过爬虫，也明白爬虫如果滥用，会对别人服务器造成伤害；反过来，自己的服务器也要做好反爬防护。</p>
-
-          <p>这些知识，以前只是听说，这次真正用在项目里，才彻底懂了。</p>
-
-          <h2>三、项目落地：域名、服务器、AI 接入，每一步都是成长</h2>
-
-          <p>确定方向和技术栈后，我开始真正把项目跑起来：</p>
-          <ul>
-            <li>申请域名</li>
-            <li>配置服务器</li>
-            <li>部署后端服务</li>
-            <li>接入 AI API</li>
-            <li>做接口调试</li>
-            <li>加固安全策略</li>
-          </ul>
-
-          <p>每一步都花了大量时间，也踩了无数坑。但正是这些琐碎、枯燥、反复调试的过程，让我从一个只会写点小代码的新手，慢慢变成能独立完成<strong>完整项目上线</strong>的开发者。</p>
-
-          <h2>四、总结：这场比赛，我收获的不只是一个项目</h2>
-
-          <p>回头看这次竞赛经历：</p>
-          <ul>
-            <li>从小程序到 AP 应用，我学会了<strong>快速调整、灵活重构</strong></li>
-            <li>从只会写功能，到重视安全，我建立了<strong>工程化思维</strong></li>
-            <li>从 Python 到 Java，我理解了<strong>技术选型的真正意义</strong></li>
-            <li>从零基础搭建服务器、域名、API，我完成了<strong>全栈开发的第一次实战</strong></li>
-          </ul>
-
-          <p>最重要的是，我真正理解了一句话：</p>
-
-          <blockquote>
-            网络安全不是附加题，而是所有产品的必修课。
-          </blockquote>
-
-          <p>未来，我会继续深耕网络安全与后端开发，努力做出更安全、更可靠、更让用户放心的产品。这不仅是一次比赛，更是我技术道路上的重要起点。</p>
-
-          <nav class="post-nav">
-            <a href="/blog.html" class="post-nav-link">
-              <span class="post-nav-caption">← 返回</span>
-              <span class="post-nav-title">所有文章</span>
-            </a>
-          </nav>
-        </article>
-
-        <aside class="blog-side">
-          <div class="widget">
-            <h3 class="widget-title">文章信息</h3>
-            <ul class="archive-list">
-              <li><i class="fa fa-calendar"></i> 发布于 2026-05-01</li>
-              <li><i class="fa fa-folder-open-o"></i> 项目复盘</li>
-              <li><i class="fa fa-clock-o"></i> 约 8 分钟阅读</li>
-            </ul>
-          </div>
-
-          <div class="widget">
-            <h3 class="widget-title">标签</h3>
-            <div class="tag-cloud">
-              <span class="tag">网络安全</span>
-              <span class="tag">Java</span>
-              <span class="tag">Python</span>
-              <span class="tag">API Security</span>
-              <span class="tag">项目复盘</span>
-            </div>
-          </div>
-
-          <div class="widget">
-            <h3 class="widget-title">相关阅读</h3>
-            <ul class="related-list">
-              <li><a href="#">一次真实 SSRF 漏洞的发现与利用链</a></li>
-              <li><a href="#">本地部署 LLM 的踩坑笔记</a></li>
-              <li><a href="#">Java 后端安全实战清单</a></li>
-            </ul>
-          </div>
-        </aside>
-      </div>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div class="footer-stack">
-        <span class="tag tag-sm">HTML</span>
-        <span class="tag tag-sm">CSS</span>
-        <span class="tag tag-sm">JavaScript</span>
-        <span class="tag tag-sm">Java</span>
-        <span class="tag tag-sm">Python</span>
-        <span class="tag tag-sm">Security</span>
-      </div>
-      <div class="footer-copy">
-        &copy; 2026 Tance Mang · Built with passion in the dark.
-      </div>
-      <div class="footer-social">
-        <a href="https://github.com/tance-mang" aria-label="GitHub"><i class="fa fa-github"></i></a>
-        <a href="#" aria-label="LinkedIn"><i class="fa fa-linkedin"></i></a>
-        <a href="mailto:hello@example.com" aria-label="Email"><i class="fa fa-envelope"></i></a>
-      </div>
+      <h2>四、最后</h2>
+      <p>回头看这次竞赛经历：</p>
+      <ul>
+        <li>从小程序到 AP 应用，我学会了<strong>快速调整、灵活重构</strong></li>
+        <li>从只会写功能，到重视安全，我建立了<strong>工程化思维</strong></li>
+        <li>从 Python 到 Java，我理解了<strong>技术选型的真正意义</strong></li>
+        <li>从零开始搭建服务器、域名、API，我完成了<strong>全栈开发的第一次实战</strong></li>
+      </ul>
+      <blockquote>网络安全不是附加题，而是所有产品的必修课。</blockquote>
+      <p>这不仅是一次比赛，更是我技术道路上的重要起点。</p>
     </div>
-  </footer>
+
+    <footer class="post-foot">
+      <a href="/observe.html">← back to observe</a>
+      <a href="/">tance</a>
+    </footer>
+  </article>
 
   <script src="/js/script.js"></script>
 </body>

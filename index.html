@@ -3,259 +3,82 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tance Mang | 网络安全 · 全栈开发 · AI</title>
-  <meta name="description" content="个人技术博客 - 网络安全、全栈开发、AI 探索记录">
+  <title>TANCE — Create &amp; Observe</title>
+  <meta name="description" content="Create & Observe — exploring the intersection of technology, creation and thought.">
   <link rel="stylesheet" href="/css/style.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 </head>
-<body>
-  <!-- Header / Navbar -->
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="/" class="logo">
-        <span class="logo-bracket">&lt;</span>Tance<span class="logo-slash">/</span>Mang<span class="logo-bracket">&gt;</span>
+<body class="page-void">
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+
+  <main class="void">
+    <header class="brand">
+      <h1 class="brand-title">TANCE</h1>
+      <p class="brand-sub">
+        <span class="brand-sub-en">Create &amp; Observe</span>
+        <span class="brand-sub-zh">创造与观察</span>
+      </p>
+    </header>
+
+    <nav class="duo" aria-label="Primary">
+      <a class="duo-card" href="/create.html" data-card="create">
+        <svg class="card-frame" viewBox="0 0 100 70" preserveAspectRatio="none" aria-hidden="true">
+          <path class="card-frame-path"
+                d="M 0 0 L 90 0 L 100 10 L 100 70 L 10 70 L 0 60 Z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1"
+                vector-effect="non-scaling-stroke"/>
+        </svg>
+        <div class="card-body">
+          <span class="card-eyebrow">01 / Create</span>
+          <h2 class="card-title">CREATE</h2>
+          <p class="card-line">Turning ideas into reality.</p>
+          <ul class="card-list">
+            <li>开发</li>
+            <li>网络安全</li>
+            <li>AI</li>
+            <li>项目实验</li>
+          </ul>
+          <span class="card-go">enter <i class="arrow">→</i></span>
+        </div>
       </a>
-      <nav class="main-nav">
-        <a href="/" class="nav-link active">Home</a>
-        <a href="/projects.html" class="nav-link">Projects</a>
-        <a href="/blog.html" class="nav-link">Blog</a>
-        <a href="/about.html" class="nav-link">About</a>
-      </nav>
-      <button class="mobile-nav-toggle" aria-label="Toggle menu">
-        <span class="fa fa-bars"></span>
-      </button>
-    </div>
-  </header>
 
-  <main>
-    <!-- Hero Section -->
-    <section class="hero">
-      <div class="hero-bg"></div>
-      <div class="container hero-inner">
-        <p class="hero-greeting">Hi, I'm</p>
-        <h1 class="hero-name">Tance Mang</h1>
-        <p class="hero-tagline">
-          <span class="tag-purple">网络安全</span>
-          <span class="tag-divider">|</span>
-          <span class="tag-purple">全栈开发</span>
-          <span class="tag-divider">|</span>
-          <span class="tag-purple">AI 爱好者</span>
-        </p>
-        <p class="hero-description">
-          专注于构建安全可靠的应用，探索 Web、网络安全、AI 与工具链的边界。
-        </p>
-        <div class="hero-cta">
-          <a href="/projects.html" class="btn btn-primary">查看项目</a>
-          <a href="/blog.html" class="btn btn-ghost">阅读博客</a>
+      <a class="duo-card" href="/observe.html" data-card="observe">
+        <svg class="card-frame" viewBox="0 0 100 70" preserveAspectRatio="none" aria-hidden="true">
+          <path class="card-frame-path"
+                d="M 10 0 L 100 0 L 100 60 L 90 70 L 0 70 L 0 10 Z"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1"
+                vector-effect="non-scaling-stroke"/>
+        </svg>
+        <div class="card-body">
+          <span class="card-eyebrow">02 / Observe</span>
+          <h2 class="card-title">OBSERVE</h2>
+          <p class="card-line">Thoughts, learning and journeys.</p>
+          <ul class="card-list">
+            <li>成长记录</li>
+            <li>灵感</li>
+            <li>学习过程</li>
+            <li>思考</li>
+          </ul>
+          <span class="card-go">enter <i class="arrow">→</i></span>
         </div>
-      </div>
-    </section>
+      </a>
+    </nav>
 
-    <!-- Featured Projects -->
-    <section class="section">
-      <div class="container">
-        <div class="section-head">
-          <h2 class="section-title">精选项目</h2>
-          <a href="/projects.html" class="section-more">查看全部 →</a>
-        </div>
-
-        <div class="project-grid">
-          <article class="project-card">
-            <div class="project-card-head">
-              <span class="project-icon"><i class="fa fa-shield"></i></span>
-              <a href="#" class="project-link" aria-label="GitHub"><i class="fa fa-github"></i></a>
-            </div>
-            <h3 class="project-title">Secure-AP-App</h3>
-            <p class="project-desc">从小程序重构而来的安全驱动应用，集成 API 签名、HTTPS、权限隔离。</p>
-            <div class="tag-list">
-              <span class="tag">Java</span>
-              <span class="tag">Spring Boot</span>
-              <span class="tag">Security</span>
-            </div>
-          </article>
-
-          <article class="project-card">
-            <div class="project-card-head">
-              <span class="project-icon"><i class="fa fa-bug"></i></span>
-              <a href="#" class="project-link" aria-label="GitHub"><i class="fa fa-github"></i></a>
-            </div>
-            <h3 class="project-title">Vuln-Lab</h3>
-            <p class="project-desc">个人漏洞研究记录平台，包含 CTF 题解、Web 渗透笔记与复现环境。</p>
-            <div class="tag-list">
-              <span class="tag">Pentest</span>
-              <span class="tag">CTF</span>
-              <span class="tag">Docker</span>
-            </div>
-          </article>
-
-          <article class="project-card">
-            <div class="project-card-head">
-              <span class="project-icon"><i class="fa fa-rocket"></i></span>
-              <a href="#" class="project-link" aria-label="GitHub"><i class="fa fa-github"></i></a>
-            </div>
-            <h3 class="project-title">AI-Assistant-API</h3>
-            <p class="project-desc">封装多家 LLM 接口的统一调用层，支持限流、缓存、Prompt 管理。</p>
-            <div class="tag-list">
-              <span class="tag">Python</span>
-              <span class="tag">FastAPI</span>
-              <span class="tag">LLM</span>
-            </div>
-          </article>
-
-          <article class="project-card">
-            <div class="project-card-head">
-              <span class="project-icon"><i class="fa fa-code"></i></span>
-              <a href="#" class="project-link" aria-label="GitHub"><i class="fa fa-github"></i></a>
-            </div>
-            <h3 class="project-title">Dev-Toolkit</h3>
-            <p class="project-desc">日常开发用到的小工具集合：编码转换、JWT 解析、正则测试等。</p>
-            <div class="tag-list">
-              <span class="tag">TypeScript</span>
-              <span class="tag">React</span>
-              <span class="tag">Vite</span>
-            </div>
-          </article>
-
-          <article class="project-card">
-            <div class="project-card-head">
-              <span class="project-icon"><i class="fa fa-database"></i></span>
-              <a href="#" class="project-link" aria-label="GitHub"><i class="fa fa-github"></i></a>
-            </div>
-            <h3 class="project-title">Crawler-Engine</h3>
-            <p class="project-desc">支持反爬绕过与代理池的通用爬虫框架，已用于多个数据采集项目。</p>
-            <div class="tag-list">
-              <span class="tag">Python</span>
-              <span class="tag">Scrapy</span>
-              <span class="tag">Proxy</span>
-            </div>
-          </article>
-
-          <article class="project-card">
-            <div class="project-card-head">
-              <span class="project-icon"><i class="fa fa-terminal"></i></span>
-              <a href="#" class="project-link" aria-label="GitHub"><i class="fa fa-github"></i></a>
-            </div>
-            <h3 class="project-title">Shell-Scripts</h3>
-            <p class="project-desc">服务器运维、部署自动化与日常效率脚本集合。</p>
-            <div class="tag-list">
-              <span class="tag">Bash</span>
-              <span class="tag">DevOps</span>
-              <span class="tag">Linux</span>
-            </div>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <!-- Latest Articles -->
-    <section class="section section-alt">
-      <div class="container">
-        <div class="section-head">
-          <h2 class="section-title">最新技术文章</h2>
-          <a href="/blog.html" class="section-more">全部文章 →</a>
-        </div>
-
-        <div class="article-list">
-          <a href="/2026/05/01/app-story/" class="article-item">
-            <div class="article-meta">
-              <time class="article-date">2026-05-01</time>
-              <span class="tag tag-sm">网络安全</span>
-              <span class="tag tag-sm">Java</span>
-            </div>
-            <h3 class="article-title">从小程序到安全驱动的 AP 应用开发复盘</h3>
-            <p class="article-excerpt">从 Python 转向 Java 的技术选型思考，以及 API 安全、数据传输、权限控制的实战经验。</p>
-          </a>
-
-          <a href="#" class="article-item">
-            <div class="article-meta">
-              <time class="article-date">2026-04-22</time>
-              <span class="tag tag-sm">Web</span>
-              <span class="tag tag-sm">前端</span>
-            </div>
-            <h3 class="article-title">现代前端工程化：从 Vite 到 Monorepo 的演进</h3>
-            <p class="article-excerpt">梳理一个真实项目从单仓库到 Monorepo 改造的全过程，性能与协作的双重收益。</p>
-          </a>
-
-          <a href="#" class="article-item">
-            <div class="article-meta">
-              <time class="article-date">2026-04-10</time>
-              <span class="tag tag-sm">AI</span>
-              <span class="tag tag-sm">LLM</span>
-            </div>
-            <h3 class="article-title">本地部署 LLM：从 Ollama 到 vLLM 的踩坑笔记</h3>
-            <p class="article-excerpt">不同推理后端的性能对比、显存占用与并发能力测试结果。</p>
-          </a>
-
-          <a href="#" class="article-item">
-            <div class="article-meta">
-              <time class="article-date">2026-03-28</time>
-              <span class="tag tag-sm">网络安全</span>
-              <span class="tag tag-sm">渗透</span>
-            </div>
-            <h3 class="article-title">一次真实 SSRF 漏洞的发现与利用链</h3>
-            <p class="article-excerpt">从信息收集到内网横向，记录一次完整的 Web 渗透思路。</p>
-          </a>
-
-          <a href="#" class="article-item">
-            <div class="article-meta">
-              <time class="article-date">2026-03-15</time>
-              <span class="tag tag-sm">工具</span>
-              <span class="tag tag-sm">效率</span>
-            </div>
-            <h3 class="article-title">我的终端配置：Zsh + Starship + tmux 工作流</h3>
-            <p class="article-excerpt">花一个晚上把终端调成自己最喜欢的样子，能换来未来几年的开发体验提升。</p>
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- Contact -->
-    <section class="section section-contact">
-      <div class="container">
-        <h2 class="section-title section-title-center">保持联系</h2>
-        <p class="section-subtitle">欢迎交流技术问题、合作机会或新点子。</p>
-        <div class="social-row">
-          <a href="https://github.com/tance-mang" class="social-link" target="_blank" rel="noopener">
-            <i class="fa fa-github"></i>
-            <span>GitHub</span>
-          </a>
-          <a href="#" class="social-link" target="_blank" rel="noopener">
-            <i class="fa fa-linkedin"></i>
-            <span>LinkedIn</span>
-          </a>
-          <a href="mailto:hello@example.com" class="social-link">
-            <i class="fa fa-envelope"></i>
-            <span>Email</span>
-          </a>
-        </div>
-      </div>
-    </section>
+    <footer class="void-foot">
+      <span class="void-foot-line">a silent digital universe</span>
+      <span class="void-foot-meta">
+        <a href="/about.html">about</a>
+        <span class="dot">·</span>
+        <a href="https://github.com/tance-mang" target="_blank" rel="noopener">github</a>
+      </span>
+    </footer>
   </main>
-
-  <!-- Footer -->
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div class="footer-stack">
-        <span class="tag tag-sm">HTML</span>
-        <span class="tag tag-sm">CSS</span>
-        <span class="tag tag-sm">JavaScript</span>
-        <span class="tag tag-sm">Java</span>
-        <span class="tag tag-sm">Python</span>
-        <span class="tag tag-sm">Security</span>
-      </div>
-      <div class="footer-copy">
-        &copy; 2026 Tance Mang · Built with passion in the dark.
-      </div>
-      <div class="footer-social">
-        <a href="https://github.com/tance-mang" aria-label="GitHub"><i class="fa fa-github"></i></a>
-        <a href="#" aria-label="LinkedIn"><i class="fa fa-linkedin"></i></a>
-        <a href="mailto:hello@example.com" aria-label="Email"><i class="fa fa-envelope"></i></a>
-      </div>
-    </div>
-  </footer>
 
   <script src="/js/script.js"></script>
 </body>

@@ -4,155 +4,91 @@
   新文章模板 · 复制此文件，按以下步骤改：
   ============================================================
   1. 复制本文件到新位置：2026/06/15/your-slug/index.html
-     （年/月/日/英文标题-用横线连接/index.html）
   2. 搜索替换以下占位符（按 Ctrl+H）：
-     - 【文章标题】       → 真实标题
-     - 【一句话副标题】   → 文章副标题
-     - 2026-06-15        → 文章发布日期
-     - 【正文从这里开始】 → 文章正文（在下方 article-entry 内）
-  3. 修改 <head> 里的 <title> 和 <meta description>
-  4. 修改顶部的 4 个标签（<span class="tag tag-sm">）
-  5. 在 blog.html 里加一条链接（复制现有的 article-item 块即可）
+     - 【文章标题】     → 真实标题
+     - 【一句话副标题】 → 文章简介
+     - 2026-06-15      → 文章发布日期
+     - 2026 · 06 · 15  → 显示用的日期
+     - 【正文从这里开始】→ 正文 HTML
+  3. 修改 <title> 和 <meta description>
+  4. 在 observe.html 里加一条 <a class="entry"> 链接到这篇
   ============================================================
 -->
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>【文章标题】 | Tance Mang</title>
+  <title>【文章标题】 — TANCE</title>
   <meta name="description" content="【一句话副标题】">
   <link rel="stylesheet" href="/css/style.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="/" class="logo">
-        <span class="logo-bracket">&lt;</span>Tance<span class="logo-slash">/</span>Mang<span class="logo-bracket">&gt;</span>
-      </a>
-      <nav class="main-nav">
-        <a href="/" class="nav-link">Home</a>
-        <a href="/projects.html" class="nav-link">Projects</a>
-        <a href="/blog.html" class="nav-link active">Blog</a>
-        <a href="/about.html" class="nav-link">About</a>
-      </nav>
-      <button class="mobile-nav-toggle" aria-label="Toggle menu">
-        <span class="fa fa-bars"></span>
-      </button>
-    </div>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html">Create</a>
+      <a href="/observe.html" class="is-current">Observe</a>
+      <a href="/about.html">About</a>
+    </nav>
   </header>
 
-  <main>
-    <section class="page-head post-head">
-      <div class="container">
-        <div class="post-meta">
-          <time class="article-date" datetime="2026-06-15">2026-06-15</time>
-          <span class="dot">·</span>
-          <!-- 标签：按需删改 -->
-          <span class="tag tag-sm">分类一</span>
-          <span class="tag tag-sm">分类二</span>
-        </div>
-        <h1 class="post-title">【文章标题】</h1>
-        <p class="post-subtitle">【一句话副标题】</p>
-      </div>
-    </section>
+  <article class="post-shell">
+    <span class="post-eyebrow">02 / Observe · 【分类，比如：复盘 / 思考 / 学习】</span>
+    <h1 class="post-h1">【文章标题】</h1>
+    <div class="post-meta">
+      <time datetime="2026-06-15">2026 · 06 · 15</time>
+      <span class="sep">·</span>
+      <span>X min</span>
+      <span class="sep">·</span>
+      <span>【标签1 / 标签2】</span>
+    </div>
 
-    <section class="section post-section">
-      <div class="container post-layout">
-        <article class="post-content article-entry">
+    <div class="post-body">
 
-          <!-- ===== 正文从这里开始 ===== -->
+      <!-- ========== 正文从这里开始 ========== -->
 
-          <p>这是第一段正文。直接写中文就行。</p>
+      <p>第一段正文。普通段落直接用 &lt;p&gt;。</p>
 
-          <p>这是第二段。如果想<strong>加粗</strong>用 <code>&lt;strong&gt;</code> 标签。</p>
+      <p>需要<strong>加粗</strong>用 &lt;strong&gt; 标签（白色）。</p>
 
-          <h2>这是大标题（自动有左侧紫色竖条）</h2>
+      <h2>这是一级标题（左侧紫色发光横线）</h2>
 
-          <p>段落正文。</p>
+      <p>段落正文。</p>
 
-          <h3>这是小标题（紫色文字）</h3>
+      <h3>这是二级标题（紫色字）</h3>
 
-          <ul>
-            <li>无序列表项 1</li>
-            <li>无序列表项 2</li>
-            <li>无序列表项 3</li>
-          </ul>
+      <ul>
+        <li>无序列表第一项</li>
+        <li>无序列表第二项</li>
+      </ul>
 
-          <blockquote>
-            这是引言块，左边会有紫色竖条 + 紫色背景。
-          </blockquote>
+      <blockquote>
+        这是引言。左侧一根紫色细线，斜体。
+      </blockquote>
 
 <pre><code>// 这是代码块
 function hello() {
-  console.log("Hello world");
+  console.log("from the void");
 }</code></pre>
 
-          <p>需要插入链接：<a href="https://example.com">这是一个链接</a>，紫色虚线下划线。</p>
+      <p>需要插入链接：<a href="https://example.com">这是一个链接</a>，紫色 + 紫色下划线。</p>
 
-          <p>需要插入图片：<img src="/path/to/image.png" alt="图片描述"></p>
+      <p>需要插入行内代码：<code>const x = 42</code>。</p>
 
-          <!-- ===== 正文结束 ===== -->
+      <!-- ========== 正文结束 ========== -->
 
-          <nav class="post-nav">
-            <a href="/blog.html" class="post-nav-link">
-              <span class="post-nav-caption">← 返回</span>
-              <span class="post-nav-title">所有文章</span>
-            </a>
-          </nav>
-        </article>
-
-        <aside class="blog-side">
-          <div class="widget">
-            <h3 class="widget-title">文章信息</h3>
-            <ul class="archive-list">
-              <li><i class="fa fa-calendar"></i> 发布于 2026-06-15</li>
-              <li><i class="fa fa-folder-open-o"></i> 分类名</li>
-              <li><i class="fa fa-clock-o"></i> 约 X 分钟阅读</li>
-            </ul>
-          </div>
-
-          <div class="widget">
-            <h3 class="widget-title">标签</h3>
-            <div class="tag-cloud">
-              <span class="tag">标签一</span>
-              <span class="tag">标签二</span>
-            </div>
-          </div>
-
-          <div class="widget">
-            <h3 class="widget-title">相关阅读</h3>
-            <ul class="related-list">
-              <li><a href="#">相关文章 1</a></li>
-              <li><a href="#">相关文章 2</a></li>
-            </ul>
-          </div>
-        </aside>
-      </div>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div class="footer-stack">
-        <span class="tag tag-sm">HTML</span>
-        <span class="tag tag-sm">CSS</span>
-        <span class="tag tag-sm">JavaScript</span>
-        <span class="tag tag-sm">Java</span>
-        <span class="tag tag-sm">Python</span>
-        <span class="tag tag-sm">Security</span>
-      </div>
-      <div class="footer-copy">&copy; 2026 Tance Mang · Built with passion in the dark.</div>
-      <div class="footer-social">
-        <a href="https://github.com/tance-mang" aria-label="GitHub"><i class="fa fa-github"></i></a>
-        <a href="#" aria-label="LinkedIn"><i class="fa fa-linkedin"></i></a>
-        <a href="mailto:hello@example.com" aria-label="Email"><i class="fa fa-envelope"></i></a>
-      </div>
     </div>
-  </footer>
+
+    <footer class="post-foot">
+      <a href="/observe.html">← back to observe</a>
+      <a href="/">tance</a>
+    </footer>
+  </article>
 
   <script src="/js/script.js"></script>
 </body>

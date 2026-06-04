@@ -3,167 +3,67 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About | Tance Mang</title>
-  <meta name="description" content="关于我 - 自我介绍、技术栈、联系方式">
+  <title>About — TANCE</title>
+  <meta name="description" content="About — a person exploring the intersection of technology, creation and thought.">
   <link rel="stylesheet" href="/css/style.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="/" class="logo">
-        <span class="logo-bracket">&lt;</span>Tance<span class="logo-slash">/</span>Mang<span class="logo-bracket">&gt;</span>
-      </a>
-      <nav class="main-nav">
-        <a href="/" class="nav-link">Home</a>
-        <a href="/projects.html" class="nav-link">Projects</a>
-        <a href="/blog.html" class="nav-link">Blog</a>
-        <a href="/about.html" class="nav-link active">About</a>
-      </nav>
-      <button class="mobile-nav-toggle" aria-label="Toggle menu">
-        <span class="fa fa-bars"></span>
-      </button>
-    </div>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html">Create</a>
+      <a href="/observe.html">Observe</a>
+      <a href="/about.html" class="is-current">About</a>
+    </nav>
   </header>
 
-  <main>
-    <section class="page-head">
-      <div class="container">
-        <h1 class="page-title">About</h1>
-        <p class="page-subtitle">关于我的故事、技能与联系方式。</p>
-      </div>
+  <main class="sub-shell">
+    <section class="sub-head">
+      <span class="sub-eyebrow">— About</span>
+      <h1 class="sub-title">A person<br>at the intersection.</h1>
+      <p class="sub-line">Exploring the space where technology, creation and thought overlap. Not a portfolio — a field notebook.</p>
     </section>
 
-    <section class="section">
-      <div class="container about-layout">
-        <aside class="about-side">
-          <div class="avatar-wrap">
-            <div class="avatar-ring"></div>
-            <div class="avatar">
-              <i class="fa fa-user-circle-o"></i>
-            </div>
-          </div>
-          <h2 class="about-name">Tance Mang</h2>
-          <p class="about-role">Security & Full-stack Developer</p>
-          <div class="about-actions">
-            <a href="#" class="btn btn-primary btn-sm">
-              <i class="fa fa-download"></i> 下载简历
-            </a>
-          </div>
-          <div class="about-social">
-            <a href="https://github.com/tance-mang" aria-label="GitHub"><i class="fa fa-github"></i></a>
-            <a href="#" aria-label="LinkedIn"><i class="fa fa-linkedin"></i></a>
-            <a href="mailto:hello@example.com" aria-label="Email"><i class="fa fa-envelope"></i></a>
-          </div>
-        </aside>
-
-        <div class="about-main">
-          <div class="about-block">
-            <h3 class="about-block-title">关于我</h3>
-            <p>
-              我是一名专注于网络安全与全栈开发的工程师，热爱在「写代码」和「破代码」之间来回切换。
-              过去几年里，我从 Python 小项目走到 Java 后端，再到完整的全栈应用上线，
-              一路上的踩坑让我相信：<strong>安全永远是产品的底线，而不是附加题。</strong>
-            </p>
-            <p>
-              业余时间研究 CTF、Web 漏洞与 LLM 应用，把学到的东西写成博客是我整理思路的方式。
-            </p>
-          </div>
-
-          <div class="about-block">
-            <h3 class="about-block-title">技术栈</h3>
-            <div class="skill-grid">
-              <div class="skill-card">
-                <h4 class="skill-name"><i class="fa fa-code"></i> 前端</h4>
-                <div class="tag-list">
-                  <span class="tag">HTML / CSS</span>
-                  <span class="tag">JavaScript</span>
-                  <span class="tag">TypeScript</span>
-                  <span class="tag">React</span>
-                  <span class="tag">Vue 3</span>
-                  <span class="tag">Vite</span>
-                </div>
-              </div>
-              <div class="skill-card">
-                <h4 class="skill-name"><i class="fa fa-server"></i> 后端</h4>
-                <div class="tag-list">
-                  <span class="tag">Java</span>
-                  <span class="tag">Spring Boot</span>
-                  <span class="tag">Python</span>
-                  <span class="tag">FastAPI</span>
-                  <span class="tag">Node.js</span>
-                  <span class="tag">MySQL / Redis</span>
-                </div>
-              </div>
-              <div class="skill-card">
-                <h4 class="skill-name"><i class="fa fa-shield"></i> 网络安全</h4>
-                <div class="tag-list">
-                  <span class="tag">Web 渗透</span>
-                  <span class="tag">CTF</span>
-                  <span class="tag">API Security</span>
-                  <span class="tag">Burp Suite</span>
-                  <span class="tag">Nmap</span>
-                </div>
-              </div>
-              <div class="skill-card">
-                <h4 class="skill-name"><i class="fa fa-rocket"></i> AI / 工具</h4>
-                <div class="tag-list">
-                  <span class="tag">LLM API</span>
-                  <span class="tag">LangChain</span>
-                  <span class="tag">RAG</span>
-                  <span class="tag">Docker</span>
-                  <span class="tag">Linux</span>
-                  <span class="tag">Git</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="about-block">
-            <h3 class="about-block-title">联系方式</h3>
-            <ul class="contact-list">
-              <li>
-                <i class="fa fa-github"></i>
-                <a href="https://github.com/tance-mang" target="_blank" rel="noopener">github.com/tance-mang</a>
-              </li>
-              <li>
-                <i class="fa fa-envelope"></i>
-                <a href="mailto:hello@example.com">hello@example.com</a>
-              </li>
-              <li>
-                <i class="fa fa-linkedin"></i>
-                <a href="#" target="_blank" rel="noopener">LinkedIn</a>
-              </li>
-            </ul>
-          </div>
+    <div class="about-grid">
+      <section class="about-section">
+        <h2 class="about-label">Identity</h2>
+        <div class="about-body">
+          <p>I write code, I read papers, I take notes in the dark. I'm interested in the boundary where security meets aesthetics, where engineering meets thinking.</p>
+          <p>I don't see myself as an expert. I see myself as someone <strong>walking through the field</strong> — looking, building, then looking again.</p>
         </div>
-      </div>
-    </section>
-  </main>
+      </section>
 
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div class="footer-stack">
-        <span class="tag tag-sm">HTML</span>
-        <span class="tag tag-sm">CSS</span>
-        <span class="tag tag-sm">JavaScript</span>
-        <span class="tag tag-sm">Java</span>
-        <span class="tag tag-sm">Python</span>
-        <span class="tag tag-sm">Security</span>
-      </div>
-      <div class="footer-copy">
-        &copy; 2026 Tance Mang · Built with passion in the dark.
-      </div>
-      <div class="footer-social">
-        <a href="https://github.com/tance-mang" aria-label="GitHub"><i class="fa fa-github"></i></a>
-        <a href="#" aria-label="LinkedIn"><i class="fa fa-linkedin"></i></a>
-        <a href="mailto:hello@example.com" aria-label="Email"><i class="fa fa-envelope"></i></a>
-      </div>
+      <section class="about-section">
+        <h2 class="about-label">Field</h2>
+        <div class="about-body">
+          <p>开发 / 网络安全 / AI / 实验性项目 / 工具链 / 偶尔写一些没用却好玩的东西。</p>
+        </div>
+      </section>
+
+      <section class="about-section">
+        <h2 class="about-label">Elsewhere</h2>
+        <dl class="about-rows">
+          <div class="about-row">
+            <dt>GitHub</dt>
+            <dd><a href="https://github.com/tance-mang" target="_blank" rel="noopener">github.com/tance-mang</a></dd>
+          </div>
+          <div class="about-row">
+            <dt>Email</dt>
+            <dd><a href="mailto:hello@example.com">hello@example.com</a></dd>
+          </div>
+          <div class="about-row">
+            <dt>Mood</dt>
+            <dd>silent digital universe</dd>
+          </div>
+        </dl>
+      </section>
     </div>
-  </footer>
+  </main>
 
   <script src="/js/script.js"></script>
 </body>

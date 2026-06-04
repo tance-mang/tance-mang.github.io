@@ -3,101 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Archives | Tance Mang</title>
-  <meta name="description" content="文章归档 - 按时间顺序回顾所有技术文章">
+  <title>Archives — TANCE</title>
   <link rel="stylesheet" href="/css/style.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fork-awesome@1.2.0/css/fork-awesome.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="/" class="logo">
-        <span class="logo-bracket">&lt;</span>Tance<span class="logo-slash">/</span>Mang<span class="logo-bracket">&gt;</span>
-      </a>
-      <nav class="main-nav">
-        <a href="/" class="nav-link">Home</a>
-        <a href="/projects.html" class="nav-link">Projects</a>
-        <a href="/blog.html" class="nav-link active">Blog</a>
-        <a href="/about.html" class="nav-link">About</a>
-      </nav>
-      <button class="mobile-nav-toggle" aria-label="Toggle menu">
-        <span class="fa fa-bars"></span>
-      </button>
-    </div>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html">Create</a>
+      <a href="/observe.html" class="is-current">Observe</a>
+      <a href="/about.html">About</a>
+    </nav>
   </header>
 
-  <main>
-    <section class="page-head">
-      <div class="container">
-        <h1 class="page-title">Archives</h1>
-        <p class="page-subtitle">按时间线回顾所有技术文章。</p>
-      </div>
+  <main class="sub-shell">
+    <section class="sub-head">
+      <span class="sub-eyebrow">— Archives</span>
+      <h1 class="sub-title">All notes,<br>in order.</h1>
+      <p class="sub-line">按时间顺序的全部记录。</p>
     </section>
 
-    <section class="section">
-      <div class="container">
-        <div class="timeline">
-          <div class="timeline-year">
-            <h2 class="timeline-year-label">
-              <span class="timeline-year-num">2026</span>
-              <span class="timeline-year-count">3 篇</span>
-            </h2>
-
-            <div class="timeline-month">
-              <h3 class="timeline-month-label">May · 2026</h3>
-              <ul class="timeline-list">
-                <li>
-                  <span class="timeline-date">05-01</span>
-                  <a href="/2026/05/01/app-story/" class="timeline-link">从小程序到安全驱动的 AP 应用开发复盘</a>
-                  <span class="tag tag-sm">网络安全</span>
-                </li>
-              </ul>
-            </div>
-
-            <div class="timeline-month">
-              <h3 class="timeline-month-label">April · 2026</h3>
-              <ul class="timeline-list">
-                <li>
-                  <span class="timeline-date">04-22</span>
-                  <a href="#" class="timeline-link">现代前端工程化：从 Vite 到 Monorepo 的演进</a>
-                  <span class="tag tag-sm">前端</span>
-                </li>
-                <li>
-                  <span class="timeline-date">04-10</span>
-                  <a href="#" class="timeline-link">本地部署 LLM：从 Ollama 到 vLLM 的踩坑笔记</a>
-                  <span class="tag tag-sm">AI</span>
-                </li>
-              </ul>
-            </div>
-          </div>
+    <section class="entry-list">
+      <a href="/2026/05/01/app-story/" class="entry">
+        <span class="entry-date">2026 · 05 · 01</span>
+        <div class="entry-body">
+          <h2 class="entry-title">从小程序到安全驱动的 AP 应用开发复盘</h2>
+          <p class="entry-line">一次比赛的技术选型转身，以及对安全这件事的重新理解。</p>
         </div>
-      </div>
+        <span class="entry-meta">复盘 <span class="dot">·</span> 8 min</span>
+      </a>
     </section>
   </main>
-
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div class="footer-stack">
-        <span class="tag tag-sm">HTML</span>
-        <span class="tag tag-sm">CSS</span>
-        <span class="tag tag-sm">JavaScript</span>
-        <span class="tag tag-sm">Java</span>
-        <span class="tag tag-sm">Python</span>
-        <span class="tag tag-sm">Security</span>
-      </div>
-      <div class="footer-copy">
-        &copy; 2026 Tance Mang · Built with passion in the dark.
-      </div>
-      <div class="footer-social">
-        <a href="https://github.com/tance-mang" aria-label="GitHub"><i class="fa fa-github"></i></a>
-        <a href="#" aria-label="LinkedIn"><i class="fa fa-linkedin"></i></a>
-        <a href="mailto:hello@example.com" aria-label="Email"><i class="fa fa-envelope"></i></a>
-      </div>
-    </div>
-  </footer>
 
   <script src="/js/script.js"></script>
 </body>
