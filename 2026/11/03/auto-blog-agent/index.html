@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>让 AI 记住我：一个博客运营 Agent 的工程实践 — TANCE</title>
+  <meta name="description" content="从自动写作走向有身份边界、审核机制与长期记忆的博客工作流，记录 Auto Blog Agent 的设计与落地。">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html">Create</a>
+      <a href="/observe.html" class="is-current">Observe</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </header>
+
+  <article class="post-shell">
+    <span class="post-eyebrow">02 / Observe · 项目 / AI / 独立开发</span>
+    <h1 class="post-h1">让 AI 记住我：一个博客运营 Agent 的工程实践</h1>
+    <div class="post-meta">
+      <time datetime="2026-11-03">2026 · 11 · 03</time>
+      <span class="sep">·</span>
+      <span>6 min</span>
+      <span class="sep">·</span>
+      <span>Agent / Python / 开源</span>
+    </div>
+
+    <div class="post-body">
+<p>最近，我在做一个开源项目：Auto Blog Agent。它的起点很实际——平时关注 AI、编程和独立开发，也希望持续记录，但很难每天留出完整的时间去选题、整理资料和写文章。</p>
+<p>我希望把其中重复的工作交给 AI，同时保留属于自己的身份和表达边界。这个目标听起来像“自动写博客”，真正拆开之后，却更接近一个小型内容生产系统：它需要知道该写什么、依据是什么，以及什么时候应该停下来。</p>
+<h2>先定义边界，再谈自动化</h2>
+<p>作为在校大学生，我关注的是 AI 工具、编程实践、开源项目和低成本独立开发。系统可以帮助整理这些方向的公开资料，但不能把我包装成资深工程师，也不能替我编出项目成果、测试结果或使用经历。</p>
+<p>因此，我给项目设定了一个明确前提：身份信息是写作约束，不是虚构个人故事的素材。有资料支撑的技术整理可以进入自动审核；涉及个人经历和观点的内容，需要真实素材，必要时停留在草稿。</p>
+<h2>把写作拆成可以检查的流程</h2>
+<p>项目采用 Python、AI API 和 GitHub Actions。Skill 描述操作规则，Python 程序负责实际执行，Actions 承担定时调度。这三部分各有职责：仅有一个 SKILL.md 文件，并不能让博客每天自行更新。</p>
+<pre><code>读取身份与编辑规则
+  → RSS 发现选题
+  → 历史去重与资料整理
+  → AI 生成文章
+  → 程序检查 + 独立 AI 审核
+  → 保存草稿或按配置发布
+  → 更新历史与预算记录</code></pre>
+<p>长期信息使用 Markdown 文件维护，包括身份、编辑规则、长期方向和素材说明；运行记录则使用 SQLite 保存。这样，写作规则能够被人直接阅读，历史与预算也能由程序查询。</p>
+<h2>审核是一道流程，不是一句提示词</h2>
+<p>当前实现将审核分为两部分。程序检查文章是否包含提供的来源链接、是否引入未经核对的额外链接、是否出现疑似密钥，以及是否与历史内容高度相似。另一次独立模型请求负责对照来源摘录，检查主题、身份和事实支持。</p>
+<p>这仍然有局限。规则可能误判，模型也可能漏掉错误；RSS 摘录更不能替代完整的事实核查。因此，当前对第一人称叙述和代码教程采用保守策略，优先留作草稿。与其为了更新频率强行发布，我更愿意让系统在资料不足时跳过。</p>
+<h2>低成本运行，也需要工程约束</h2>
+<p>项目不要求长期运行服务器，定时任务由 GitHub Actions 唤醒。模型服务通过环境变量配置，写作和审核可以使用不同模型；程序在请求前预留预算，超过每日额度就停止调用。</p>
+<p>发布端采用独立适配的思路。目前已有向 GitHub 仓库新增 Markdown 文件的实现，并通过“不携带旧文件 SHA”的方式拒绝覆盖现有文章。但不同博客的文章结构差异很大：我的博客就是直接维护 HTML 页面，因此接入时还需要处理模板和文章列表，不能把通用 Markdown 输出当成已经完成的部署。</p>
+<h2>现在走到了哪一步</h2>
+<p>项目已在 GitHub 开源，现阶段完成了 Skill 入口、身份与编辑规则配置、RSS 筛选、模型调用接口、独立审核、文本去重、预算限制、Markdown 输出，以及 Actions 工作流和 GitHub 发布接口。</p>
+<p>本地五项测试和 Skill 格式校验已通过，离线 Dry Run 能生成文章与审核报告。这些验证说明基础流程可以执行，但不等于真实模型写作、事实核验和无人值守发布已经完成联调。自动发布目前保持关闭。</p>
+<p>下一步需要补齐更可靠的长期状态存储、完整资料核对和博客适配。当前 Actions 缓存并不是永久数据库；发布成功与历史记录之间也还需要更完善的故障恢复。这些问题会直接影响系统能否长期运行，比增加更多写作模板更值得优先解决。</p>
+<h2>把一个想法做成可以继续维护的项目</h2>
+<p>这次开发中，我与 OpenAI Codex 协作推进了架构、代码、测试和文档。需求来自我的实际使用场景，AI 帮助将它拆成可执行的模块；项目能力是否成立，最终仍要回到测试、运行记录和真实部署来判断。</p>
+<p>对我来说，这也是一次从“调用 AI 生成内容”走向“为 AI 的工作建立规则和反馈”的实践。目标仍然是减少日常维护负担，但前提是让系统的行为可以理解、可以检查，也能在不确定时停下来。</p>
+<p>项目地址：<a href="https://github.com/tance-mang/auto-blog-agent">Auto Blog Agent</a>。代码、配置和当前限制都写在仓库里，欢迎查看和交流。</p>
+</div>
+
+    <footer class="post-foot">
+      <a href="/observe.html">← back to observe</a>
+      <a href="/">tance</a>
+    </footer>
+  </article>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>
