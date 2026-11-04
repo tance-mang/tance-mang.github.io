@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>让 AI 帮忙记录时，怎样保留真实的自己 — TANCE</title>
+  <meta name="description" content="从一次博客整理出发，讨论自动写作中的身份、事实与表达边界。">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html">Create</a>
+      <a href="/observe.html" class="is-current">Observe</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </header>
+
+  <article class="post-shell">
+    <span class="post-eyebrow">02 / Observe · 项目 / AI / 独立开发</span>
+    <h1 class="post-h1">让 AI 帮忙记录时，怎样保留真实的自己</h1>
+    <div class="post-meta">
+      <time datetime="2026-11-04">2026 · 11 · 04</time>
+      <span class="sep">·</span>
+      <span>4 min</span>
+      <span class="sep">·</span>
+      <span>Agent / Python / 开源</span>
+    </div>
+
+    <div class="post-body"><p>整理博客时，我发现一些条目连自己都不记得写过。检查页面后，能确认其中一部分只是链接到 # 的占位内容，并没有实际文章。但它们带着标题、日期和简介，放在列表里，很容易被理解成已经完成的记录。</p><p>这也提醒了我：一个页面看起来完整，与它是否准确反映真实经历，是两件需要分别检查的事。对于正在做的博客 Agent，这个问题尤其具体。</p>
+<h2>身份背景不能代替真实经历</h2><p>我是一名关注 AI、编程和独立开发的大学生。这些信息可以帮助系统判断主题是否合适、表达深度是否自然，却不能证明我实际使用过某个工具、完成过某次部署，或者拥有某种成果。</p><p>所以，公开资料适合整理成工具介绍和技术说明；个人记录则需要对应真实素材。系统知道我接触过 Python，不意味着它可以替我写“在多个生产项目中验证过”。</p>
+<h2>表达可以认真，进度必须准确</h2><p>我希望项目介绍有质量，也能讲清楚设计上的考虑。架构拆分、审核规则和预算控制，本身就值得说明，不需要额外添加用户规模、性能数据或成功案例。</p><p>目前 Auto Blog Agent 跑通了本地测试和离线流程，真实模型与自动发布还需要联调。把两部分放在一起写清楚，读者才知道哪些可以尝试，哪些仍然只是目标。</p>
+<h2>Create 与 Observe 应该承载不同内容</h2><p>Create 用来展示做出来的东西：项目解决什么问题、采用什么结构、目前能运行到哪一步，以及源码在哪里。Observe 用来记录围绕这些工作的观察和思考：遇到了什么问题，哪些边界值得重新考虑。</p><p>同一个项目可以在两边出现，但不必重复介绍。项目页提供可核对的实现信息，思考文章保留上下文与问题。这样读者能看到作品，也能理解作品背后的取舍。</p>
+<h2>允许博客留白</h2><p>希望减少每天写作的负担，是这个项目的出发点。持续更新仍然需要真实素材和足够资料；没有合适内容时，可以跳过，也可以只保留草稿。</p><p>今天的整理先从移除没有详情页的占位条目开始。对于已有实际页面的旧内容，仅凭“记不清”还不足以判断真假，需要再核对原始素材。博客可以慢一点更新，但每一条公开记录都应当有依据。</p></div>
+
+    <footer class="post-foot">
+      <a href="/observe.html">← back to observe</a>
+      <a href="/">tance</a>
+    </footer>
+  </article>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>

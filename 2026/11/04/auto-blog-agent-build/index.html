@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auto Blog Agent：把博客自动化拆成可执行的模块 — TANCE</title>
+  <meta name="description" content="项目结构、运行流程与当前进度：一次基于 Python、Agent Skill 和 GitHub Actions 的开发实践。">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html" class="is-current">Create</a>
+      <a href="/observe.html">Observe</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </header>
+
+  <article class="post-shell">
+    <span class="post-eyebrow">01 / Create · 项目 / 开发</span>
+    <h1 class="post-h1">Auto Blog Agent：把博客自动化拆成可执行的模块</h1>
+    <div class="post-meta">
+      <time datetime="2026-11-04">2026 · 11 · 04</time>
+      <span class="sep">·</span>
+      <span>4 min</span>
+      <span class="sep">·</span>
+      <span>Agent / Python / 开源</span>
+    </div>
+
+    <div class="post-body"><p>最近在推进的 Auto Blog Agent，来自一个实际需求：希望持续更新技术博客，又不想每天重复选题、整理资料和处理发布。项目已经开源，本篇记录目前具体做出了什么，以及接下来需要打通的部分。</p>
+<h2>项目入口：Skill 与程序各司其职</h2><p>仓库保留 SKILL.md，描述身份约束、素材使用方式和执行步骤；实际工作由 Python CLI 承担。支持 Agent Skills 的工具可以读取规则并调用程序，GitHub Actions 则提供独立的调度入口。</p><p>这种拆分让写作规则与执行逻辑可以分别维护。修改身份和编辑偏好时，不必重写程序；执行预算、输出文件和发布检查，也不只依赖模型是否记住提示词。</p>
+<h2>目前已有的处理链路</h2><p>程序从配置的 RSS 来源读取选题，按关键词筛选，与 SQLite 中的历史记录比较，再将来源摘录、身份和编辑规则交给写作模型。正文生成之后，由另一次模型请求独立审核，同时执行程序规则检查。</p><p>输出包括 Markdown 正文与 JSON 审核报告。可能涉及个人叙述、代码执行验证、来源不足或重复内容时，文章会留在草稿路径。模型 API 使用环境变量配置，预算在请求前预留，超过每日上限停止调用。</p>
+<h2>已经验证的范围</h2><p>目前本地五项测试和 Skill 格式校验通过，离线 Dry Run 能输出文章和审核报告。仓库也包含 GitHub Actions 工作流与向 GitHub 仓库新增 Markdown 文件的接口。</p><p>这些结果对应的是基础执行链路。真实模型生成质量、事实核验效果，以及长期无人值守运行还没有完成联调，自动发布仍保持关闭。</p>
+<h2>博客接入暴露出的适配问题</h2><p>这个博客使用 HTML 页面，文章还需要进入 Create、Observe 与 Archives 列表。通用 Markdown 输出不能直接完成这些操作。目前博客更新通过单独的脚本按模板生成页面，再把正文与列表改动放进同一次提交；这部分还没有整合成 Skill 的通用适配器。</p><p>下一步优先解决持久状态、发布恢复和 HTML 博客适配，然后再考虑封面与更多平台。这样每增加一项能力，都能对应到具体可检查的行为。</p><p>源码与配置说明：<a href="https://github.com/tance-mang/auto-blog-agent">tance-mang/auto-blog-agent</a>。项目由我提出需求，与 OpenAI Codex 协作开发。</p></div>
+
+    <footer class="post-foot">
+      <a href="/create.html">← back to create</a>
+      <a href="/">tance</a>
+    </footer>
+  </article>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>
