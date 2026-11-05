@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>给无人值守任务加一份故障报告 — TANCE</title>
+  <meta name="description" content="从博客发布出发，验证独立监测、日志诊断与报告。">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html" class="is-current">Create</a>
+      <a href="/observe.html">Observe</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </header>
+
+  <article class="post-shell">
+    <span class="post-eyebrow">01 / Create · 项目 / 开发</span>
+    <h1 class="post-h1">给无人值守任务加一份故障报告</h1>
+    <div class="post-meta">
+      <time datetime="2026-11-05">2026 · 11 · 05</time>
+      <span class="sep">·</span>
+      <span>3 min</span>
+      <span class="sep">·</span>
+      <span>Agent / Python / 开源</span>
+    </div>
+
+    <div class="post-body"><p>博客发布、视频上传和定时同步可以交给工作流执行。等任务失败，维护者往往还得从头翻日志。Auto Blog Agent 增加了独立的 Workflow Guardian，先把博客工作流的失败整理成一份可以追溯的报告。</p><h2>让监测在发布任务之外运行</h2><p>GitHub Actions 在任务结束后启动独立监测。遇到失败、超时或取消，它从失败日志中匹配线索，在运行摘要和 Markdown 产物里写入初步判断、影响范围和处理建议。报告保留运行链接和尝试次数，原始日志留在 GitHub 的原运行页。</p><h2>演练从一次预期失败开始</h2><p>手动运行 Guardian drill 注入故障。线上验证中，演练按预期失败，独立监测随后成功，产物正确识别了模拟故障并链接回原运行。本地 11 项测试通过，包括限流分类、日志缺失和超时报告。<a href="https://github.com/tance-mang/auto-blog-agent/actions/runs/42051460253">查看线上演练</a>。</p><h2>面向全国开放试用</h2><p>项目采用 MIT 许可。可把同一套监测接到视频发布等其他 GitHub Actions 任务。可选邮件推送通过 SMTP 配置。欢迎分享脱敏案例与复现步骤，帮助改进报告。</p><p><a href="https://github.com/tance-mang/auto-blog-agent">源码与配置</a> · <a href="https://github.com/tance-mang/auto-blog-agent/issues">试用反馈</a> · <a href="mailto:2123759705@qq.com">QQ 邮箱</a> · <a href="mailto:tance.hub@gmail.com">Gmail</a>。由 tance-mang 发起，OpenAI Codex 协作实现与验证。</p></div>
+
+    <footer class="post-foot">
+      <a href="/create.html">← back to create</a>
+      <a href="/">tance</a>
+    </footer>
+  </article>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>

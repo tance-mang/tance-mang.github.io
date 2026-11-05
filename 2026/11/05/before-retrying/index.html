@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>自动化失败后，为什么要先查结果再重跑 — TANCE</title>
+  <meta name="description" content="一次失败信号可能对应两种发布结果。">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html">Create</a>
+      <a href="/observe.html" class="is-current">Observe</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </header>
+
+  <article class="post-shell">
+    <span class="post-eyebrow">02 / Observe · 项目 / AI / 独立开发</span>
+    <h1 class="post-h1">自动化失败后，为什么要先查结果再重跑</h1>
+    <div class="post-meta">
+      <time datetime="2026-11-05">2026 · 11 · 05</time>
+      <span class="sep">·</span>
+      <span>3 min</span>
+      <span class="sep">·</span>
+      <span>Agent / Python / 开源</span>
+    </div>
+
+    <div class="post-body"><p>设想一条视频上传任务。服务端已经收到视频，客户端却在等待响应时超时。工作流显示失败，平台上可能已有这条视频。如果看到红叉就再传一遍，故障可能变成重复发布。博客也有类似情况：文章已提交，但后续部署仍可能失败。</p><h2>报告先交代已经确认的事</h2><p>工作流的结论描述执行过程。文章是否已上线、视频是否已进入平台后台，要去目标端核对。故障报告应把两种状态分开写：一次运行因超时结束是已知事实，发布结果待确认是接手人下一步要查的问题。</p><h2>从故障报告借鉴复现方式</h2><p>一份报告可以把运行链接、尝试次数、症状和下一步放在一起。权限错误就核对令牌与目标仓库，网络超时则先查目标端有没有接收内容。日志暂时拿不到时，可以留下“证据不足”，让后续的人知道哪些判断还需要补证据。</p><p>我希望无人值守任务在出问题时也能把现场交代清楚。这样的报告也方便向维护者反馈：先描述实际影响，再附可复现的线索。博客发布场景的实现和演练已经公开。<a href="https://github.com/tance-mang/auto-blog-agent">查看 Auto Blog Agent</a>。</p></div>
+
+    <footer class="post-foot">
+      <a href="/observe.html">← back to observe</a>
+      <a href="/">tance</a>
+    </footer>
+  </article>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>
