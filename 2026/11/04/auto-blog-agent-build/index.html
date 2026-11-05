@@ -41,7 +41,7 @@
 <h2>博客接入暴露出的适配问题</h2><p>这个博客使用 HTML 页面，文章还需要进入 Create、Observe 与 Archives 列表。通用 Markdown 输出不能直接完成这些操作。目前博客更新通过单独的脚本按模板生成页面，再把正文与列表改动放进同一次提交；这部分还没有整合成 Skill 的通用适配器。</p><p>下一步优先解决持久状态、发布恢复和 HTML 博客适配，然后再考虑封面与更多平台。这样每增加一项能力，都能对应到具体可检查的行为。</p><h2>11 月 5 日更新 · 给无人值守任务加一份故障报告</h2>
 <p>定时任务失败后，我最想知道的是卡在哪一步、内容有没有发出去，以及下一步该检查什么。Auto Blog Agent 现在有一个独立的监测工作流。它在发布任务结束后读取运行结果，在失败时按规则诊断，并在 GitHub Actions 留下 Markdown 报告。</p>
 <p>比如，日志里出现 GitHub 拒绝写入的特征时，报告会建议检查目标仓库、令牌权限和分支规则。只凭失败结果无法确定文章是否已经发出，因此重跑前要先核对目标站点。邮件推送可按需开启。</p>
-<p>这一版从博客发布出发，也欢迎用在视频发布和其他定时工作流上。项目以 MIT 许可面向全国开放试用，欢迎通过 <a href="https://github.com/tance-mang/auto-blog-agent/issues">GitHub Issues</a> 提交案例和合作建议。</p><p>源码与配置说明：<a href="https://github.com/tance-mang/auto-blog-agent">tance-mang/auto-blog-agent</a>。项目由我提出需求，与 OpenAI Codex 协作开发。</p></div>
+<p>这一版从博客发布出发，也欢迎用在视频发布和其他定时工作流上。项目以 MIT 许可面向全国开放试用，欢迎通过 <a href="https://github.com/tance-mang/auto-blog-agent/issues">GitHub Issues</a> 提交案例和合作建议。也欢迎发邮件到 <a href="mailto:2123759705@qq.com">QQ 邮箱</a>或 <a href="mailto:tance.hub@gmail.com">Gmail</a>。</p><p>源码与配置说明：<a href="https://github.com/tance-mang/auto-blog-agent">tance-mang/auto-blog-agent</a>。项目由我提出需求，与 OpenAI Codex 协作开发。</p></div>
 
     <footer class="post-foot">
       <a href="/create.html">← back to create</a>
