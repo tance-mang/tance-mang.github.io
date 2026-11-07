@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>在 Codex 里找回 ChatGPT 的项目讨论 — TANCE</title>
+  <meta name="description" content="一次桌面端验证，看看网页聊天里的项目决策能不能和代码记录一起成为博客素材。">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html" class="is-current">Create</a>
+      <a href="/observe.html">Observe</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </header>
+
+  <article class="post-shell">
+    <span class="post-eyebrow">01 / Create · 项目 / AI / 独立开发</span>
+    <h1 class="post-h1">在 Codex 里找回 ChatGPT 的项目讨论</h1>
+    <div class="post-meta">
+      <time datetime="2026-11-07">2026 · 11 · 07</time>
+      <span class="sep">·</span>
+      <span>3 min</span>
+      <span class="sep">·</span>
+      <span>Agent / Python / 开源</span>
+    </div>
+
+    <div class="post-body">
+<p>做 Auto Blog Agent 时，最早想到的是从代码和提交里整理开发经历。后来发现，代码只留下了最后做成的部分。选方案之前问过什么、为什么调整方向，往往留在 ChatGPT 网页聊天里。比如把个人技术博客限定为产品范围，以及让文章语言跟随作者的写作习惯，这些都先出现在讨论中。</p>
+<h2>这次实际查到了什么</h2>
+<p>我在 Codex 桌面端和 Codex 做了一次验证。桌面端返回了 ChatGPT 历史聊天列表，我们选取其中一条，再确认能够读到一轮消息。至此验证的是两步：能定位聊天，也能读取对应内容。开源仓库里的 Skill 还没有集成这套流程，GitHub Actions 的运行环境也需要自己的素材入口。</p>
+<h2>把聊天和开发证据放在一起</h2>
+<p>我想从一个具体项目开始，比如只找最近两周与 Auto Blog Agent 有关的记录。先根据标题和时间定位对话，再读取相关段落，筛出值得留下的三类信息：当时遇到的问题、明确做过的决定、后来发生的变化。闲聊、重复讨论和跟项目无关的个人细节可以直接跳过。</p>
+<p>写文章时还需要和开发记录对照。例如，讨论里提出「用已有文章判断语言」，可以用来解释设计动机。项目的 <a href="https://github.com/tance-mang/auto-blog-agent/blob/main/CHANGELOG.md">变更日志</a>记录了随后实现的范围：可以明确设置语言，也可以根据用户提供的正文样本识别中英文。把两者接起来，就能讲清楚为什么做、实际做到了哪一步。</p>
+<h2>下一步先做成一个可触发的草稿入口</h2>
+<p>理想的用法是在 Codex 里给出项目名和日期范围，请它结合相关聊天、代码和测试整理草稿。草稿附一份供自己检查的来源清单，指出哪些结论来自聊天、哪些有开发证据。项目实绩可以进入 Create，决策背后的取舍可以写进 Observe。这次验证让这条路径有了一个起点，剩下的是把检索、筛选和草稿预览接起来。</p>
+</div>
+
+    <footer class="post-foot">
+      <a href="/create.html">← back to create</a>
+      <a href="/">tance</a>
+    </footer>
+  </article>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>

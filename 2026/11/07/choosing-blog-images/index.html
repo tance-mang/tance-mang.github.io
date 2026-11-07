@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>博客配图，哪些交给 AI，哪些留给自己选 — TANCE</title>
+  <meta name="description" content="同一篇博客可以让 AI 找封面，也可以由作者挑一段对话放进正文。">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html">Create</a>
+      <a href="/observe.html" class="is-current">Observe</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </header>
+
+  <article class="post-shell">
+    <span class="post-eyebrow">02 / Observe · 项目 / AI / 独立开发</span>
+    <h1 class="post-h1">博客配图，哪些交给 AI，哪些留给自己选</h1>
+    <div class="post-meta">
+      <time datetime="2026-11-07">2026 · 11 · 07</time>
+      <span class="sep">·</span>
+      <span>3 min</span>
+      <span class="sep">·</span>
+      <span>Agent / Python / 开源</span>
+    </div>
+
+    <div class="post-body">
+<p>最近在想博客配图时，我碰到了两种很不一样的需求。有时文章已经写完，只想尽快找到一张合适的封面。有时想发的就是手里那张图，比如和 AI 讨论方案时的一段界面截图。前一种需要帮忙找，后一种需要保留自己挑选的细节。</p>
+<h2>让自动找图有明确的交付</h2>
+<p>如果点「AI 配图」，我希望看到几张候选，以及每张图适合放在哪一段。候选项应带原始链接和使用条件，方便检查能否用于公开博客。找到合适的图后，裁剪尺寸、压缩、命名和补充替代文本都可以一起处理。没有合适的候选时，文章依然可以先按纯文字排版。</p>
+<h2>想分享的是对话中的某个转折</h2>
+<p>如果自己提供截图，我更在意哪几句话会被读者看到。拿 Auto Blog Agent 举例，可以挑出讨论文章语言的几轮，把从「按地区猜语言」转到「看已有正文和作者设置」的思路讲清楚。原界面有现场感，遇到长截图时，也可以把选中的消息整理成更易读的对话摘录，保留说话人，标明省略的地方。</p>
+<p>AI 可以标记可能需要遮挡的信息，给出裁剪建议，并把处理后的图片插到文章里。我想在预览时亲自看一遍最终画面，因为是否公开一句话、一个头像或一段项目细节，取决于自己愿意分享多少。</p>
+<h2>两个入口，共用一次预览</h2>
+<p>同一篇文章可以用自动找到的图做封面，在正文放自己挑的截图。草稿预览应该展示读者最终看到的图片和说明。这样，我可以一次确认文章和图片的公开范围，把重复的处理工作交给程序。</p>
+<p>这还是配图功能的设计。先从本地图和对话截图入手，可以尽早验证选图、遮挡、预览这一段是否顺手。之后再接自动找图，沿用同一套插入和预览方式。</p>
+</div>
+
+    <footer class="post-foot">
+      <a href="/observe.html">← back to observe</a>
+      <a href="/">tance</a>
+    </footer>
+  </article>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>
