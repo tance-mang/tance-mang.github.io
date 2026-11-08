@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>读懂 Python 版本状态：从 3.10 结束支持说起 — TANCE</title>
+  <meta name="description" content="根据 Python 开发者指南，梳理当前各版本所处阶段，以及 3.10 结束支持后该看哪些官方信息。">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html">Create</a>
+      <a href="/observe.html" class="is-current">Observe</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </header>
+
+  <article class="post-shell">
+    <span class="post-eyebrow">02 / Observe · 学习 / 开源</span>
+    <h1 class="post-h1">读懂 Python 版本状态：从 3.10 结束支持说起</h1>
+    <div class="post-meta">
+      <time datetime="2026-11-08">2026 · 11 · 08</time>
+      <span class="sep">·</span>
+      <span>3 min</span>
+      <span class="sep">·</span>
+      <span>Python / 版本 / 官方文档</span>
+    </div>
+
+    <div class="post-body">
+
+      <p>选择 Python 版本时，最需要先确认的不是「最新」，而是这个版本还处在哪个维护阶段。官方在 <a href="https://devguide.python.org/versions/">Status of Python versions</a> 页面给出了统一口径：当前 <code>main</code> 面向未来的 3.16，并注明各分支的首发日期、结束支持日期与发布经理。</p>
+
+      <h2>3.10 已经进入 end-of-life</h2>
+
+      <p>同一份表格把 3.10 标为 <strong>end-of-life</strong>：首发于 2021-10-04，结束支持日期为 2026-10-01。按页面说明，进入 end-of-life 后，发布周期冻结，不再接受进一步改动。这意味着继续依赖 3.10 运行环境时，不能再指望官方安全修复窗口。</p>
+
+      <h2>现在还在支持的分支怎么读</h2>
+
+      <p>截至该页面当前内容，仍在支持的分支包括：</p>
+      <ul>
+        <li><strong>3.15</strong>：bugfix，首发 2026-10-09，计划结束支持约 2031-10</li>
+        <li><strong>3.14</strong>：bugfix，首发 2025-10-07，计划结束支持约 2030-10</li>
+        <li><strong>3.13</strong>：security，首发 2024-10-07，计划结束支持约 2029-10</li>
+        <li><strong>3.12</strong>：security，首发 2023-10-02，计划结束支持约 2028-10</li>
+        <li><strong>3.11</strong>：security，首发 2022-10-24，计划结束支持约 2027-10</li>
+      </ul>
+      <p>页面还说明：表格中斜体日期属于计划时间，发布经理可以按需要调整。核对版本时应以该页面与对应 PEP 为准，而不是二手摘要。</p>
+
+      <h2>五个阶段分别意味着什么</h2>
+
+      <p>开发者指南按 <a href="https://peps.python.org/pep-0602/">PEP 602</a> 描述了五个阶段。粗略理解可以记这几点：</p>
+      <ul>
+        <li><strong>feature</strong>：可接受新特性；当前 <code>main</code>（未来 3.16）处于这一阶段</li>
+        <li><strong>prerelease</strong>：首个 beta 之后，不再塞新特性，但仍可修特性与缺陷</li>
+        <li><strong>bugfix</strong>：正式发布后接受缺陷与安全修复，大约每两个月有二进制发布</li>
+        <li><strong>security</strong>：通常两年后只接受安全修复，且不再发布二进制包</li>
+        <li><strong>end-of-life</strong>：约五年后支持结束，仓库不再继续变更</li>
+      </ul>
+
+      <h2>写自动化或部署脚本时怎么用这份表</h2>
+
+      <p>如果项目声明「支持的 Python 版本」，最好直接对齐官方状态：把仍在 bugfix / security 的版本写进矩阵，把已经 end-of-life 的版本从默认支持里拿掉，并在文档里链回官方版本页。这样读者可以自己核对日期，而不是依赖文章里的转述。CPython 的发布说明也会出现在 <a href="https://github.com/python/cpython/releases">cpython releases</a>；阅读时仍应以版本状态页的阶段定义为准。</p>
+
+      <blockquote>
+        本文只整理官方公开表格与阶段定义，不涉及个人升级经历、性能测试或具体业务迁移结果。
+      </blockquote>
+
+    </div>
+
+    <footer class="post-foot">
+      <a href="/observe.html">← back to observe</a>
+      <a href="/">tance</a>
+    </footer>
+  </article>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>
