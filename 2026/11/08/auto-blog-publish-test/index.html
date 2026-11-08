@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>自动发博客：一次按配置记录试发的练习 — TANCE</title>
+  <meta name="description" content="记录这次安装 auto-blog-agent skill、接上工作日例行，以及向 tance-mang.github.io 试发时如何改掉独立选题。">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html" class="is-current">Create</a>
+      <a href="/observe.html">Observe</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </header>
+
+  <article class="post-shell">
+    <span class="post-eyebrow">01 / Create · 项目 / 测试</span>
+    <h1 class="post-h1">自动发博客：一次按配置记录试发的练习</h1>
+    <div class="post-meta">
+      <time datetime="2026-11-08">2026 · 11 · 08</time>
+      <span class="sep">·</span>
+      <span>3 min</span>
+      <span class="sep">·</span>
+      <span>Agent / 发布 / 练习</span>
+    </div>
+
+    <div class="post-body">
+
+      <p>这是一次「自动发博客」的练习记录。下面只写这次配置会话里做过的步骤，以及已经能核对到的结果。</p>
+
+      <h2>安装 skill，并接上工作日例行</h2>
+
+      <p>这次会话安装了 auto-blog-agent skill，并接上一条工作日例行，用来按这个流程向个人站点发文章。目标仓库是 <a href="https://github.com/tance-mang/tance-mang.github.io">tance-mang.github.io</a>。</p>
+
+      <h2>第一次试发用了独立选题</h2>
+
+      <p>试发时提交的草稿是一篇 Observe 文章，题目是「读懂 Python 版本状态：从 3.10 结束支持说起」。页面放在 <code>2026/11/08/python-version-status/index.html</code>，并被加进 <code>observe.html</code> 和 <code>archives/index.html</code>。改动在分支上打开了 <a href="https://github.com/tance-mang/tance-mang.github.io/pull/1">pull request #1</a>，没有直接推到 <code>main</code>。</p>
+
+      <h2>选题改为聊天和工作记录</h2>
+
+      <p>随后的说明是：不要做独立选题。文章必须来自和作者的聊天或工作记录，而不是 RSS 选题。Python 版本状态这篇因此不保留。</p>
+
+      <h2>写作不使用 AI_API_KEY</h2>
+
+      <p>同一条说明还写明：这条链路不需要 <code>AI_API_KEY</code>，因为正文由 Grok Bot 直接写。</p>
+
+      <h2>这次留下的页面</h2>
+
+      <p>按更正后的范围，保留的是本篇 Create 练习记录，路径为 <code>2026/11/08/auto-blog-publish-test/index.html</code>。列表改动在 <code>create.html</code> 和 <code>archives/index.html</code>。<code>observe.html</code> 恢复为不含那条 Python 版本状态入口。上面的 pull request 改为提交这篇记录。本文不把「已经合并并出现在线上站点」写成结果，因为记录时该请求还未合并。</p>
+
+    </div>
+
+    <footer class="post-foot">
+      <a href="/create.html">← back to create</a>
+      <a href="/">tance</a>
+    </footer>
+  </article>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>
