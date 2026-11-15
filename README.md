@@ -57,7 +57,7 @@ node tools/serve.mjs          # http://localhost:8080
 
 无需 `npm install`，没有构建步骤。`tools/serve.mjs` 的行为对齐 GitHub Pages：目录 URL 解析到 `index.html`，未知路径返回真实的 `404.html`，文件每次请求都从磁盘读取。
 
-## 🗺️ 站点结构
+## 📁 站点结构
 
 ```
 index.html                    12 区块首页
@@ -97,7 +97,7 @@ feed.xml sitemap.xml robots.txt LICENSE CHANGELOG.md
 - 布局是一次性力导向松弛后固定，窗口变化只做重映射，不重复迭代。
 - 标签按碰撞裁剪，避免糊成文字墙；无法使用 Canvas 时有等价的芯片列表作为回退。
 
-## 🛠️ 工具与自检
+## 🔧 工具与自检
 
 ```bash
 node tools/check_site.mjs             # 结构自检：链接、占位符、标签闭合、发布标记、联系方式一致性
@@ -181,7 +181,7 @@ node tools/serve.mjs                  # 本地服务器（对齐 GitHub Pages �
 - 留言与纠错：[仓库 Issues](https://github.com/tance-mang/tance-mang.github.io/issues)
 - 措辞约定：只写 Personal / Business，不使用「私人邮箱」「工作室邮箱」「官方商务邮箱」「企业邮箱」这类把个人品牌说成机构的称呼；商务邮箱不附带任何尚不存在的商业成果承诺。
 
-## ⚖️ 许可证
+## 📃 许可证
 
 站点代码与工具（HTML / CSS / JS、`tools/`、`data/`）采用 [MIT](LICENSE) © 2026 tance-mang，可自由使用、修改、二次分发。
 
