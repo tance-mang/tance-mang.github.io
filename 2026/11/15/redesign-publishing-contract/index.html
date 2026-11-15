@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>博客可以大改，发文章的路得留着 — TANCE · Neural Orbit</title>
+  <meta name="description" content="记一次博客改版里的取舍，关于视觉、静态 HTML 和原来的发布方式。">
+  <meta name="theme-color" content="#07050D">
+  <link rel="canonical" href="https://tance-mang.github.io/">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="博客可以大改，发文章的路得留着 — TANCE">
+  <meta property="og:description" content="记一次博客改版里的取舍，关于视觉、静态 HTML 和原来的发布方式。">
+  <meta property="og:site_name" content="TANCE · Neural Orbit">
+  <meta name="twitter:card" content="summary">
+  <link rel="alternate" type="application/rss+xml" title="TANCE · Neural Orbit" href="/feed.xml">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2307050D'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23D6AAFF'/%3E%3Cellipse cx='16' cy='16' rx='13' ry='5' fill='none' stroke='%239D70FF' stroke-width='1.4' transform='rotate(-24 16 16)'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="bg-veil"></div>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+  <div class="bg-grain"></div>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html" class="is-current">Create</a>
+      <a href="/observe.html">Observe</a>
+      <a href="/projects/">Projects</a>
+      <a href="/archives/">Archive</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </header>
+
+  <article class="post-shell">
+    <span class="post-eyebrow">01 / Create · 博客 / 开发</span>
+      <h1 class="post-h1">博客可以大改，发文章的路得留着</h1>
+      <div class="post-meta">
+        <time datetime="2026-11-15">2026 · 11 · 15</time>
+        <span class="sep">·</span>
+        <span>3 min</span>
+        <span class="sep">·</span>
+        <span>博客 / 开发</span>
+      </div>
+
+      <div class="post-body">
+<p>最近又在折腾博客首页。我喜欢现在那层黑紫色背景，但往下翻，项目、时间线和主题都长得差不多。尤其是最后一排只剩两张卡片的时候，后面的空位怎么看都像在等我填满。我也不想为了让格子好看，先编几个主题放上去。</p>
+<p>聊到要不要换框架的时候，我才意识到，改版还有一个地方比首页更容易被忽略：文章怎么发上来。我现在的站点是静态 HTML，Auto Blog Agent 有一套对应的发布方式。它按模板生成正文，再把链接写进对应栏目和归档。换框架会牵动两个仓库，连原来一次提交能完成的事情都得重新接上。</p>
+<h2>先把这条路画出来</h2><p>对我来说，最实际的检查就是拿一篇新文走一遍：正文能打开，Create 或 Observe 能点到它，归档和 RSS 也能找到。现在仓库里已经有站点检查和 feed 生成脚本。正文模板、栏目列表和归档页，是这次改版里需要保留的约定。</p>
+<h2>首页的变化从已有内容里长出来</h2><p>我很喜欢 Fragments 里几张高低不同的摘录，看到它们才觉得这个博客有一点自己的样子。以后有新文章，可以从里面选真正有意思的句子，读者点过去还能看到前后文。主题多的时候自然展开，少的时候也有自己的排法。我想要的页面大概就是这样：值得看的东西有地方放，暂时没有的地方也不用急着填。</p>
+      </div>
+
+    <footer class="post-foot">
+      <a href="/create.html">← back to create</a>
+      <a href="/">tance</a>
+    </footer>
+  </article>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>
