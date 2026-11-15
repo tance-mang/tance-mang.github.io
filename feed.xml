@@ -5,10 +5,34 @@
     <link>https://tance-mang.github.io/</link>
     <description>做出来的东西和想过的事情，放在同一个站点里。 Create 与 Observe 两侧的技术记录与思考。</description>
     <language>zh-CN</language>
-    <lastBuildDate>Sun, 15 Nov 2026 15:16:10 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 15 Nov 2026 15:28:23 GMT</lastBuildDate>
     <managingEditor>tance_mang@qq.com (tance-mang)</managingEditor>
     <webMaster>tance_mang@qq.com (tance-mang)</webMaster>
     <atom:link href="https://tance-mang.github.io/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>博客可以大改，发文章的路得留着</title>
+      <link>https://tance-mang.github.io/2026/11/15/redesign-publishing-contract/</link>
+      <guid isPermaLink="true">https://tance-mang.github.io/2026/11/15/redesign-publishing-contract/</guid>
+      <pubDate>Sun, 15 Nov 2026 04:00:00 GMT</pubDate>
+      <description>记一次博客改版里的取舍，关于视觉、静态 HTML 和原来的发布方式。</description>
+      <category>博客 / 开发</category>
+    </item>
+    <item>
+      <title>我想让《消费陷阱》的街景能逛起来</title>
+      <link>https://tance-mang.github.io/2026/11/15/spending-trap-street/</link>
+      <guid isPermaLink="true">https://tance-mang.github.io/2026/11/15/spending-trap-street/</guid>
+      <pubDate>Sun, 15 Nov 2026 04:00:00 GMT</pubDate>
+      <description>从留白、蒙层和鼠标视差说起，记录我对这款 2D 游戏首页的修改想法。</description>
+      <category>游戏 / 设计</category>
+    </item>
+    <item>
+      <title>我想先做，再看看自己会走到哪</title>
+      <link>https://tance-mang.github.io/2026/11/15/room-to-change-direction/</link>
+      <guid isPermaLink="true">https://tance-mang.github.io/2026/11/15/room-to-change-direction/</guid>
+      <pubDate>Sun, 15 Nov 2026 04:00:00 GMT</pubDate>
+      <description>从给工作室写介绍说起，关于现在做的东西和以后可能会变的方向。</description>
+      <category>思考 / 随笔</category>
+    </item>
     <item>
       <title>如果科技能改造整个宇宙</title>
       <link>https://tance-mang.github.io/2026/11/08/universe-thoughts/</link>

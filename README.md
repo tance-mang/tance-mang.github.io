@@ -9,7 +9,7 @@
 
 [![Live](https://img.shields.io/badge/live-tance--mang.github.io-9D70FF)](https://tance-mang.github.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Articles](https://img.shields.io/badge/articles-9-brightgreen)](archives/index.html)
+[![Articles](https://img.shields.io/badge/articles-12-brightgreen)](archives/index.html)
 [![Projects](https://img.shields.io/badge/projects-10-blue)](projects/index.html)
 [![Build](https://img.shields.io/badge/build-none-lightgrey)](#-内容如何自动更新)
 [![Issues Welcome](https://img.shields.io/badge/issues-welcome-success)](https://github.com/tance-mang/tance-mang.github.io/issues)
@@ -42,7 +42,7 @@
 ## ✨ 这个站点在解决什么
 
 - **静态站也能自动汇总**：浏览器在运行时读取 `create.html`、`observe.html`、`archives/index.html` 的文章列表，派生出首页卡片、时间线、思想碎片、主题概况与主题索引、档案搜索、相关文章与三维星域。新增一篇文章不需要改第二遍文件。
-- **改版不能伤害历史**：9 篇文章的地址、正文与发布时间保持不变；本轮只给页面外壳补上背景层与统一导航（每个文件 +4 行装饰性标记），新的阅读体验（目录侧栏、进度条、代码复制、仓库卡片、上一篇下一篇）由运行时脚本注入。
+- **改版不能伤害历史**：改版前 9 篇文章的地址、正文与发布时间保持不变，只给页面外壳补上背景层与统一导航（每个文件 +4 行装饰性标记）；改版期间 Auto Blog Agent 又发布了 3 篇，用的是同一套模板。新的阅读体验（目录侧栏、进度条、代码复制、仓库卡片、上一篇下一篇）全部由运行时脚本注入。
 - **自动化必须可验证**：博客由 [Auto Blog Agent](https://github.com/tance-mang/auto-blog-agent) 自动发布，所以发布契约在仓库里有专门的回归测试，而不是靠人记住。
 - **不装作有后端**：站点只呈现已经存在的东西——没有真实数据的区块留白，仓库是私有的就写私有，不给访客一个打不开的链接。
 - **交互是真的**：3D 星域的旋转缩放与节点面板、档案筛选、复制按钮、阅读进度都是可操作的代码，不是静态截图。
@@ -60,7 +60,7 @@ node tools/serve.mjs          # http://localhost:8080
 ## 📁 站点结构
 
 ```
-index.html                    12 区块首页
+index.html                    13 区块首页
 create.html observe.html      两个内容入口，也是文章列表的真实存放处
 archives/index.html           档案库（关键词 + 年份 + 分类 + 主题筛选）
 about.html                    个人数字档案，含 #contact 联系卡片
@@ -99,7 +99,7 @@ feed.xml sitemap.xml robots.txt LICENSE CHANGELOG.md
 首页 `#constellation-section` 不是装饰，也不是平面力导图：它是一个真的三维场。
 
 - **三层纵深**：主题壳（0.5）、项目壳（0.84）、记录壳（1.14）。记录与项目按所属主题方向聚簇，前中后景由透视与远近衰减区分，绘制顺序按深度排序（远→近）。
-- **数据来源只有站内真实内容**：主题取自 `content.tagMap()`，项目取自 `data/projects.json`，记录取自文章索引；连线来自同一篇文章、同一仓库或共现两次以上的主题。当前规模 17 主题 / 10 项目 / 9 记录 / 96 连线。
+- **数据来源只有站内真实内容**：主题取自 `content.tagMap()`，项目取自 `data/projects.json`，记录取自文章索引；连线来自同一篇文章、同一仓库或共现两次以上的主题。当前规模 44 节点 / 105 连线（22 个主题 + 10 个项目 + 12 篇记录）。
 - **交互**：鼠标与触摸拖动旋转（带惯性衰减）、滚轮与双指缩放、缓慢自转（交互后暂停）、点击节点、方向键在空间中就近步进、Enter 打开节点、Esc 复位。
 - **节点简介面板**：点击任意节点后，星图**下方**的卡片显示名称、一两句说明（主题用 `data/site.json` 的 `topicNotes`，项目用 tagline 与状态，记录用摘要）和一个跳转按钮。不弹窗、不遮挡页面。
 - 无法使用 Canvas 时退化为芯片列表，内容与链接保持一致。
@@ -119,7 +119,7 @@ node tools/serve.mjs                  # 本地服务器（对齐 GitHub Pages �
 
 | 命令 | 退出码 | 结果 |
 | --- | --- | --- |
-| `node tools/check_site.mjs` | 0 | 28 个 HTML 页面 · 9 篇文章 · 10 个项目 · feed 9 条 · sitemap 26 条 |
+| `node tools/check_site.mjs` | 0 | 31 个 HTML 页面 · 12 篇文章 · 10 个项目 · feed 12 条 · sitemap 29 条 |
 | `python tools/test_publish_contract.py` | 0 | 9 项测试全部通过（模板逐字节比对 + 列表页标记 + 插入后可解析） |
 | `node tools/sync-github.mjs --dry-run` | 0 | 10/10 仓库可达（7 rest + 3 gh 私有），本轮无字段差异 |
 | Chrome 性能轨迹（首页） | — | LCP 512 ms · CLS 0.00 |

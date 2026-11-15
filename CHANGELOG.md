@@ -24,7 +24,7 @@
 - 全站文案重写：删除 `A universe of ideas, code and consciousness.`（该句此前已进入 `feed.xml` 的频道描述）、`Turning ideas into reality`、`Thoughts, learning and journeys`、`探索技术与观察的边界` 等模板化表述；About / Create / Observe / Archive / Projects / Orbit / 404 的标题、描述与 og 文案改为陈述事实的语气。
 - **`/orbit/` 重新定位为联系与内容入口**：删除 Member / Badge / Email push / Payment 四行「尚未开通」条目与全部相关解释文案，新增 RECORDS 一行指向 `/archives/`；按钮改为 Follow on GitHub / RSS / Browse records，底部保留 Personal 与 Business 两个邮箱。首页 ORBIT 区块同步为相同结构，并删除「不展示粉丝数」「邮件推送未接入」这类向访客解释功能缺失的句子。
 - 私有仓库如实呈现：`data/projects.json` 新增 `visibility` 字段，3 个私有仓库的项目页按钮退化为「仓库未公开 · 没有可访问的链接」，卡片与星图面板标注「私有仓库」，首页作品区文案不再声称数据全部来自公开仓库。
-- 9 篇文章的页面外壳统一：补上背景层与 5 项主导航（Create / Observe / Projects / Archive / About）。正文、标题、时间、标签、URL 均未改动。
+- 改版前 9 篇文章的页面外壳统一：补上背景层与 5 项主导航（Create / Observe / Projects / Archive / About）。正文、标题、时间、标签、URL 均未改动。改版期间 Auto Blog Agent 通过原有发布契约又发布了 3 篇（`/2026/11/15/` 三条），新文章直接取自统一后的模板，站点现为 12 篇文章 / 31 个页面；星图节点随之自动增长到 44 个、连线 105 条，无需人工干预。
 
 **修复**
 

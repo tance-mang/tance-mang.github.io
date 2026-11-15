@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我想让《消费陷阱》的街景能逛起来 — TANCE · Neural Orbit</title>
+  <meta name="description" content="从留白、蒙层和鼠标视差说起，记录我对这款 2D 游戏首页的修改想法。">
+  <meta name="theme-color" content="#07050D">
+  <link rel="canonical" href="https://tance-mang.github.io/">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="我想让《消费陷阱》的街景能逛起来 — TANCE">
+  <meta property="og:description" content="从留白、蒙层和鼠标视差说起，记录我对这款 2D 游戏首页的修改想法。">
+  <meta property="og:site_name" content="TANCE · Neural Orbit">
+  <meta name="twitter:card" content="summary">
+  <link rel="alternate" type="application/rss+xml" title="TANCE · Neural Orbit" href="/feed.xml">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2307050D'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23D6AAFF'/%3E%3Cellipse cx='16' cy='16' rx='13' ry='5' fill='none' stroke='%239D70FF' stroke-width='1.4' transform='rotate(-24 16 16)'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="bg-veil"></div>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+  <div class="bg-grain"></div>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html" class="is-current">Create</a>
+      <a href="/observe.html">Observe</a>
+      <a href="/projects/">Projects</a>
+      <a href="/archives/">Archive</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </header>
+
+  <article class="post-shell">
+    <span class="post-eyebrow">01 / Create · 游戏 / 设计</span>
+      <h1 class="post-h1">我想让《消费陷阱》的街景能逛起来</h1>
+      <div class="post-meta">
+        <time datetime="2026-11-15">2026 · 11 · 15</time>
+        <span class="sep">·</span>
+        <span>3 min</span>
+        <span class="sep">·</span>
+        <span>游戏 / 设计</span>
+      </div>
+
+      <div class="post-body">
+<p>改《消费陷阱》首页时，我遇到一个挺具体的问题。中间是我想要的夜晚街道，有橱窗和灯光。放到网页里之后，它缩成了中间一块，四周还有很多空。我原本想在边上做点设计，结果浅色背景和白色蒙层叠上去，街景和周围还是各过各的。</p>
+<p>我后来想，如果两边空出来的是同一条街的延伸，感觉应该会不一样。比如让店旁的植物和光影延伸到边缘，下面的路继续往外走。边距可以保留一点，主场景还是占住视线。这样也比较接近我想做的那种 2D 贴画感。</p>
+<h2>鼠标动了，街道还可以怎么回应</h2><p>讨论时我提到，当前画面已经会跟随鼠标有一点变化，但我看着还是觉得不够。可能是因为画面整体在动，我还是只看见了一张图。要是近处的树枝和远处的灯有不同的移动幅度，或者某个橱窗能点进去，鼠标经过一块地方就有了意义。</p>
+<p>我也拿它和那些很流行的 3D 游戏比较过，想知道自己的 2D 游戏到底能靠什么让人记住。现在我想先看一个更小的问题：玩家看到这个页面时，会不会想走进第一家店？如果这一步有了，街景就开始参与游戏了。至于场景分层和环境反馈，我还在想该怎么做。</p><p><a href="/projects/spending-trap/">《消费陷阱》项目页</a></p>
+      </div>
+
+    <footer class="post-foot">
+      <a href="/create.html">← back to create</a>
+      <a href="/">tance</a>
+    </footer>
+  </article>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>
