@@ -304,12 +304,15 @@
   content.SMALL = SMALL;
 
   /* ------------------------------------------------------------------ */
-  /* 2. Cosmos engine — upgraded from the original neural-thread field    */
+  /* 2. Cosmos engine — a depth-layered star field                        */
   /* ------------------------------------------------------------------ */
-  // Tuning knobs per device tier.
+  // The atmosphere (galactic band, orbit arcs) is CSS and costs no canvas
+  // frame time. This layer only draws stars: three depth bands, a little
+  // stardust, and thin threads between the near stars. No per-frame
+  // gradients and no travelling glow orbs — those were the dropped frames.
   var TIERS = {
-    full: { nodes: 90, link: 170, trail: 3, trailPts: 140, dust: 130, dpr: 2 },
-    lite: { nodes: 46, link: 140, trail: 2, trailPts: 90, dust: 70, dpr: 1.6 }
+    full: { nodes: 165, link: 128, dust: 60, dpr: 2 },
+    lite: { nodes: 70, link: 104, dust: 20, dpr: 1.6 }
   };
 
   function makeCosmos(canvas, opts) {
@@ -320,8 +323,8 @@
     var tier = (opts.lite || SMALL) ? TIERS.lite : TIERS.full;
     var cfg = Object.assign({}, tier, opts.cfg || {});
     var w = 0, h = 0, dpr = 1;
-    var nodes = [], dust = [], trails = [];
-    var raf = null, t0 = 0, visible = true;
+    var far = [], mid = [], near = [], dust = [], linked = [];
+    var raf = null;
     var pointer = { x: -9999, y: -9999, active: false };
     var parallax = { x: 0, y: 0, tx: 0, ty: 0 };
 
@@ -338,8 +341,6 @@
       lastH = Math.round(rect.height);
 
       dpr = Math.min(window.devicePixelRatio || 1, cfg.dpr);
-      w = Math.max(1, lastW);
-      h = Math.max(1, lastH);
       w = Math.max(1, Math.round(rect.width));
       h = Math.max(1, Math.round(rect.height));
       canvas.width = Math.round(w * dpr);
@@ -356,171 +357,144 @@
       var density = opts.density || 0.000055;
       var count = Math.round(w * h * density);
       count = Math.max(opts.minNodes || 14, Math.min(cfg.nodes, count));
-      nodes = [];
-      for (var i = 0; i < count; i++) {
-        nodes.push({
-          x: Math.random() * w,
-          y: Math.random() * h,
-          vx: (Math.random() - 0.5) * 0.12,
-          vy: (Math.random() - 0.5) * 0.12,
-          r: 0.6 + Math.random() * 1.4,
-          phase: Math.random() * Math.PI * 2
-        });
-      }
+      // Three bands of distance. Only the near band is allowed to move much,
+      // which is what makes the field read as space instead of as noise.
+      far = band(Math.round(count * 0.56), 0.5, 1.2, 0.16, 0.34);
+      mid = band(Math.round(count * 0.3), 0.8, 1.6, 0.3, 0.5);
+      near = band(Math.max(3, count - Math.round(count * 0.56) - Math.round(count * 0.3)),
+        1.1, 2.1, 0.42, 0.68);
       dust = [];
       for (var d = 0; d < cfg.dust; d++) {
         dust.push({
           x: Math.random() * w,
           y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.02,
+          vy: -(Math.random() * 0.05 + 0.008),
           r: Math.random() * 1.1 + 0.2,
-          a: Math.random() * 0.5 + 0.12,
-          sp: Math.random() * 0.06 + 0.01,
-          phase: Math.random() * Math.PI * 2
+          a: Math.random() * 0.42 + 0.1,
+          fill: '#F4EEFF',
+          phase: Math.random() * Math.PI * 2,
+          tw: 0.0009 + Math.random() * 0.0014
         });
       }
-      trails = [];
-      for (var k = 0; k < cfg.trail; k++) {
-        trails.push({
-          rx: w * (0.26 + Math.random() * 0.5),
-          ry: h * (0.16 + Math.random() * 0.34),
-          rot: Math.random() * Math.PI,
-          speed: (0.00004 + Math.random() * 0.00006) * (k % 2 ? -1 : 1),
-          tilt: 0.32 + Math.random() * 0.3,
-          hue: k % 3 === 1 ? 'pink' : 'violet',
-          pts: cfg.trailPts
-        });
+      linked = mid.concat(near);
+
+      function band(n, rMin, rMax, aMin, aMax) {
+        var out = [];
+        for (var i = 0; i < n; i++) {
+          out.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            vx: (Math.random() - 0.5) * 0.05,
+            vy: (Math.random() - 0.5) * 0.05,
+            r: rMin + Math.random() * (rMax - rMin),
+            a: aMin + Math.random() * (aMax - aMin),
+            // Cold blue and mist pink only appear at the rim of the field;
+            // most stars stay moon-white or violet.
+            fill: Math.random() < 0.08 ? '#7C9BD6'
+              : Math.random() < 0.1 ? '#E7B6E2'
+              : Math.random() < 0.5 ? '#D6AAFF' : '#F4EEFF',
+            phase: Math.random() * Math.PI * 2,
+            tw: 0.0006 + Math.random() * 0.0012
+          });
+        }
+        return out;
       }
     }
 
-    function drawTrails(t) {
-      var cx = w / 2 + parallax.x * 26;
-      var cy = h * 0.44 + parallax.y * 18;
-      trails.forEach(function (tr) {
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(tr.rot + t * tr.speed * 1000);
-        ctx.beginPath();
-        for (var i = 0; i <= tr.pts; i++) {
-          var a = (i / tr.pts) * Math.PI * 2;
-          var wob = Math.sin(a * 3 + t * 0.0004) * 8;
-          var x = Math.cos(a) * (tr.rx + wob);
-          var y = Math.sin(a) * (tr.rx * tr.tilt + wob * 0.4);
-          if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    function paint(list, px, t, square) {
+      for (var i = 0; i < list.length; i++) {
+        var s = list[i];
+        s.x += s.vx; s.y += s.vy;
+        if (s.x < -6) s.x = w + 6; else if (s.x > w + 6) s.x = -6;
+        if (s.y < -6) s.y = h + 6; else if (s.y > h + 6) s.y = -6;
+        ctx.globalAlpha = s.a * (0.62 + Math.sin(t * s.tw + s.phase) * 0.38);
+        ctx.fillStyle = s.fill;
+        if (square) {
+          ctx.fillRect(s.x + px, s.y, s.r, s.r);
+        } else {
+          ctx.beginPath();
+          ctx.arc(s.x + px, s.y, s.r, 0, 6.2832);
+          ctx.fill();
         }
-        ctx.strokeStyle = tr.hue === 'pink'
-          ? 'rgba(242,168,236,0.055)'
-          : 'rgba(157,112,255,0.075)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
 
-        // A brighter head travelling along the same orbit.
-        var head = (t * 0.00016 * (tr.speed > 0 ? 1 : -1) + tr.rot) % (Math.PI * 2);
-        var hx = Math.cos(head) * tr.rx;
-        var hy = Math.sin(head) * (tr.rx * tr.tilt);
-        var g = ctx.createRadialGradient(hx, hy, 0, hx, hy, 26);
-        g.addColorStop(0, tr.hue === 'pink' ? 'rgba(242,168,236,0.5)' : 'rgba(214,170,255,0.55)');
-        g.addColorStop(1, 'rgba(157,112,255,0)');
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(hx, hy, 26, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      });
+    function threads(px, py) {
+      var reach = cfg.link, reach2 = reach * reach;
+      ctx.lineWidth = 0.6;
+      ctx.strokeStyle = '#9D70FF';
+      for (var a = 0; a < linked.length; a++) {
+        var na = linked[a];
+        for (var b = a + 1; b < linked.length; b++) {
+          var nb = linked[b];
+          var dx = na.x - nb.x, dy = na.y - nb.y;
+          var d2 = dx * dx + dy * dy;
+          if (d2 > reach2) continue;
+          var alpha = (1 - d2 / reach2) * 0.15;
+          if (pointer.active) {
+            var mx = (na.x + nb.x) / 2 + px, my = (na.y + nb.y) / 2 + py;
+            var pdx = pointer.x - mx, pdy = pointer.y - my;
+            var pd2 = pdx * pdx + pdy * pdy;
+            if (pd2 < 22500) alpha += (1 - pd2 / 22500) * 0.24;
+          }
+          ctx.globalAlpha = Math.min(0.38, alpha);
+          ctx.beginPath();
+          ctx.moveTo(na.x + px, na.y + py);
+          ctx.lineTo(nb.x + px, nb.y + py);
+          ctx.stroke();
+        }
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    function nudge(list, strength) {
+      if (!pointer.active) return;
+      for (var i = 0; i < list.length; i++) {
+        var s = list[i];
+        var dx = pointer.x - s.x, dy = pointer.y - s.y;
+        var d2 = dx * dx + dy * dy;
+        if (d2 > 28900 || d2 < 0.25) continue;
+        var pull = (1 - d2 / 28900) * strength;
+        s.vx += dx * pull; s.vy += dy * pull;
+      }
+      for (var j = 0; j < list.length; j++) {
+        list[j].vx *= 0.982; list[j].vy *= 0.982;
+      }
     }
 
     function frame(time) {
       var t = time || 0;
+      parallax.x += (parallax.tx - parallax.x) * 0.05;
+      parallax.y += (parallax.ty - parallax.y) * 0.05;
       ctx.clearRect(0, 0, w, h);
 
-      // L1 breathing nebula wash
-      var pulse = 0.5 + Math.sin(t * 0.00035) * 0.5;
-      var neb = ctx.createRadialGradient(w * 0.3, h * 0.2, 0, w * 0.3, h * 0.2, Math.max(w, h) * 0.7);
-      neb.addColorStop(0, 'rgba(103,56,206,' + (0.05 + pulse * 0.03) + ')');
-      neb.addColorStop(1, 'rgba(103,56,206,0)');
-      ctx.fillStyle = neb;
-      ctx.fillRect(0, 0, w, h);
+      nudge(near, 0.0011);
+      nudge(mid, 0.0005);
 
-      drawTrails(t);
-
-      // Stardust
-      dust.forEach(function (p) {
-        p.y -= p.sp;
-        if (p.y < -4) { p.y = h + 4; p.x = Math.random() * w; }
-        var tw = p.a * (0.6 + Math.sin(t * 0.0012 + p.phase) * 0.4);
-        ctx.fillStyle = 'rgba(244,238,255,' + tw.toFixed(3) + ')';
-        ctx.beginPath();
-        ctx.arc(p.x + parallax.x * 12, p.y, p.r, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      // Neural threads
-      nodes.forEach(function (n) {
-        if (pointer.active) {
-          var dx = pointer.x - n.x, dy = pointer.y - n.y;
-          var dist = Math.hypot(dx, dy);
-          if (dist < 170 && dist > 0.5) {
-            var pull = (1 - dist / 170) * 0.0018;
-            n.vx += dx * pull;
-            n.vy += dy * pull;
-          }
-        }
-        n.vx *= 0.985; n.vy *= 0.985;
-        n.x += n.vx + Math.sin(t * 0.0003 + n.phase) * 0.04;
-        n.y += n.vy + Math.cos(t * 0.00027 + n.phase) * 0.04;
-        if (n.x < -20) n.x = w + 20; else if (n.x > w + 20) n.x = -20;
-        if (n.y < -20) n.y = h + 20; else if (n.y > h + 20) n.y = -20;
-
-        var glow = 0.5 + Math.sin(t * 0.0008 + n.phase) * 0.18;
-        ctx.fillStyle = 'rgba(214,170,255,' + (glow * 0.6).toFixed(3) + ')';
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      for (var a = 0; a < nodes.length; a++) {
-        for (var b = a + 1; b < nodes.length; b++) {
-          var na = nodes[a], nb = nodes[b];
-          var d2 = Math.hypot(na.x - nb.x, na.y - nb.y);
-          if (d2 > cfg.link) continue;
-          var alpha = (1 - d2 / cfg.link) * 0.3;
-          if (pointer.active) {
-            var near = Math.min(Math.hypot(pointer.x - na.x, pointer.y - na.y),
-                                Math.hypot(pointer.x - nb.x, pointer.y - nb.y));
-            if (near < 170) alpha += (1 - near / 170) * 0.3;
-          }
-          ctx.strokeStyle = 'rgba(124,58,237,' + Math.min(1, alpha).toFixed(3) + ')';
-          ctx.lineWidth = 0.6;
-          ctx.beginPath();
-          ctx.moveTo(na.x, na.y);
-          ctx.lineTo(nb.x, nb.y);
-          ctx.stroke();
-        }
-      }
+      // far → near: the deeper the band, the less it answers to the cursor.
+      paint(far, parallax.x * 4, t, true);
+      paint(dust, parallax.x * 7, t, false);
+      threads(parallax.x * 14, parallax.y * 10);
+      paint(mid, parallax.x * 11, t, true);
+      paint(near, parallax.x * 18, t, false);
 
       raf = requestAnimationFrame(frame);
     }
 
     function staticFrame() {
       ctx.clearRect(0, 0, w, h);
-      drawTrails(2000);
-      dust.forEach(function (p) {
-        ctx.fillStyle = 'rgba(244,238,255,' + (p.a * 0.7).toFixed(3) + ')';
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fill();
-      });
-      nodes.forEach(function (n) {
-        ctx.fillStyle = 'rgba(214,170,255,0.4)';
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-        ctx.fill();
-      });
+      paint(far, 0, 1200, true);
+      threads(0, 0);
+      paint(mid, 0, 1200, true);
+      paint(near, 0, 1200, false);
+      ctx.globalAlpha = 1;
     }
 
     function start() {
       if (REDUCED) { staticFrame(); return; }
       if (raf) return;
-      visible = true;
       raf = requestAnimationFrame(frame);
     }
 
@@ -548,12 +522,8 @@
       }, { passive: true });
     }
 
-    // Parallax easing rides the same rAF loop.
-    (function ease() {
-      parallax.x += (parallax.tx - parallax.x) * 0.06;
-      parallax.y += (parallax.ty - parallax.y) * 0.06;
-      requestAnimationFrame(ease);
-    })();
+    // Parallax easing rides frame(): a second always-on rAF loop per canvas
+    // kept the compositor busy even when nothing was visible.
 
     return { start: start, stop: stop, canvas: canvas, resize: resize };
   }

@@ -70,8 +70,10 @@ function relatedBlock(related) {
 }
 
 function page(p) {
+  const isPrivate = p.visibility === 'private';
   const stats = [
     ['状态', p.status],
+    ['可见性', isPrivate ? '私有仓库' : '公开仓库'],
     ['语言', p.language],
     ['起始', p.since],
     ['最近推送', p.updated],
@@ -132,7 +134,9 @@ function page(p) {
       <div class="tag-line" style="margin-top:20px;">${topics}</div>
       <div class="pdetail-grid">${stats}</div>
       <div class="club-actions" style="justify-content:flex-start;margin-top:26px;">
-        <a class="btn" href="${esc(p.repo)}" target="_blank" rel="noopener">打开仓库 <i class="arrow">→</i></a>
+        ${isPrivate
+          ? '<span class="btn btn--ghost" aria-disabled="true">仓库未公开 · 没有可访问的链接</span>'
+          : `<a class="btn" href="${esc(p.repo)}" target="_blank" rel="noopener">打开仓库 <i class="arrow">→</i></a>`}
         <a class="btn btn--ghost" href="/projects/">返回作品星系</a>
       </div>
     </section>
@@ -147,7 +151,9 @@ function page(p) {
     ${relatedBlock(p.related)}
 
     <p class="signal-note" style="margin-top:40px;">
-      本页内容取自 ${esc(p.repo)} 的 README / CHANGELOG 与 GitHub 仓库元数据，观测日期 ${esc(SITE.snapshot?.date || '')}。
+      ${isPrivate
+        ? `这个仓库目前是私有的，${esc(p.repo)} 对外部访问会返回 404。本页内容取自本地开发记录与仓库元数据，观测日期 ${esc(SITE.observed || SITE.snapshot?.date || '')}。`
+        : `本页内容取自 ${esc(p.repo)} 的 README / CHANGELOG 与 GitHub 仓库元数据，观测日期 ${esc(SITE.observed || SITE.snapshot?.date || '')}。`}
       数字与状态会随仓库变化，页面不做推测性补充。
     </p>
 

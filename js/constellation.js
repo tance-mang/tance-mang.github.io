@@ -1,21 +1,44 @@
 /* ==========================================================================
-   TANCE · NEURAL CONSTELLATION
-   A star map of this site's own content: every topic node is a tag or
-   category that real articles and projects carry, every edge is a real
-   co-occurrence. It is a "thoughts and works" graph — not a claim about
-   model weights.
+   TANCE · STAR FIELD (3D)
+   A rotatable volume of this site's own content. Topics form the inner shell,
+   projects the middle one, records sit around the topic they actually carry,
+   and every edge is a real co-occurrence. Depth comes from perspective
+   projection, not from layering flat dots.
    ========================================================================== */
 (function () {
   'use strict';
 
   function el(sel, root) { return (root || document).querySelector(sel); }
 
-  var PALETTE = {
-    topic: { fill: '#D6AAFF', glow: 'rgba(214,170,255,0.85)' },
-    post: { fill: '#9D70FF', glow: 'rgba(157,112,255,0.7)' },
-    project: { fill: '#F2A8EC', glow: 'rgba(242,168,236,0.7)' }
+  var SHELL = { topic: 0.5, project: 0.84, post: 1.14 };
+  var FOCAL = 2.35;          // in shell units; smaller = stronger perspective
+  var GOLDEN = 2.39996323;
+
+  function hash(str) {
+    var h = 2166136261;
+    for (var i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return (h >>> 0) / 4294967295;
+  }
+
+  /* The two sections arrive through tagMap() like any other tag, but they are
+     the axis the site is built on, so they get their own words and doorway. */
+  var WORLD_TAGS = {
+    Create: {
+      href: '/create.html',
+      line: '做出来并且还在跑的东西。结论要能被复现，做不到就写清楚卡在哪一步。'
+    },
+    Observe: {
+      href: '/observe.html',
+      line: '想明白和没想明白的。这里经常没有结论，有些想法放着放着就变了。'
+    }
   };
 
+  /* ------------------------------------------------------------------ */
+  /* 1. Graph — the data decides the shape                               */
+  /* ------------------------------------------------------------------ */
   function build(content) {
     var nodes = [];
     var index = {};
@@ -41,7 +64,7 @@
     (content.projects || []).forEach(function (pr) {
       add({
         id: '/projects/' + pr.slug + '/', kind: 'project', label: pr.name, weight: 2,
-        href: '/projects/' + pr.slug + '/', meta: pr.status || 'project'
+        href: '/projects/' + pr.slug + '/', slug: pr.slug, meta: pr.status || 'project'
       });
     });
 
@@ -50,13 +73,14 @@
       .map(function (k) { return { tag: k, hrefs: tagMap[k].hrefs || [], projects: tagMap[k].projects || [] }; })
       .filter(function (t) { return (t.hrefs.length + t.projects.length) >= 1; })
       .sort(function (a, b) { return (b.hrefs.length + b.projects.length) - (a.hrefs.length + a.projects.length); })
-      .slice(0, 26);
+      .slice(0, 22);
 
     topics.forEach(function (t) {
       add({
         id: 'topic:' + t.tag, kind: 'topic', label: t.tag,
         weight: 1 + (t.hrefs.length + t.projects.length) * 0.6,
         count: t.hrefs.length + t.projects.length,
+        href: (WORLD_TAGS[t.tag] || {}).href || '/archives/#tag-' + encodeURIComponent(t.tag),
         hrefs: t.hrefs, projects: t.projects
       });
     });
@@ -78,7 +102,6 @@
       t.projects.forEach(function (s) { link(tid, '/projects/' + s + '/', 1.4, 'project'); });
     });
 
-    // Co-occurrence between topics that share at least two articles.
     for (var i = 0; i < topics.length; i++) {
       for (var j = i + 1; j < topics.length; j++) {
         var A = topics[i].hrefs, B = topics[j].hrefs;
@@ -88,108 +111,107 @@
       }
     }
 
+    place({ nodes: nodes, links: links }, index);
     return { nodes: nodes, links: links };
   }
 
-  // Deterministic first layout, then a few relaxation passes so the shape
-  // comes from the data rather than from Math.random(). The simulation runs
-  // once in a nominal box; resizing only re-maps the result, because re-running
-  // 170 passes of an O(n²) solver on every ResizeObserver tick was measurable
-  // forced layout.
-  var SIM_W = 1000, SIM_H = 600;
-
-  function layout(graph, w, h) {
-    if (!graph.sim) simulate(graph);
-
-    var b = graph.bounds, pad = 46;
-    var sx = (w - pad * 2) / Math.max(1, b.maxX - b.minX);
-    var sy = (h - pad * 2) / Math.max(1, b.maxY - b.minY);
-    var s = Math.min(sx, sy, 1.35);
-    graph.nodes.forEach(function (n) {
-      n.x = pad + (n.x0 - b.minX) * s + (w - pad * 2 - (b.maxX - b.minX) * s) / 2;
-      n.y = pad + (n.y0 - b.minY) * s + (h - pad * 2 - (b.maxY - b.minY) * s) / 2;
-      n.phase = (n.id.length * 12.9898) % (Math.PI * 2);
-      n.r = n.kind === 'topic' ? 4 + Math.min(9, (n.count || 1) * 1.5) : n.kind === 'project' ? 6 : 3.2;
-    });
+  /* A flattened spiral keeps the shells readable: a full sphere of labels
+     turns into fog, a disc still reads as a system. */
+  function fibDir(i, n) {
+    var y = n < 2 ? 0 : 1 - (i / (n - 1)) * 2;
+    var r = Math.sqrt(Math.max(0.05, 1 - y * y));
+    var theta = i * GOLDEN + 0.6;
+    return { x: Math.cos(theta) * r, y: y * 0.66, z: Math.sin(theta) * r };
   }
 
-  function simulate(graph) {
-    var w = SIM_W, h = SIM_H;
+  function norm(v) {
+    var d = Math.hypot(v.x, v.y, v.z) || 1;
+    return { x: v.x / d, y: v.y / d, z: v.z / d };
+  }
+
+  function place(graph, index) {
     var topics = graph.nodes.filter(function (n) { return n.kind === 'topic'; });
-    var posts = graph.nodes.filter(function (n) { return n.kind === 'post'; });
-    var projects = graph.nodes.filter(function (n) { return n.kind === 'project'; });
+    var byId = index;
 
     topics.forEach(function (n, i) {
-      var a = (i / Math.max(1, topics.length)) * Math.PI * 2 - Math.PI / 2;
-      var r = Math.min(w, h) * 0.30 * (1 - Math.min(0.45, n.count * 0.03));
-      n.x = w / 2 + Math.cos(a) * r * 1.15;
-      n.y = h / 2 + Math.sin(a) * r;
+      var d = fibDir(i, topics.length);
+      var wobble = 0.86 + hash(n.id) * 0.3;
+      n.vx = d.x * SHELL.topic * wobble;
+      n.vy = d.y * SHELL.topic * wobble;
+      n.vz = d.z * SHELL.topic * wobble;
     });
 
-    projects.forEach(function (n, i) {
-      var a = (i / Math.max(1, projects.length)) * Math.PI * 2 + Math.PI / 7;
-      n.x = w / 2 + Math.cos(a) * Math.min(w, h) * 0.44;
-      n.y = h / 2 + Math.sin(a) * Math.min(w, h) * 0.30;
-    });
-
-    var byId = {};
-    graph.nodes.forEach(function (n) { byId[n.id] = n; });
-
-    posts.forEach(function (n) {
-      var home = graph.links.filter(function (l) { return l.b === n.id || l.a === n.id; })
-        .map(function (l) { return byId[l.a === n.id ? l.b : l.a]; })
-        .filter(function (m) { return m && m.kind === 'topic'; })[0];
-      if (home) {
-        n.x = home.x + Math.cos(n.id.length) * 62;
-        n.y = home.y + Math.sin(n.id.length * 1.7) * 52;
-      } else {
-        n.x = w * 0.5 + Math.cos(n.id.length) * 200;
-        n.y = h * 0.5 + Math.sin(n.id.length) * 150;
-      }
-    });
-
-    for (var pass = 0; pass < 170; pass++) {
-      for (var a1 = 0; a1 < graph.nodes.length; a1++) {
-        for (var b1 = a1 + 1; b1 < graph.nodes.length; b1++) {
-          var na = graph.nodes[a1], nb = graph.nodes[b1];
-          var dx = nb.x - na.x, dy = nb.y - na.y;
-          var d2 = dx * dx + dy * dy || 0.01;
-          if (d2 < 38000) {
-            var f = (38000 - d2) / 38000 * 1.7;
-            var d = Math.sqrt(d2);
-            na.x -= (dx / d) * f; na.y -= (dy / d) * f;
-            nb.x += (dx / d) * f; nb.y += (dy / d) * f;
-          }
-        }
-      }
+    function homeDir(node) {
+      var acc = { x: 0, y: 0, z: 0 }, got = 0;
       graph.links.forEach(function (l) {
-        var s = byId[l.a], t = byId[l.b];
-        var ddx = t.x - s.x, ddy = t.y - s.y;
-        var dd = Math.hypot(ddx, ddy) || 1;
-        var target = l.kind === 'tag' ? 108 : l.kind === 'co' ? 150 : 190;
-        var pull = (dd - target) / dd * 0.045;
-        s.x += ddx * pull; s.y += ddy * pull;
-        t.x -= ddx * pull; t.y -= ddy * pull;
+        if (l.a !== node.id && l.b !== node.id) return;
+        var other = byId[l.a === node.id ? l.b : l.a];
+        if (!other || other.kind !== 'topic' || other.vx === undefined) return;
+        acc.x += other.vx; acc.y += other.vy; acc.z += other.vz;
+        got++;
       });
-      graph.nodes.forEach(function (n) {
-        n.x += (w / 2 - n.x) * 0.006;
-        n.y += (h / 2 - n.y) * 0.011;
-      });
+      if (!got) return null;
+      return norm(acc);
     }
 
-    // Freeze the simulated coordinates; layout() maps them into whatever box
-    // the canvas currently has.
-    var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
     graph.nodes.forEach(function (n) {
-      n.x0 = n.x;
-      n.y0 = n.y;
-      minX = Math.min(minX, n.x); maxX = Math.max(maxX, n.x);
-      minY = Math.min(minY, n.y); maxY = Math.max(maxY, n.y);
+      if (n.kind === 'topic') return;
+      var h = hash(n.id);
+      var base = homeDir(n);
+      if (!base) {
+        base = fibDir(Math.floor(h * 1000), 1000);
+      }
+      // Push the node away from its topic so clusters stay legible instead of
+      // collapsing onto the label they belong to.
+      var spread = n.kind === 'post' ? 0.62 : 0.4;
+      var dir = norm({
+        x: base.x * 1.6 + (hash(n.id + 'x') - 0.5) * spread * 2,
+        y: base.y * 1.6 + (hash(n.id + 'y') - 0.5) * spread * 2,
+        z: base.z * 1.6 + (hash(n.id + 'z') - 0.5) * spread * 2
+      });
+      var shell = n.kind === 'post' ? SHELL.post : SHELL.project;
+      var rr = shell * (0.9 + h * 0.24);
+      n.vx = dir.x * rr;
+      n.vy = dir.y * rr * 0.8;
+      n.vz = dir.z * rr;
     });
-    graph.bounds = { minX: minX, maxX: maxX, minY: minY, maxY: maxY };
-    graph.sim = true;
+
+    graph.nodes.forEach(function (n) {
+      n.phase = hash(n.id) * Math.PI * 2;
+      n.r = n.kind === 'topic' ? 5.2 + Math.min(7, (n.count || 1) * 1.1)
+        : n.kind === 'project' ? 5.4 : 3.1;
+    });
   }
 
+  /* ------------------------------------------------------------------ */
+  /* 2. Glow sprites — one radial gradient per kind, made once            */
+  /* ------------------------------------------------------------------ */
+  function sprites() {
+    var spec = {
+      topic: ['rgba(244,238,255,0.9)', 'rgba(214,170,255,0.26)', 'rgba(157,112,255,0)'],
+      project: ['rgba(255,236,251,0.85)', 'rgba(242,168,236,0.22)', 'rgba(242,168,236,0)'],
+      post: ['rgba(214,170,255,0.8)', 'rgba(157,112,255,0.18)', 'rgba(124,155,214,0)']
+    };
+    var out = {};
+    Object.keys(spec).forEach(function (k) {
+      var c = document.createElement('canvas');
+      c.width = c.height = 96;
+      var g = c.getContext('2d');
+      if (!g) return;
+      var grad = g.createRadialGradient(48, 48, 0, 48, 48, 48);
+      grad.addColorStop(0, spec[k][0]);
+      grad.addColorStop(0.34, spec[k][1]);
+      grad.addColorStop(1, spec[k][2]);
+      g.fillStyle = grad;
+      g.fillRect(0, 0, 96, 96);
+      out[k] = c;
+    });
+    return out;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 3. Mount                                                            */
+  /* ------------------------------------------------------------------ */
   function mount(root) {
     var canvas = el('#cx-canvas', root);
     var panel = el('.cx-panel', root);
@@ -198,15 +220,29 @@
     if (!canvas || !window.TANCE) return;
 
     var ctx = canvas.getContext('2d');
+    if (!ctx) return;
     var T = window.TANCE;
     var reduced = T.reduced;
+    var sprite = sprites();
     var graph = null;
-    var cam = { x: 0, y: 0, scale: 1, tx: 0, ty: 0, tscale: 1 };
-    var w = 0, h = 0, dpr = 1;
-    var hover = null, selected = null, pulse = null;
-    var drag = null;
-    var raf = null, running = false;
     var byId = {};
+
+    var w = 0, h = 0, dpr = 1;
+    var PITCH_MAX = 1.25;
+    var cam = { yaw: 0.5, pitch: -0.2, zoom: 1, tyaw: 0.5, tpitch: -0.2, tzoom: 1 };
+    var spin = !reduced;
+    var vel = { yaw: 0, pitch: 0 };
+    var hover = null, selected = null, pulse = null;
+    var pointers = {}, dragging = null, pinch = null;
+    var raf = null, running = false, last = 0;
+
+    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+    function unit() { return Math.min(h * 0.4, w * 0.32) * cam.zoom; }
+
+    // A wide, short canvas needs the volume stretched sideways or the field
+    // reads as a coin in the middle of an empty room.
+    function spread() { return clamp(w / (h * 1.45), 1, 1.7); }
 
     function resize() {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -216,42 +252,48 @@
       canvas.width = Math.round(w * dpr);
       canvas.height = Math.round(h * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      if (graph) layout(graph, w, h);
     }
 
-    function toWorld(px, py) {
-      return { x: (px - w / 2) / cam.scale + w / 2 - cam.x, y: (py - h / 2) / cam.scale + h / 2 - cam.y };
+    // world → screen, once per frame; everything else reads the cache.
+    function project() {
+      if (!graph) return;
+      var cy = Math.cos(cam.yaw), sy = Math.sin(cam.yaw);
+      var cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch);
+      var u = unit(), sx = spread(), ox = w / 2, oy = h / 2;
+      graph.nodes.forEach(function (n) {
+        var x1 = n.vx * cy + n.vz * sy;
+        var z1 = -n.vx * sy + n.vz * cy;
+        var y2 = n.vy * cp - z1 * sp;
+        var z2 = n.vy * sp + z1 * cp;
+        var k = FOCAL / Math.max(0.35, FOCAL + z2);
+        n.sx = ox + x1 * sx * u * k;
+        n.sy = oy + y2 * u * k;
+        n.sk = k;
+        n.sz = z2;
+      });
+    }
+
+    // Larger z2 is further from the camera; k shrinks with it.
+    function depthFade(n) {
+      return Math.max(0.22, Math.min(1, (1.45 - n.sz) / 2.9));
     }
 
     function pick(px, py) {
       if (!graph) return null;
-      var p = toWorld(px, py);
-      var best = null, bestD = Infinity;
+      var best = null, bestScore = -Infinity;
       graph.nodes.forEach(function (n) {
-        var d = Math.hypot(n.x - p.x, n.y - p.y);
-        if (d < Math.max(14, n.r * cam.scale + 10) && d < bestD) { best = n; bestD = d; }
-      });
-      return best;
-    }
-
-    function pickLink(px, py) {
-      if (!graph) return null;
-      var p = toWorld(px, py);
-      var best = null, bestD = 9;
-      graph.links.forEach(function (l) {
-        var s = byId[l.a], t = byId[l.b];
-        var dx = t.x - s.x, dy = t.y - s.y;
-        var len2 = dx * dx + dy * dy || 1;
-        var u = Math.max(0, Math.min(1, ((p.x - s.x) * dx + (p.y - s.y) * dy) / len2));
-        var cx = s.x + dx * u, cy = s.y + dy * u;
-        var d = Math.hypot(p.x - cx, p.y - cy);
-        if (d < bestD) { bestD = d; best = l; }
+        var reach = Math.max(15, n.r * n.sk * cam.zoom + 8);
+        var d = Math.hypot(n.sx - px, n.sy - py);
+        if (d > reach) return;
+        // prefer the node closest to the camera, then the one closest to cursor
+        var score = -n.sz * 40 - d;
+        if (score > bestScore) { bestScore = score; best = n; }
       });
       return best;
     }
 
     function neighbours(node) {
-      if (!node) return [];
+      if (!node || !graph) return [];
       return graph.links
         .filter(function (l) { return l.a === node.id || l.b === node.id; })
         .map(function (l) { return byId[l.a === node.id ? l.b : l.a]; });
@@ -266,129 +308,149 @@
       return false;
     }
 
-    function draw() {
+    function draw(now) {
       if (!graph) return;
-      var boxes = [];
       ctx.clearRect(0, 0, w, h);
-      ctx.save();
-      ctx.translate(w / 2, h / 2);
-      ctx.scale(cam.scale, cam.scale);
-      ctx.translate(-w / 2 + cam.x, -h / 2 + cam.y);
+      project();
 
-      var now = performance.now();
       var lit = selected || hover;
       var litSet = {};
       neighbours(lit).forEach(function (n) { litSet[n.id] = 1; });
       if (lit) litSet[lit.id] = 1;
 
+      // Painter's order: far shell first so the near nodes sit on top of it.
+      var order = graph.nodes.slice().sort(function (a, b) { return b.sz - a.sz; });
+
+      // edges first, so nodes read as objects floating in front of them
       graph.links.forEach(function (l) {
         var s = byId[l.a], t = byId[l.b];
+        if (!s || !t) return;
         var on = lit && (l.a === lit.id || l.b === lit.id);
-        var breathe = reduced ? 1 : 0.75 + Math.sin(now * 0.0007 + (s.phase || 0)) * 0.25;
+        var fade = Math.min(depthFade(s), depthFade(t));
+        var breathe = reduced ? 1 : 0.8 + Math.sin(now * 0.0005 + s.phase) * 0.2;
         ctx.beginPath();
         if (l.kind === 'co') {
-          var mx = (s.x + t.x) / 2 + Math.sin((s.x + t.y) * 0.01) * 22;
-          var my = (s.y + t.y) / 2 + Math.cos((t.x + s.y) * 0.01) * 22;
-          ctx.moveTo(s.x, s.y);
-          ctx.quadraticCurveTo(mx, my, t.x, t.y);
+          var mx = (s.sx + t.sx) / 2 + (s.sy - t.sy) * 0.12;
+          var my = (s.sy + t.sy) / 2 + (t.sx - s.sx) * 0.12;
+          ctx.moveTo(s.sx, s.sy);
+          ctx.quadraticCurveTo(mx, my, t.sx, t.sy);
         } else {
-          ctx.moveTo(s.x, s.y);
-          ctx.lineTo(t.x, t.y);
+          ctx.moveTo(s.sx, s.sy);
+          ctx.lineTo(t.sx, t.sy);
         }
-        ctx.lineWidth = on ? 1.6 : (l.kind === 'project' ? 1.1 : 0.7);
+        ctx.lineWidth = on ? 1.5 : (l.kind === 'co' ? 0.6 : 0.75);
         ctx.strokeStyle = on
-          ? 'rgba(242,168,236,0.85)'
-          : (l.kind === 'co' ? 'rgba(157,112,255,' + (0.16 * breathe).toFixed(3) + ')'
-                             : 'rgba(214,170,255,' + (0.22 * breathe).toFixed(3) + ')');
+          ? 'rgba(242,168,236,' + (0.7 + fade * 0.25).toFixed(3) + ')'
+          : (l.kind === 'co'
+            ? 'rgba(124,155,214,' + (0.26 * fade * breathe).toFixed(3) + ')'
+            : 'rgba(214,170,255,' + (0.34 * fade * breathe).toFixed(3) + ')');
         ctx.stroke();
       });
 
       if (pulse) {
-        var sN = byId[pulse.a], tN = byId[pulse.b];
-        if (sN && tN) {
-          var k = (now - pulse.at) / 900;
-          if (k > 1) { pulse = null; }
+        var ps = byId[pulse.a], pt = byId[pulse.b];
+        if (ps && pt) {
+          var k = (now - pulse.at) / 1100;
+          if (k > 1) pulse = null;
           else {
-            var px = sN.x + (tN.x - sN.x) * k, py = sN.y + (tN.y - sN.y) * k;
-            var g = ctx.createRadialGradient(px, py, 0, px, py, 22);
-            g.addColorStop(0, 'rgba(244,238,255,0.95)');
-            g.addColorStop(1, 'rgba(242,168,236,0)');
-            ctx.fillStyle = g;
-            ctx.beginPath();
-            ctx.arc(px, py, 22, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.globalAlpha = 0.9 * Math.min(1, 1.2 - k);
+            var gx = ps.sx + (pt.sx - ps.sx) * k, gy = ps.sy + (pt.sy - ps.sy) * k;
+            if (sprite.topic) ctx.drawImage(sprite.topic, gx - 16, gy - 16, 32, 32);
+            ctx.globalAlpha = 1;
           }
-        } else { pulse = null; }
+        } else pulse = null;
       }
 
-      graph.nodes.forEach(function (n) {
-        var pal = PALETTE[n.kind];
+      var boxes = [];
+      var narrow = w < 720;
+      order.forEach(function (n) {
+        var fade = depthFade(n);
         var isLit = lit && n.id === lit.id;
         var isNear = litSet[n.id] && lit && n.id !== lit.id;
-        var amp = reduced ? 0 : Math.sin(now * 0.0011 + (n.phase || 0)) * 0.22;
-        var r = n.r * (1 + amp) * (isLit ? 1.5 : 1);
+        var amp = reduced ? 0 : 1 + Math.sin(now * 0.0009 + n.phase) * 0.12;
+        var r = n.r * n.sk * cam.zoom * amp * (isLit ? 1.7 : 1);
+        var sp = sprite[n.kind] || sprite.post;
 
-        var halo = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, r * (isLit ? 7 : 4.2));
-        halo.addColorStop(0, pal.glow);
-        halo.addColorStop(1, 'rgba(10,7,20,0)');
-        ctx.globalAlpha = isLit ? 0.95 : (n.kind === 'topic' ? 0.5 : 0.34);
-        ctx.fillStyle = halo;
+        if (sp) {
+          var halo = r * (isLit ? 7.5 : n.kind === 'post' ? 4 : 5.2);
+          ctx.globalAlpha = Math.min(1, fade * (isLit ? 0.92 : n.kind === 'post' ? 0.5 : 0.68));
+          ctx.drawImage(sp, n.sx - halo / 2, n.sy - halo / 2, halo, halo);
+        }
+        ctx.globalAlpha = Math.min(1, fade + (isLit ? 0.4 : 0.12));
         ctx.beginPath();
-        ctx.arc(n.x, n.y, r * (isLit ? 7 : 4.2), 0, Math.PI * 2);
+        ctx.arc(n.sx, n.sy, Math.max(0.9, r * 0.5), 0, Math.PI * 2);
+        ctx.fillStyle = isLit || isNear ? '#F4EEFF'
+          : n.kind === 'topic' ? '#E7D8FF' : n.kind === 'project' ? '#F2A8EC' : '#9D70FF';
         ctx.fill();
         ctx.globalAlpha = 1;
 
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
-        ctx.fillStyle = isLit || isNear ? '#F4EEFF' : pal.fill;
-        ctx.fill();
-
-        // Labels: topics and projects name the structure; article titles only
-        // appear for the node you are actually looking at. Twenty long Chinese
-        // titles in a circle is a wall of text, not a star map.
-        var wantLabel = n.kind === 'topic' || n.kind === 'project' || isLit;
-        if (wantLabel) {
-          var full = n.label;
-          var text = full.length > 18 ? full.slice(0, 17) + '…' : full;
+        // Topics name the structure; projects when they are close enough to
+        // read; records only the one you are looking at. Twenty long titles in
+        // a rotating sphere is fog, not a map.
+        var wantLabel = n.kind === 'topic' || (n.kind === 'project' && n.sk > 1.02) || isLit;
+        if (wantLabel && !narrow) {
+          var text = n.label.length > 14 ? n.label.slice(0, 13) + '…' : n.label;
           var size = isLit ? 13 : 11;
           ctx.font = (isLit ? '600 ' : '') + size + 'px "JetBrains Mono", monospace';
           var tw = ctx.measureText(text).width;
-          var box = { x: n.x - tw / 2 - 4, y: n.y - r - size - 8, w: tw + 8, h: size + 5 };
-          if (!collides(boxes, box)) {
+          var box = { x: n.sx - tw / 2 - 4, y: n.sy - r * 0.5 - size - 12, w: tw + 8, h: size + 5 };
+          if (!collides(boxes, box) || isLit) {
             boxes.push(box);
-            ctx.fillStyle = isLit ? '#F4EEFF' : 'rgba(214,170,255,0.92)';
+            ctx.globalAlpha = Math.max(0.35, fade);
+            ctx.fillStyle = isLit ? '#F4EEFF' : 'rgba(214,170,255,0.95)';
             ctx.textAlign = 'center';
-            ctx.fillText(text, n.x, n.y - r - 9);
-          } else if (isLit) {
-            // The node under the cursor always gets its name, even if it overlaps.
-            ctx.fillStyle = '#F4EEFF';
-            ctx.textAlign = 'center';
-            ctx.fillText(text, n.x, n.y - r - 9);
+            ctx.fillText(text, n.sx, n.sy - r * 0.5 - 9);
+            ctx.globalAlpha = 1;
           }
         }
       });
 
-      ctx.restore();
-
-      if (running && !reduced) raf = requestAnimationFrame(draw);
+      if (lit) {
+        ctx.beginPath();
+        ctx.arc(lit.sx, lit.sy, Math.max(14, lit.r * lit.sk * cam.zoom + 6), 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(242,168,236,0.55)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
     }
 
-    function loop() {
-      cam.x += (cam.tx - cam.x) * 0.12;
-      cam.y += (cam.ty - cam.y) * 0.12;
-      cam.scale += (cam.tscale - cam.scale) * 0.12;
+    function step(now) {
+      var dt = Math.min(48, now - (last || now));
+      var u = dt / 1000;
+      last = now;
+      if (!dragging) {
+        cam.tyaw += vel.yaw;
+        cam.tpitch += vel.pitch;
+        vel.yaw *= 0.94;
+        vel.pitch *= 0.94;
+        if (Math.abs(vel.yaw) < 0.00004) vel.yaw = 0;
+        if (Math.abs(vel.pitch) < 0.00004) vel.pitch = 0;
+      }
+      if (spinHold && !dragging && now > spinHold) {
+        spinHold = 0;
+        if (!reduced) { spin = true; syncSpin(); }
+      }
+      if (spin && !dragging) cam.tyaw += 0.058 * u;
+      cam.tpitch = clamp(cam.tpitch, -PITCH_MAX, PITCH_MAX);
+      cam.yaw += (cam.tyaw - cam.yaw) * 0.12;
+      cam.pitch += (cam.tpitch - cam.pitch) * 0.12;
+      cam.zoom += (cam.tzoom - cam.zoom) * 0.12;
+    }
+
+    function tick(now) {
+      if (!running) return;
+      step(now);
+      draw(now);
+      raf = requestAnimationFrame(tick);
     }
 
     function start() {
-      if (running || !graph) return;
+      if (!graph) return;
+      if (reduced) { project(); draw(performance.now()); return; }
+      if (running) return;
       running = true;
-      (function tick() {
-        if (!running) return;
-        loop();
-        if (reduced) { draw(); running = false; return; }
-        draw();
-        raf = requestAnimationFrame(tick);
-      })();
+      last = 0;
+      raf = requestAnimationFrame(tick);
     }
 
     function stop() {
@@ -397,90 +459,399 @@
       raf = null;
     }
 
+    function drawIfStatic() {
+      if (reduced || !running) { project(); draw(performance.now()); }
+    }
+
+    /* Bring a node to the front of the volume: solve yaw/pitch that put it on
+       the camera axis instead of sliding a flat sheet around. */
     function focus(node) {
       if (!node) return;
-      cam.tx = w / 2 - node.x;
-      cam.ty = h / 2 - node.y;
-      cam.tscale = Math.max(cam.tscale, 1.25);
+      var twoPi = Math.PI * 2;
+      var wantYaw = Math.atan2(node.vx, -node.vz);
+      var flat = Math.hypot(node.vx, node.vz);
+      var wantPitch = clamp(Math.atan2(-node.vy, flat), -PITCH_MAX, PITCH_MAX);
+      cam.tyaw = cam.tyaw + (((wantYaw - cam.tyaw) % twoPi + twoPi * 1.5) % twoPi - Math.PI);
+      cam.tpitch = wantPitch;
+      cam.tzoom = Math.max(cam.tzoom, 1.3);
+      vel.yaw = vel.pitch = 0;
+      holdSpin(12000);
     }
 
     function reset() {
-      cam.tx = 0; cam.ty = 0; cam.tscale = 1;
+      cam.tyaw = 0.5; cam.tpitch = -0.2; cam.tzoom = 1;
+      vel.yaw = vel.pitch = 0;
       selected = null;
+      spinHold = 0;
+      spin = !reduced;
+      syncSpin();
       showDefault();
+      drawIfStatic();
+    }
+
+    /* ---------------------------------------------------------------- */
+    /* Node description — name, one or two sentences, one way in        */
+    /* ---------------------------------------------------------------- */
+    function sentence(str, max) {
+      var s = String(str || '').replace(/\s+/g, ' ').trim();
+      if (s.length <= max) return s;
+      var cut = s.slice(0, max);
+      var stop = Math.max(cut.lastIndexOf('。'), cut.lastIndexOf('.'), cut.lastIndexOf('；'));
+      return (stop > max * 0.45 ? cut.slice(0, stop + 1) : cut.trim() + '…');
+    }
+
+    function info(node) {
+      var site = (T.content.site || {});
+      if (node.kind === 'topic') {
+        var notes = site.topicNotes || {};
+        var hrefs = node.hrefs || [];
+        var projs = (node.projects || []).length;
+        var world = WORLD_TAGS[node.label];
+        var first = hrefs.length ? T.content.find(hrefs[0]) : null;
+        var text = world ? world.line : (notes[node.label] || (hrefs.length
+          ? '站内有 ' + hrefs.length + ' 篇记录带着这个标签' + (first ? '，最近的一篇写于 ' + (first.date || '') + '。' : '。')
+          : '这个标签目前只挂在项目上，还没有对应的记录。'));
+        return {
+          kind: '主题', cls: 'topic', name: node.label,
+          text: text,
+          meta: hrefs.length + ' 篇记录 · ' + projs + ' 个项目',
+          cta: world
+            ? { href: world.href, label: '进入这一侧' }
+            : { href: node.href, label: '进入主题' }
+        };
+      }
+      if (node.kind === 'project') {
+        var p = (T.content.projects || []).filter(function (x) {
+          return '/projects/' + x.slug + '/' === node.id;
+        })[0] || {};
+        var bits = [p.status, p.visibility === 'private' ? '私有仓库' : p.language, p.updated ? '更新 ' + p.updated : ''].filter(Boolean);
+        return {
+          kind: '项目', cls: 'project', name: node.label,
+          text: sentence(p.tagline || p.background, 150) || '这个项目还没有写简介。',
+          meta: bits.join(' · '),
+          cta: { href: node.href, label: '查看项目' }
+        };
+      }
+      var rec = T.content.find(node.id) || {};
+      var tags = (rec.tags || []).slice(0, 3).join(' · ');
+      return {
+        kind: '记录', cls: 'record', name: node.label,
+        text: sentence(rec.excerpt || rec.plain, 160) || '这篇还没有摘要，打开就是原文。',
+        meta: [rec.date, rec.minutes ? rec.minutes + ' min' : '', tags].filter(Boolean).join(' · '),
+        cta: { href: node.id, label: '打开记录' }
+      };
     }
 
     function describe(node) {
       if (!node) return;
-      var links = [];
-      if (node.kind === 'topic') {
-        (node.hrefs || []).slice(0, 6).forEach(function (h) {
-          var r = T.content.find(h);
-          if (r) links.push({ href: r.href, text: r.title, kind: '记录' });
-        });
-        (node.projects || []).slice(0, 4).forEach(function (s) {
-          var p = (T.content.projects || []).filter(function (x) { return x.slug === s; })[0];
-          if (p) links.push({ href: '/projects/' + p.slug + '/', text: p.name, kind: '项目' });
-        });
-      } else if (node.kind === 'post') {
-        var r2 = T.content.find(node.id);
-        links.push({ href: node.id, text: '打开这篇文章', kind: '文章' });
-        neighbours(node).forEach(function (m) {
-          if (m.kind === 'topic') links.push({ href: '/archives/#tag-' + encodeURIComponent(m.label), text: m.label, kind: '主题' });
-        });
-      } else {
-        links.push({ href: node.href, text: '项目详情', kind: '项目' });
-        neighbours(node).forEach(function (m) {
-          if (m.kind === 'topic') links.push({ href: '/archives/#tag-' + encodeURIComponent(m.label), text: m.label, kind: '主题' });
-        });
-        (T.content.find || null);
-      }
-
-      var curated = (T.content.site && T.content.site.topicNotes && T.content.site.topicNotes[node.label]) || '';
-      var counts = node.kind === 'topic'
-        ? ((node.hrefs || []).length + ' 篇记录 · ' + (node.projects || []).length + ' 个项目')
-        : node.meta || '';
-
+      var d = info(node);
       panel.hidden = false;
       panel.innerHTML = '';
+      var chip = document.createElement('span');
+      chip.className = 'cx-panel-kind is-' + d.cls;
+      chip.textContent = d.kind;
       var name = document.createElement('h3');
       name.className = 'cx-panel-name';
-      name.textContent = node.label;
+      name.textContent = d.name;
       var desc = document.createElement('p');
       desc.className = 'cx-panel-desc';
-      desc.textContent = (curated ? curated + ' — ' : '') + counts;
-      var row = document.createElement('div');
-      row.className = 'cx-panel-links';
-      links.slice(0, 9).forEach(function (l) {
-        var a = document.createElement('a');
-        a.className = 'cx-link';
-        a.href = l.href;
-        a.innerHTML = '<span class="kind"></span><span></span>';
-        a.firstChild.textContent = l.kind;
-        a.lastChild.textContent = l.text;
-        row.appendChild(a);
-      });
-      if (!links.length) {
-        var none = document.createElement('span');
-        none.className = 'cx-link';
-        none.textContent = '暂无关联内容';
-        row.appendChild(none);
-      }
+      desc.textContent = d.text;
+      panel.appendChild(chip);
       panel.appendChild(name);
       panel.appendChild(desc);
-      panel.appendChild(row);
+      if (d.meta) {
+        var meta = document.createElement('p');
+        meta.className = 'cx-panel-meta';
+        meta.textContent = d.meta;
+        panel.appendChild(meta);
+      }
+      var go = document.createElement('a');
+      go.className = 'cx-panel-go';
+      go.href = d.cta.href;
+      go.innerHTML = '<span></span><i class="arrow">→</i>';
+      go.firstChild.textContent = d.cta.label;
+      panel.appendChild(go);
+    }
+
+    function describeLink(link) {
+      var a = byId[link.a], b = byId[link.b];
+      if (!a || !b) return;
+      var shared = graph.nodes.filter(function (n) {
+        return n.kind === 'post' &&
+          graph.links.some(function (x) { return (x.a === link.a && x.b === n.id) || (x.b === link.a && x.a === n.id); }) &&
+          graph.links.some(function (x) { return (x.a === link.b && x.b === n.id) || (x.b === link.b && x.a === n.id); });
+      });
+      panel.hidden = false;
+      panel.innerHTML = '';
+      var chip = document.createElement('span');
+      chip.className = 'cx-panel-kind';
+      chip.textContent = '关联';
+      var name = document.createElement('h3');
+      name.className = 'cx-panel-name';
+      name.textContent = a.label + ' ↔ ' + b.label;
+      var desc = document.createElement('p');
+      desc.className = 'cx-panel-desc';
+      desc.textContent = shared.length
+        ? '这两个主题共享 ' + shared.length + ' 篇记录，连线不是画上去的，是同一批文章同时带着它们。'
+        : '这两个主题在站内有关联，但没有完全相同的文章。';
+      panel.appendChild(chip);
+      panel.appendChild(name);
+      panel.appendChild(desc);
+      if (shared.length) {
+        var row = document.createElement('div');
+        row.className = 'cx-panel-links';
+        shared.slice(0, 6).forEach(function (n) {
+          var x = document.createElement('a');
+          x.className = 'cx-link';
+          x.href = n.href;
+          x.textContent = n.label;
+          row.appendChild(x);
+        });
+        panel.appendChild(row);
+      }
     }
 
     function showDefault() {
+      if (!graph) return;
+      var counts = { topic: 0, project: 0, post: 0 };
+      graph.nodes.forEach(function (n) { counts[n.kind]++; });
       panel.hidden = false;
-      var topics = graph.nodes.filter(function (n) { return n.kind === 'topic'; }).length;
-      panel.innerHTML =
-        '<h3 class="cx-panel-name">Neural Constellation</h3>' +
-        '<p class="cx-panel-desc">思维星图：' + topics + ' 个主题节点、' +
-        graph.nodes.filter(function (n) { return n.kind === 'post'; }).length + ' 篇记录与 ' +
-        graph.nodes.filter(function (n) { return n.kind === 'project'; }).length +
-        ' 个项目由站内真实标签与分类自动聚合。悬停看关联，点击看内容。</p>';
+      panel.innerHTML = '';
+      var chip = document.createElement('span');
+      chip.className = 'cx-panel-kind';
+      chip.textContent = 'Star Field';
+      var name = document.createElement('h3');
+      name.className = 'cx-panel-name';
+      name.textContent = '这一团是我自己的内容结构';
+      var desc = document.createElement('p');
+      desc.className = 'cx-panel-desc';
+      desc.textContent = '主题在内圈，项目在中层，记录挂在自己对应的主题外面。'
+        + '拖动可以旋转，滚轮或双指缩放，点任意一个节点看它是什么。';
+      var meta = document.createElement('p');
+      meta.className = 'cx-panel-meta';
+      meta.textContent = counts.topic + ' 个主题 · ' + counts.project + ' 个项目 · ' +
+        counts.post + ' 篇记录 · ' + graph.links.length + ' 条真实关联';
+      panel.appendChild(chip);
+      panel.appendChild(name);
+      panel.appendChild(desc);
+      panel.appendChild(meta);
+      var go = document.createElement('a');
+      go.className = 'cx-panel-go';
+      go.href = '/archives/';
+      go.innerHTML = '<span>全部记录</span><i class="arrow">→</i>';
+      panel.appendChild(go);
     }
+
+    /* ---------------------------------------------------------------- */
+    /* Interaction                                                       */
+    /* ---------------------------------------------------------------- */
+    function local(e) {
+      var rect = canvas.getBoundingClientRect();
+      return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    }
+
+    function pickLink(px, py) {
+      if (!graph) return null;
+      var best = null, bestD = 8;
+      graph.links.forEach(function (l) {
+        var s = byId[l.a], t = byId[l.b];
+        if (!s || !t) return;
+        var dx = t.sx - s.sx, dy = t.sy - s.sy;
+        var len2 = dx * dx + dy * dy || 1;
+        var u = Math.max(0, Math.min(1, ((px - s.sx) * dx + (py - s.sy) * dy) / len2));
+        var d = Math.hypot(px - (s.sx + dx * u), py - (s.sy + dy * u));
+        if (d < bestD) { bestD = d; best = l; }
+      });
+      return best;
+    }
+
+    var spinHold = 0;
+
+    function holdSpin(ms) {
+      if (reduced) return;
+      spin = false;
+      spinHold = performance.now() + ms;
+      syncSpin();
+    }
+
+    canvas.addEventListener('pointerdown', function (e) {
+      var p = local(e);
+      pointers[e.pointerId] = { x: p.x, y: p.y };
+      if (Object.keys(pointers).length === 2) {
+        var ids = Object.keys(pointers);
+        var a = pointers[ids[0]], b = pointers[ids[1]];
+        pinch = { dist: Math.hypot(a.x - b.x, a.y - b.y), zoom: cam.tzoom };
+        dragging = null;
+        return;
+      }
+      dragging = { x: p.x, y: p.y, moved: 0, hit: pick(p.x, p.y) };
+      canvas.classList.add('is-grabbing');
+      canvas.setPointerCapture(e.pointerId);
+      vel.yaw = vel.pitch = 0;
+      holdSpin(3500);
+      if (!running) drawIfStatic();
+    });
+
+    canvas.addEventListener('pointermove', function (e) {
+      var p = local(e);
+      if (pointers[e.pointerId]) pointers[e.pointerId] = { x: p.x, y: p.y };
+
+      if (pinch) {
+        var ids = Object.keys(pointers);
+        if (ids.length >= 2) {
+          var a = pointers[ids[0]], b = pointers[ids[1]];
+          var d = Math.hypot(a.x - b.x, a.y - b.y);
+          cam.tzoom = Math.max(0.6, Math.min(2.6, pinch.zoom * (d / pinch.dist)));
+          if (reduced) { cam.zoom = cam.tzoom; }
+          drawIfStatic();
+        }
+        return;
+      }
+
+      if (dragging) {
+        var dx = p.x - dragging.x, dy = p.y - dragging.y;
+        dragging.moved += Math.abs(dx) + Math.abs(dy);
+        var s = 0.0052 / Math.max(0.6, cam.zoom);
+        cam.tyaw += dx * s;
+        cam.tpitch = clamp(cam.tpitch + dy * s * 0.85, -PITCH_MAX, PITCH_MAX);
+        cam.yaw = cam.tyaw;
+        cam.pitch = cam.tpitch;
+        vel.yaw = dx * s * 0.45;
+        vel.pitch = dy * s * 0.35;
+        dragging.x = p.x;
+        dragging.y = p.y;
+        holdSpin(3500);
+        drawIfStatic();
+        return;
+      }
+
+      var n = pick(p.x, p.y);
+      if (n !== hover) {
+        hover = n;
+        canvas.classList.toggle('is-target', !!n);
+        // Hover only narrates when nothing is pinned; clicking pins.
+        if (!selected) {
+          if (n) describe(n);
+          else showDefault();
+        }
+        drawIfStatic();
+      }
+    });
+
+    function release(e) {
+      delete pointers[e.pointerId];
+      if (Object.keys(pointers).length < 2) pinch = null;
+      if (dragging) {
+        var p = local(e);
+        if (dragging.moved < 6) {
+          if (dragging.hit) {
+            selected = dragging.hit;
+            describe(selected);
+            focus(selected);
+          } else {
+            var l = pickLink(p.x, p.y);
+            if (l) {
+              pulse = { a: l.a, b: l.b, at: performance.now() };
+              describeLink(l);
+            } else {
+              selected = null;
+              showDefault();
+            }
+          }
+        }
+        dragging = null;
+        canvas.classList.remove('is-grabbing');
+        drawIfStatic();
+      }
+    }
+
+    canvas.addEventListener('pointerup', release);
+    canvas.addEventListener('pointercancel', release);
+    canvas.addEventListener('pointerleave', function () {
+      hover = null;
+      canvas.classList.remove('is-target');
+    });
+
+    canvas.addEventListener('wheel', function (e) {
+      e.preventDefault();
+      cam.tzoom = clamp(cam.tzoom * (e.deltaY > 0 ? 0.93 : 1.07), 0.6, 2.6);
+      if (reduced) cam.zoom = cam.tzoom;
+      holdSpin(3500);
+      drawIfStatic();
+    }, { passive: false });
+
+    canvas.addEventListener('keydown', function (e) {
+      if (!graph) return;
+      var dirs = { ArrowRight: [1, 0], ArrowLeft: [-1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+      if (dirs[e.key]) {
+        e.preventDefault();
+        var from = selected;
+        if (!from) {
+          // start from whatever is closest to the camera
+          graph.nodes.forEach(function (n) {
+            if (!from || n.sz < from.sz) from = n;
+          });
+        }
+        if (!from) return;
+        var d = dirs[e.key], best = null, bestCost = Infinity;
+        // Nearest node in that direction. Stepping keeps the field still:
+        // rotating on every keystroke moves the targets out from under the keys.
+        graph.nodes.forEach(function (n) {
+          if (n === from) return;
+          var vx = n.sx - from.sx, vy = n.sy - from.sy;
+          var along = vx * d[0] + vy * d[1];
+          if (along < 6) return;
+          var side = Math.abs(vx * d[1] - vy * d[0]);
+          var cost = along + (side * side) / Math.max(60, along);
+          if (cost < bestCost) { bestCost = cost; best = n; }
+        });
+        if (best) {
+          selected = best;
+          describe(best);
+          holdSpin(12000);
+          drawIfStatic();
+        }
+      } else if (e.key === 'Enter') {
+        var target = selected || hover;
+        if (target && target.href) location.href = target.href;
+      } else if (e.key === 'Escape') {
+        reset();
+      } else if (e.key === '+' || e.key === '=') {
+        cam.tzoom = Math.min(2.6, cam.tzoom * 1.15); drawIfStatic();
+      } else if (e.key === '-' || e.key === '_') {
+        cam.tzoom = Math.max(0.6, cam.tzoom / 1.15); drawIfStatic();
+      }
+    });
+
+    /* controls -------------------------------------------------------- */
+    var spinBtn = el('[data-cx="spin"]', root);
+
+    function syncSpin() {
+      if (!spinBtn) return;
+      spinBtn.classList.toggle('is-off', !spin);
+      spinBtn.setAttribute('aria-pressed', spin ? 'true' : 'false');
+    }
+
+    if (spinBtn) {
+      spinBtn.setAttribute('aria-pressed', spin ? 'true' : 'false');
+      spinBtn.addEventListener('click', function () {
+        spin = !spin;
+        vel.yaw = vel.pitch = 0;
+        syncSpin();
+        if (!running) drawIfStatic();
+      });
+    }
+
+    var zoomIn = el('[data-cx="in"]', root);
+    var zoomOut = el('[data-cx="out"]', root);
+    var home = el('[data-cx="home"]', root);
+    if (zoomIn) zoomIn.addEventListener('click', function () {
+      cam.tzoom = Math.min(2.6, cam.tzoom * 1.2); if (reduced) cam.zoom = cam.tzoom; drawIfStatic();
+    });
+    if (zoomOut) zoomOut.addEventListener('click', function () {
+      cam.tzoom = Math.max(0.6, cam.tzoom / 1.2); if (reduced) cam.zoom = cam.tzoom; drawIfStatic();
+    });
+    if (home) home.addEventListener('click', reset);
 
     function renderFallback() {
       if (!fallback) return;
@@ -496,133 +867,13 @@
           b.lastChild.textContent = n.count;
           b.addEventListener('click', function () {
             selected = n;
-            focus(n);
             describe(n);
-            if (reduced) draw();
+            focus(n);
+            drawIfStatic();
           });
           fallback.appendChild(b);
         });
     }
-
-    // pointer -------------------------------------------------------------
-    canvas.addEventListener('pointermove', function (e) {
-      var rect = canvas.getBoundingClientRect();
-      var px = e.clientX - rect.left, py = e.clientY - rect.top;
-      if (drag) {
-        cam.tx += (e.clientX - drag.x) / cam.scale;
-        cam.ty += (e.clientY - drag.y) / cam.scale;
-        cam.x += (e.clientX - drag.x) / cam.scale;
-        cam.y += (e.clientY - drag.y) / cam.scale;
-        drag.x = e.clientX; drag.y = e.clientY;
-        return;
-      }
-      var n = pick(px, py);
-      if (n !== hover) {
-        hover = n;
-        canvas.style.cursor = n ? 'pointer' : 'grab';
-        if (!selected && n) describe(n); else if (!selected && !n) showDefault();
-        if (reduced) draw();
-      }
-    });
-
-    canvas.addEventListener('pointerdown', function (e) {
-      var rect = canvas.getBoundingClientRect();
-      var n = pick(e.clientX - rect.left, e.clientY - rect.top);
-      if (n) {
-        selected = n;
-        focus(n);
-        describe(n);
-      } else {
-        drag = { x: e.clientX, y: e.clientY };
-        canvas.classList.add('is-grabbing');
-        canvas.setPointerCapture(e.pointerId);
-      }
-      if (reduced) draw();
-    });
-
-    canvas.addEventListener('pointerup', function (e) {
-      if (drag) {
-        var moved = Math.hypot(e.clientX - drag.x, e.clientY - drag.y);
-        var rect = canvas.getBoundingClientRect();
-        if (moved < 4) {
-          var l = pickLink(e.clientX - rect.left, e.clientY - rect.top);
-          if (l) {
-            pulse = { a: l.a, b: l.b, at: performance.now() };
-            var shared = graph.nodes.filter(function (n) {
-              return n.kind === 'post' &&
-                graph.links.some(function (x) { return (x.a === l.a && x.b === n.id) || (x.b === l.a && x.a === n.id); }) &&
-                graph.links.some(function (x) { return (x.a === l.b && x.b === n.id) || (x.b === l.b && x.a === n.id); });
-            });
-            panel.hidden = false;
-            panel.innerHTML = '<h3 class="cx-panel-name">' + byId[l.a].label + ' ↔ ' + byId[l.b].label + '</h3>';
-            var d = document.createElement('p');
-            d.className = 'cx-panel-desc';
-            d.textContent = shared.length
-              ? '这两个主题共享 ' + shared.length + ' 篇记录：'
-              : '这两个主题在站内存在关联，但没有完全相同的文章。';
-            panel.appendChild(d);
-            var row = document.createElement('div');
-            row.className = 'cx-panel-links';
-            shared.slice(0, 6).forEach(function (n) {
-              var a = document.createElement('a');
-              a.className = 'cx-link';
-              a.href = n.href;
-              a.textContent = n.label;
-              row.appendChild(a);
-            });
-            panel.appendChild(row);
-          } else if (selected) {
-            selected = null;
-            showDefault();
-          }
-        }
-        drag = null;
-        canvas.classList.remove('is-grabbing');
-      }
-    });
-
-    canvas.addEventListener('wheel', function (e) {
-      e.preventDefault();
-      var next = Math.min(2.4, Math.max(0.55, cam.tscale * (e.deltaY > 0 ? 0.92 : 1.08)));
-      cam.tscale = next;
-      if (reduced) { cam.scale = next; draw(); }
-    }, { passive: false });
-
-    canvas.addEventListener('pointerleave', function () { hover = null; });
-
-    canvas.addEventListener('keydown', function (e) {
-      if (!graph) return;
-      var dirs = { ArrowRight: [1, 0], ArrowLeft: [-1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
-      if (dirs[e.key]) {
-        e.preventDefault();
-        var from = selected || graph.nodes[0];
-        if (!from) return;
-        var d = dirs[e.key];
-        var best = null, bestScore = -Infinity;
-        graph.nodes.forEach(function (n) {
-          if (n === from) return;
-          var vx = n.x - from.x, vy = n.y - from.y;
-          var along = vx * d[0] + vy * d[1];
-          if (along <= 0) return;
-          var side = Math.abs(vx * d[1] - vy * d[0]);
-          var score = along - side * 1.6;
-          if (score > bestScore) { bestScore = score; best = n; }
-        });
-        if (best) { selected = best; focus(best); describe(best); if (reduced) draw(); }
-      } else if (e.key === 'Enter' && selected) {
-        if (selected.href) location.href = selected.href;
-      } else if (e.key === 'Escape') {
-        reset();
-      }
-    });
-
-    // controls ------------------------------------------------------------
-    var zoomIn = el('[data-cx="in"]', root);
-    var zoomOut = el('[data-cx="out"]', root);
-    var home = el('[data-cx="home"]', root);
-    if (zoomIn) zoomIn.addEventListener('click', function () { cam.tscale = Math.min(2.4, cam.tscale * 1.2); if (reduced) { cam.scale = cam.tscale; draw(); } });
-    if (zoomOut) zoomOut.addEventListener('click', function () { cam.tscale = Math.max(0.55, cam.tscale / 1.2); if (reduced) { cam.scale = cam.tscale; draw(); } });
-    if (home) home.addEventListener('click', reset);
 
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(function (entries) {
@@ -634,24 +885,25 @@
       if (document.hidden) stop(); else start();
     });
 
-    new ResizeObserver(function () { resize(); if (graph && reduced) draw(); if (graph) { stop(); start(); } }).observe(root);
+    new ResizeObserver(function () { resize(); drawIfStatic(); }).observe(root);
 
     resize();
 
-    // Wait until the articles are enriched: the graph is made of real tags,
-    // so building it from the bare lists would draw a sparser, wrong shape.
+    // Wait until the articles are enriched: the shells are made of real tags,
+    // so building them from the bare lists would draw a sparser, wrong shape.
     T.content.load()
       .then(function (content) { return (content.settled || Promise.resolve(content)); })
       .then(function (content) {
         graph = build(content);
         byId = {};
         graph.nodes.forEach(function (n) { byId[n.id] = n; });
-        layout(graph, w, h);
         renderFallback();
         showDefault();
+        syncSpin();
         start();
         if (hud) {
-          hud.innerHTML = '<span>节点 <b></b></span><span>连线 <b></b></span><span>拖动平移 · 滚轮缩放 · 方向键换节点</span>';
+          hud.innerHTML = '<span>节点 <b></b> · 连线 <b></b></span>' +
+            '<span>拖动旋转 · 滚轮或双指缩放 · 点击节点</span>';
           var b = hud.querySelectorAll('b');
           b[0].textContent = graph.nodes.length;
           b[1].textContent = graph.links.length;

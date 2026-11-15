@@ -91,7 +91,7 @@ const feed = `<?xml version="1.0" encoding="UTF-8"?>
   <channel>
     <title>${esc(SITE.name)} · ${esc(SITE.subtitle)}</title>
     <link>${BASE}/</link>
-    <description>${esc(SITE.tagline)} Create 与 Observe 两条主线的技术记录与思考。</description>
+    <description>${esc(SITE.tagline)} Create 与 Observe 两侧的技术记录与思考。</description>
     <language>${esc(SITE.locale)}</language>
     <lastBuildDate>${now}</lastBuildDate>
     <managingEditor>${esc(SITE.email)} (${esc(SITE.author)})</managingEditor>

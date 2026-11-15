@@ -142,11 +142,11 @@
       if (!T.cosmos) return;
       var eng = T.cosmos(cv, {
         fit: true,
-        density: kind === 'create' ? 0.00022 : 0.00012,
+        density: kind === 'create' ? 0.00018 : 0.00012,
         minNodes: 26,
         cfg: kind === 'create'
-          ? { trail: 0, dust: 40, link: 92, nodes: 70 }
-          : { trail: 2, dust: 90, link: 150, nodes: 50 }
+          ? { dust: 34, link: 92, nodes: 96 }
+          : { dust: 88, link: 150, nodes: 84 }
       });
       if (eng) T.engine(eng);
     });
@@ -176,9 +176,10 @@
 
     $$('.sec-note[data-count-note]').forEach(function (node) {
       var n = parseInt(node.dataset.countNote, 10);
-      node.textContent = (n === 1 ? 'auto-derived from ' + posts.length + ' records'
-        : n === 2 ? 'from ' + (content.projects || []).length + ' public repositories'
-        : 'updated ' + ymd(posts.length ? posts[0].date : ''));
+      node.textContent = n === 1 ? '按标签自动分成两侧 · 共 ' + posts.length + ' 篇'
+        : n === 2 ? '来自 ' + (content.projects || []).length + ' 个公开仓库'
+        : n === 4 ? '共 ' + tags + ' 个主题，取自站内真实标签'
+        : '记录与仓库时间线合并 · 最近 ' + ymd(posts.length ? posts[0].date : '');
     });
   }
 
@@ -280,6 +281,7 @@
     (p.stack || []).slice(0, 5).forEach(function (t) { a.querySelector('.pcard-stack').appendChild(make('span', '', t)); });
     var foot = a.querySelector('.pcard-foot');
     foot.appendChild(make('span', '', (p.language || '—')));
+    if (p.visibility === 'private') foot.appendChild(make('span', 'pcard-priv', '私有仓库'));
     if (p.stars) foot.appendChild(make('span', '', '★ ' + p.stars));
     if (p.forks) foot.appendChild(make('span', '', '⑂ ' + p.forks));
     foot.appendChild(make('span', '', 'since ' + (p.since || '').slice(0, 10)));
@@ -325,6 +327,16 @@
             date: v.date, kind: '版本 ' + (v.ver || ''), title: p.name + ' · ' + (v.label || ''),
             href: '/projects/' + p.slug + '/', desc: v.note || ''
           });
+        });
+      });
+
+      // Manual milestones sit in the same stream as the derived entries, so a
+      // date that only exists in the repo's own history can still be read.
+      ((content.site || {}).milestones || []).forEach(function (m) {
+        if (!m.date) return;
+        items.push({
+          date: m.date, kind: '站点里程碑', title: m.title,
+          href: m.href || '/', desc: m.desc || ''
         });
       });
 
@@ -665,6 +677,51 @@
   }
 
   /* ------------------------------------------------------------------ */
+  /* Topic overview — the homepage's own reading of the tag cloud        */
+  /* ------------------------------------------------------------------ */
+  function fillTopicOverview(content) {
+    $$('[data-fill="topic-overview"]').forEach(function (wrap) {
+      var map = content.tagMap();
+      var notes = (content.site || {}).topicNotes || {};
+      var rows = Object.keys(map)
+        .filter(function (k) { return k !== 'Create' && k !== 'Observe'; })
+        .map(function (k) {
+          var hrefs = map[k].hrefs || [];
+          var recs = hrefs.map(content.find).filter(Boolean)
+            .sort(function (a, b) { return a.date < b.date ? 1 : -1; });
+          return {
+            tag: k,
+            posts: hrefs.length,
+            projects: (map[k].projects || []).length,
+            line: notes[k] || (recs.length ? '最近一篇：' + recs[0].title : ''),
+            latest: recs.length ? recs[0].date : ''
+          };
+        })
+        .filter(function (x) { return x.posts + x.projects > 0; })
+        .sort(function (a, b) { return (b.posts + b.projects) - (a.posts + a.projects); })
+        .slice(0, 12);
+
+      var top = rows.length ? rows[0].posts + rows[0].projects : 1;
+      wrap.innerHTML = '';
+      rows.forEach(function (x) {
+        var total = x.posts + x.projects;
+        var a = make('a', 'tp');
+        a.href = '/archives/#tag-' + encodeURIComponent(x.tag);
+        a.appendChild(make('span', 'tp-tag', '#' + x.tag));
+        a.appendChild(make('span', 'tp-line', x.line || '这个主题还没有写简介。'));
+        var meta = make('span', 'tp-meta');
+        meta.textContent = x.posts + ' 篇记录' + (x.projects ? ' · ' + x.projects + ' 个项目' : '');
+        a.appendChild(meta);
+        var bar = make('span', 'tp-bar');
+        bar.appendChild(make('i'));
+        bar.firstChild.style.setProperty('--w', Math.round(total / top * 100) + '%');
+        a.appendChild(bar);
+        wrap.appendChild(a);
+      });
+    });
+  }
+
+  /* ------------------------------------------------------------------ */
   /* Shared nav highlight + spine                                        */
   /* ------------------------------------------------------------------ */
   function initNav() {
@@ -698,6 +755,7 @@
       fillSignal(content);
       fillArchivePreview(content);
       fillTopicIndex(content);
+      fillTopicOverview(content);
       if (T.reveal) T.reveal();
     }
     // Content keeps arriving as articles are read in the background; coalesce

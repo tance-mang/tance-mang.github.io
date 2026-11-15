@@ -6,7 +6,8 @@
 
 /* ---------- 1. Design tokens ---------- */
 :root {
-  /* Brand palette */
+  /* Brand palette — violet carries identity, pink carries mood,
+     indigo only ever appears far back, never on a button. */
   --void-black: #07050D;
   --deep-violet: #180D30;
   --royal-purple: #6738CE;
@@ -15,6 +16,12 @@
   --dream-pink: #F2A8EC;
   --moon-white: #F4EEFF;
   --card-surface: #242035;
+
+  /* Depth palette — the distance in the field, not decoration */
+  --indigo-void: #0B1130;   /* far space */
+  --indigo-haze: #2B3A72;   /* galactic band, low alpha only */
+  --far-blue: #7C9BD6;      /* the coldest starlight at the rim */
+  --mist-pink: #E7B6E2;     /* softer than dream-pink, for haze edges */
 
   /* Legacy aliases — kept so old markup and new code share one scale */
   --bg-0: var(--void-black);
@@ -164,8 +171,9 @@ a:hover { color: var(--starlight); }
 }
 
 /* ---------- 3. Background layers ---------- */
-/* #neural-net is the canvas every page already ships; the ambient engine in
-   /js/script.js draws star trails, stardust and neural threads onto it. */
+/* Four layers, painted far → near: deep space, the galactic band, the orbit
+   arcs, then the star canvas every page already ships. Atmosphere is pure CSS
+   so it composites on the GPU and never enters the canvas frame budget. */
 #neural-net {
   position: fixed;
   inset: 0;
@@ -179,13 +187,59 @@ a:hover { color: var(--starlight); }
 .bg-veil {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: -3;
   pointer-events: none;
+  /* L1 / deep space: near-black with a cold rim, never flat black */
   background:
-    radial-gradient(ellipse 70% 50% at 18% 8%, rgba(103, 56, 206, 0.22), transparent 62%),
-    radial-gradient(ellipse 60% 45% at 88% 22%, rgba(242, 168, 236, 0.12), transparent 60%),
-    radial-gradient(ellipse 90% 60% at 50% 108%, rgba(24, 13, 48, 0.9), transparent 70%),
-    linear-gradient(180deg, var(--void-black) 0%, #0A0714 45%, var(--void-black) 100%);
+    radial-gradient(120% 88% at 80% -12%, rgba(103, 56, 206, 0.17), transparent 56%),
+    radial-gradient(105% 82% at 6% 110%, rgba(11, 17, 48, 0.9), transparent 62%),
+    linear-gradient(180deg, #07050D 0%, #0A0714 40%, #0A0A1C 68%, #07050D 100%);
+}
+
+/* L2 / one wide galactic plane running diagonally across the viewport */
+.bg-veil::before {
+  content: "";
+  position: absolute;
+  left: -25%;
+  top: -12%;
+  width: 150%;
+  height: 124%;
+  background:
+    linear-gradient(101deg,
+      transparent 10%,
+      rgba(124, 155, 214, 0.05) 26%,
+      rgba(214, 170, 255, 0.075) 42%,
+      rgba(231, 182, 226, 0.045) 58%,
+      transparent 78%),
+    radial-gradient(56% 20% at 44% 46%, rgba(43, 58, 114, 0.34), transparent 72%);
+  transform: rotate(-9deg);
+  animation: bandDrift 110s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+
+@keyframes bandDrift {
+  from { transform: rotate(-9.6deg) translate3d(-1.6%, 0, 0) scaleY(1); opacity: 0.74; }
+  to   { transform: rotate(-8.2deg) translate3d(1.6%, 1.2%, 0) scaleY(1.05); opacity: 0.96; }
+}
+
+/* L3 / large-scale orbits: three sparse gravitational paths, no glow heads */
+.bg-veil::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 176vmax;
+  height: 176vmax;
+  margin: -88vmax 0 0 -88vmax;
+  opacity: 0.5;
+  background: center / contain no-repeat
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000'%3E%3Cg fill='none' stroke-width='1'%3E%3Cellipse cx='500' cy='500' rx='462' ry='152' stroke='rgba(157,112,255,0.20)' transform='rotate(-17 500 500)'/%3E%3Cellipse cx='500' cy='500' rx='372' ry='296' stroke='rgba(124,155,214,0.15)' transform='rotate(26 500 500)'/%3E%3Cellipse cx='500' cy='500' rx='296' ry='88' stroke='rgba(231,182,226,0.13)' transform='rotate(-42 500 500)'/%3E%3C/g%3E%3C/svg%3E");
+  animation: arcTurn 420s linear infinite;
+  will-change: transform;
+}
+
+@keyframes arcTurn {
+  to { transform: rotate(360deg); }
 }
 
 .bg-grain {

@@ -1,7 +1,7 @@
 {
   "name": "TANCE",
   "subtitle": "NEURAL ORBIT",
-  "tagline": "A universe of ideas, code and consciousness.",
+  "tagline": "做出来的东西和想过的事情，放在同一个站点里。",
   "claim": "我使用的技术，和我想让它成为的东西，是两件事。",
   "author": "tance-mang",
   "email": "tance_mang@qq.com",
@@ -12,7 +12,7 @@
       "zh": "个人交流",
       "scope": "技术交流 · 开源讨论 · 日常联系",
       "email": "tance_mang@qq.com",
-      "note": "读者与开发者走这里"
+      "note": "技术与日常联系走这里"
     },
     {
       "key": "business",
@@ -27,9 +27,33 @@
   "issues": "https://github.com/tance-mang/tance-mang.github.io/issues",
   "baseUrl": "https://tance-mang.github.io",
   "locale": "zh-CN",
-
   "featured": [],
-
+  "milestones": [
+    {
+      "date": "2026-05-01",
+      "title": "仓库建立，发出第一篇复盘",
+      "desc": "当时还叫 mang-root.github.io，第一篇文章是一个应用开发的复盘。",
+      "href": "/2026/05/01/app-story/"
+    },
+    {
+      "date": "2026-06-04",
+      "title": "分成 Create 与 Observe 两侧",
+      "desc": "做出来的东西和想过的事情不再混在同一个列表里。",
+      "href": "/create.html"
+    },
+    {
+      "date": "2026-11-04",
+      "title": "删掉列表里的占位条目",
+      "desc": "没有内容的位置保持空白，不再用示例句子填着。",
+      "href": "/archives/"
+    },
+    {
+      "date": "2026-11-15",
+      "title": "首页变成一张由内容自己长出来的星域",
+      "desc": "12 个连续区块 + 可旋转的立体星域，节点与连线全部来自站内真实标签与仓库主题。",
+      "href": "/"
+    }
+  ],
   "topicNotes": {
     "Agent": "AI Agent 的工程实践：写作、审核、发布与故障诊断。",
     "Python": "这个站点背后大多数工具与自动化使用的语言。",
@@ -47,16 +71,36 @@
     "Create": "把想法做成能碰到的东西。",
     "Observe": "走路时看见的东西。"
   },
-
   "snapshot": {
     "date": "2026-11-15",
     "note": "GitHub Events API 不可用或触发速率限制时展示的最后核实快照。",
     "activity": [
-      { "date": "2026-11-15", "text": "spending-trap 更新至 v6（首页与街区收纳布局）", "href": "https://github.com/tance-mang/spending-trap" },
-      { "date": "2026-11-14", "text": "secunpack-skills v0.2.0：新增 Web 安全学习路径", "href": "https://github.com/tance-mang/secunpack-skills" },
-      { "date": "2026-11-14", "text": "weidingyi 小程序开发记录更新", "href": "https://github.com/tance-mang/weidingyi" },
-      { "date": "2026-11-12", "text": "auto-blog-agent：定时任务与发布链路持续运行", "href": "https://github.com/tance-mang/auto-blog-agent" },
-      { "date": "2026-11-08", "text": "发布《如果科技能改造整个宇宙》", "href": "/2026/11/08/universe-thoughts/" }
+      {
+        "date": "2026-11-15",
+        "text": "spending-trap 更新至 v6（首页与街区收纳布局）",
+        "href": "https://github.com/tance-mang/spending-trap"
+      },
+      {
+        "date": "2026-11-14",
+        "text": "secunpack-skills v0.2.0：新增 Web 安全学习路径",
+        "href": "https://github.com/tance-mang/secunpack-skills"
+      },
+      {
+        "date": "2026-11-14",
+        "text": "weidingyi 小程序开发记录更新",
+        "href": "https://github.com/tance-mang/weidingyi"
+      },
+      {
+        "date": "2026-11-12",
+        "text": "auto-blog-agent：定时任务与发布链路持续运行",
+        "href": "https://github.com/tance-mang/auto-blog-agent"
+      },
+      {
+        "date": "2026-11-08",
+        "text": "发布《如果科技能改造整个宇宙》",
+        "href": "/2026/11/08/universe-thoughts/"
+      }
     ]
-  }
+  },
+  "observed": "2026-11-15"
 }

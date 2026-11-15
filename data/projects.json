@@ -1,20 +1,5 @@
 [
   {
-    "slug": "auto-blog-agent",
-    "name": "Auto Blog Agent",
-    "status": "In development",
-    "kind": "开源工具",
-    "tagline": "让 AI 按我的身份规则写作、独立审核，再按规则发布中文技术博客。",
-    "summary": "Agent Skill + Python 自动化 + GitHub Actions 的博客运营流水线。",
-    "language": "Python",
-    "stack": ["Python 3.12", "GitHub Actions", "Agent Skills", "RSS", "SQLite"],
-    "topics": ["Agent", "Python", "开源", "AI", "自动化", "写作"],
-    "repo": "https://github.com/tance-mang/auto-blog-agent",
-    "since": "2026-11-02",
-    "updated": "2026-11-12",
-    "stars": 1,
-    "forks": 0,
-    "license": "MIT",
     "background": "博客更新长期依赖手动整理：想法散在对话和代码记录里，发布时再重新抄一遍。我想把选题、写作、审核、发布变成一个可以被检查的流程，而不是每次都靠记性。",
     "problem": "自动写作最容易出的问题不是写不出来，而是四件事：身份漂移（AI 写成通用口吻）、重复发布、token 成本失控，以及失败之后没有人知道发生了什么。",
     "implementation": [
@@ -38,27 +23,55 @@
       "在线博客历史自动导入、多语言审核全面验证、Draft PR 与可靠恢复仍未完成。"
     ],
     "versions": [
-      { "date": "2026-11-03", "ver": "0.1.0", "label": "初始 CLI、Skill、RSS、审核、SQLite 与发布接口", "note": "本地测试与离线流程通过；真实模型和无人值守部署未联调。" },
-      { "date": "2026-11-04", "ver": "0.2.0", "label": "定位收窄为个人技术博客自动化", "note": "新增文章语言配置与 --language 覆盖；不从 IP、地理位置、时区或身份模板推断语言。" }
+      {
+        "date": "2026-11-03",
+        "ver": "0.1.0",
+        "label": "初始 CLI、Skill、RSS、审核、SQLite 与发布接口",
+        "note": "本地测试与离线流程通过；真实模型和无人值守部署未联调。"
+      },
+      {
+        "date": "2026-11-04",
+        "ver": "0.2.0",
+        "label": "定位收窄为个人技术博客自动化",
+        "note": "新增文章语言配置与 --language 覆盖；不从 IP、地理位置、时区或身份模板推断语言。"
+      }
     ],
-    "related": ["/2026/11/04/auto-blog-agent-build/", "/2026/11/03/auto-blog-agent/", "/2026/11/05/before-retrying/"]
+    "related": [
+      "/2026/11/04/auto-blog-agent-build/",
+      "/2026/11/03/auto-blog-agent/",
+      "/2026/11/05/before-retrying/"
+    ],
+    "slug": "auto-blog-agent",
+    "name": "Auto Blog Agent",
+    "status": "In development",
+    "kind": "开源工具",
+    "visibility": "public",
+    "tagline": "让 AI 按我的身份规则写作、独立审核，再按规则发布中文技术博客。",
+    "summary": "Agent Skill + Python 自动化 + GitHub Actions 的博客运营流水线。",
+    "language": "Python",
+    "stack": [
+      "Python 3.12",
+      "GitHub Actions",
+      "Agent Skills",
+      "RSS",
+      "SQLite"
+    ],
+    "topics": [
+      "Agent",
+      "Python",
+      "开源",
+      "AI",
+      "自动化",
+      "写作"
+    ],
+    "repo": "https://github.com/tance-mang/auto-blog-agent",
+    "since": "2026-11-02",
+    "updated": "2026-11-12",
+    "stars": 1,
+    "forks": 0,
+    "license": "MIT"
   },
   {
-    "slug": "chinese-webnovel-skills",
-    "name": "网文工坊 · WebNovel Studio",
-    "status": "Active",
-    "kind": "开源技能包",
-    "tagline": "中文网文写作工具包：39 个技能、35 份参考库，覆盖选题到投稿。",
-    "summary": "Claude Code 插件，也可用于 ChatGPT / DeepSeek / Gemini / Kimi。",
-    "language": "Python",
-    "stack": ["Claude Code Plugin", "Markdown Skills", "Python CLI", "多模型适配"],
-    "topics": ["写作", "AI", "开源", "工具", "Agent"],
-    "repo": "https://github.com/tance-mang/chinese-webnovel-skills",
-    "since": "2026-06-05",
-    "updated": "2026-11-08",
-    "stars": 104,
-    "forks": 17,
-    "license": "MIT",
     "background": "用大模型写中文网文时，大多数人在做的是零散复制 prompt：今天一个开篇模板，明天一个爽点清单，规则互相冲突，也不懂平台与读者的商业逻辑。",
     "problem": "需要一套稳定、可组合、懂网文行业约束的工具：男频女频双线、起点 / 番茄 / 晋江 / UC / 知乎盐选 / Webnovel 的平台差异、同人合规、以及最容易翻车的 AI 味。",
     "implementation": [
@@ -79,27 +92,52 @@
       "输出仍需作者逐段判断，工具不做自动投稿。"
     ],
     "versions": [
-      { "date": "2026-06-13", "ver": "0.29.1", "label": "当前发布版本", "note": "英文写作三段化与海外平台边界更新。" },
-      { "date": "2026-06-12", "ver": "0.26.0", "label": "CLI 与模型配置扩展", "note": "命名模型、健康检查与显式切换。" }
+      {
+        "date": "2026-06-13",
+        "ver": "0.29.1",
+        "label": "当前发布版本",
+        "note": "英文写作三段化与海外平台边界更新。"
+      },
+      {
+        "date": "2026-06-12",
+        "ver": "0.26.0",
+        "label": "CLI 与模型配置扩展",
+        "note": "命名模型、健康检查与显式切换。"
+      }
     ],
-    "related": ["/2026/11/04/writing-with-ai/", "/2026/11/07/choosing-blog-images/"]
+    "related": [
+      "/2026/11/04/writing-with-ai/",
+      "/2026/11/07/choosing-blog-images/"
+    ],
+    "slug": "chinese-webnovel-skills",
+    "name": "网文工坊 · WebNovel Studio",
+    "status": "Active",
+    "kind": "开源技能包",
+    "visibility": "public",
+    "tagline": "中文网文写作工具包：39 个技能、35 份参考库，覆盖选题到投稿。",
+    "summary": "Claude Code 插件，也可用于 ChatGPT / DeepSeek / Gemini / Kimi。",
+    "language": "Python",
+    "stack": [
+      "Claude Code Plugin",
+      "Markdown Skills",
+      "Python CLI",
+      "多模型适配"
+    ],
+    "topics": [
+      "写作",
+      "AI",
+      "开源",
+      "工具",
+      "Agent"
+    ],
+    "repo": "https://github.com/tance-mang/chinese-webnovel-skills",
+    "since": "2026-06-05",
+    "updated": "2026-11-08",
+    "stars": 104,
+    "forks": 17,
+    "license": "MIT"
   },
   {
-    "slug": "nuanxiaoquan-app",
-    "name": "暖小圈 · WarmCircle",
-    "status": "On hold",
-    "kind": "全栈应用",
-    "tagline": "学习 · 生理期 · 记账 三合一的离线优先工具。",
-    "summary": "Flutter 客户端 + Spring Boot 服务端，统计与预测全部本地完成。",
-    "language": "Dart",
-    "stack": ["Flutter 3.x", "Spring Boot 3.x", "Python 3.11", "本地确定性算法"],
-    "topics": ["网络安全", "工具", "AI"],
-    "repo": "https://github.com/tance-mang/nuanxiaoquan-app",
-    "since": "2026-04-25",
-    "updated": "2026-05-22",
-    "stars": 1,
-    "forks": 0,
-    "license": "Source-available · 非商业",
     "background": "记账、生理期记录和学习计划通常是三个互不相干的 App。但真正想知道的恰恰是它们之间的关系：这个阶段的消费变化、经期前后的学习状态。",
     "problem": "把三件事放进同一个应用不难，难的是建立关联而不牺牲离线可用性，也不把敏感数据交给云端模型。",
     "implementation": [
@@ -118,26 +156,42 @@
       "公开仓库为源码存档，完整工程与线上服务不在本仓库内。"
     ],
     "versions": [
-      { "ver": "1.1", "label": "三合一离线优先版本", "note": "本地算法承担统计与预测，AI 仅生成文案。" }
+      {
+        "ver": "1.1",
+        "label": "三合一离线优先版本",
+        "note": "本地算法承担统计与预测，AI 仅生成文案。"
+      }
     ],
-    "related": ["/2026/05/01/app-story/"]
-  },
-  {
-    "slug": "workflow-guardian",
-    "name": "Workflow Guardian",
-    "status": "Active",
-    "kind": "开源工具",
-    "tagline": "在看日志之前，先知道无人值守的自动化为什么失败。",
-    "summary": "为 GitHub Actions 生成故障报告的独立监测工具。",
-    "language": "Python",
-    "stack": ["GitHub Actions", "Python", "Markdown 报告", "可选 SMTP"],
-    "topics": ["自动化", "Agent", "开源", "Python"],
-    "repo": "https://github.com/tance-mang/workflow-guardian",
-    "since": "2026-11-05",
-    "updated": "2026-11-05",
+    "related": [
+      "/2026/05/01/app-story/"
+    ],
+    "slug": "nuanxiaoquan-app",
+    "name": "暖小圈 · WarmCircle",
+    "status": "On hold",
+    "kind": "全栈应用",
+    "visibility": "public",
+    "tagline": "学习 · 生理期 · 记账 三合一的离线优先工具。",
+    "summary": "Flutter 客户端 + Spring Boot 服务端，统计与预测全部本地完成。",
+    "language": "Dart",
+    "stack": [
+      "Flutter 3.x",
+      "Spring Boot 3.x",
+      "Python 3.11",
+      "本地确定性算法"
+    ],
+    "topics": [
+      "网络安全",
+      "工具",
+      "AI"
+    ],
+    "repo": "https://github.com/tance-mang/nuanxiaoquan-app",
+    "since": "2026-04-25",
+    "updated": "2026-05-22",
     "stars": 1,
     "forks": 0,
-    "license": "开源",
+    "license": "Source-available · 非商业"
+  },
+  {
     "background": "博客自动化跑在 Actions 上之后，最早暴露问题的人往往是第二天打开仓库的我。失败静默、漏跑、上游任务初始化失败，都没有稳定的通知路径。",
     "problem": "监测不能和被监测的任务共用一条命：如果它自己也依赖同一个工作流，上游一崩就同时失联。",
     "implementation": [
@@ -155,26 +209,45 @@
       "报告针对 Actions 场景，非 GitHub 的调度系统不在覆盖范围。"
     ],
     "versions": [
-      { "date": "2026-11-05", "ver": "v1", "label": "首个发布", "note": "基础版故障报告与漏跑检查。" }
+      {
+        "date": "2026-11-05",
+        "ver": "v1",
+        "label": "首个发布",
+        "note": "基础版故障报告与漏跑检查。"
+      }
     ],
-    "related": ["/2026/11/05/workflow-guardian/", "/2026/11/05/before-retrying/"]
+    "related": [
+      "/2026/11/05/workflow-guardian/",
+      "/2026/11/05/before-retrying/"
+    ],
+    "slug": "workflow-guardian",
+    "name": "Workflow Guardian",
+    "status": "Active",
+    "kind": "开源工具",
+    "visibility": "public",
+    "tagline": "在看日志之前，先知道无人值守的自动化为什么失败。",
+    "summary": "为 GitHub Actions 生成故障报告的独立监测工具。",
+    "language": "Python",
+    "stack": [
+      "GitHub Actions",
+      "Python",
+      "Markdown 报告",
+      "可选 SMTP"
+    ],
+    "topics": [
+      "自动化",
+      "Agent",
+      "开源",
+      "Python"
+    ],
+    "repo": "https://github.com/tance-mang/workflow-guardian",
+    "since": "2026-11-05",
+    "updated": "2026-11-05",
+    "stars": 1,
+    "forks": 0,
+    "license": "MIT"
   },
   {
-    "slug": "secunpack-skills",
-    "name": "SecUnpack · 安全拆解工坊",
-    "status": "Active",
-    "kind": "学习路径与技能包",
-    "tagline": "把网络安全原理拆成初学者能理解、能观察、能验证的过程。",
-    "summary": "8 个技能 + Windows 程序行为 / Web 安全两条学习路径，含本机可复现实验。",
-    "language": "Python",
-    "stack": ["Markdown Skills", "Python 3.10+ 标准库", "本机回环 Web 教学应用"],
-    "topics": ["网络安全", "Agent", "开源", "学习"],
-    "repo": "https://github.com/tance-mang/secunpack-skills",
-    "since": "2026-11-14",
-    "updated": "2026-11-14",
-    "stars": 2,
-    "forks": 0,
-    "license": "开源",
     "background": "安全入门资料常见两种极端：只讲概念，或者直接给攻击工具。前者学完无法验证，后者跳过机制去追求结果。",
     "problem": "需要一条固定流程：先理解机制，再在本机观察证据，最后验证防御是否真的起作用——而且整条路径不能依赖扫描公网或运行恶意样本。",
     "implementation": [
@@ -193,26 +266,43 @@
       "不保证每个模型都按同一流程执行。"
     ],
     "versions": [
-      { "date": "2026-11-14", "ver": "0.2.0", "label": "Web 安全学习路径", "note": "新增脆弱对照页面与参数化 / 转义对比实验。" }
+      {
+        "date": "2026-11-14",
+        "ver": "0.2.0",
+        "label": "Web 安全学习路径",
+        "note": "新增脆弱对照页面与参数化 / 转义对比实验。"
+      }
     ],
-    "related": ["/2026/05/01/app-story/"]
+    "related": [
+      "/2026/05/01/app-story/"
+    ],
+    "slug": "secunpack-skills",
+    "name": "SecUnpack · 安全拆解工坊",
+    "status": "Active",
+    "kind": "学习路径与技能包",
+    "visibility": "public",
+    "tagline": "把网络安全原理拆成初学者能理解、能观察、能验证的过程。",
+    "summary": "8 个技能 + Windows 程序行为 / Web 安全两条学习路径，含本机可复现实验。",
+    "language": "Python",
+    "stack": [
+      "Markdown Skills",
+      "Python 3.10+ 标准库",
+      "本机回环 Web 教学应用"
+    ],
+    "topics": [
+      "网络安全",
+      "Agent",
+      "开源",
+      "学习"
+    ],
+    "repo": "https://github.com/tance-mang/secunpack-skills",
+    "since": "2026-11-14",
+    "updated": "2026-11-14",
+    "stars": 2,
+    "forks": 0,
+    "license": "开源"
   },
   {
-    "slug": "spending-trap",
-    "name": "心愿街 · Spending Trap",
-    "status": "Active",
-    "kind": "互动叙事游戏",
-    "tagline": "走进心愿街，在一次次选择中看清消费机制。",
-    "summary": "以日常购物为背景的互动体验游戏，2026 Qoder 高校创造力大赛参赛作品。",
-    "language": "TypeScript",
-    "stack": ["React", "TypeScript", "Vite", "Tailwind CSS v4"],
-    "topics": ["游戏", "AI", "工具"],
-    "repo": "https://github.com/tance-mang/spending-trap",
-    "since": "2026-11-06",
-    "updated": "2026-11-15",
-    "stars": 1,
-    "forks": 0,
-    "license": "私有（比赛作品记录）",
     "background": "消费心理的机制写在文章里很难被感受到。想做一个让玩家先体验、后发现的场景：小额消费、促销优惠和预算取舍都发生在具体情境中。",
     "problem": "如果直接把金额和余额摆在界面上，玩家会进入计算模式，机制感就消失了。设计难点是让玩家通过自己的决定逐渐意识到环境如何影响选择。",
     "implementation": [
@@ -231,31 +321,67 @@
       "叙事与美术方向仍在调整，公开仓库以迭代记录为主。"
     ],
     "versions": [
-      { "ver": "v6", "label": "首页与街区收纳布局（当前版本）", "note": "油画保持 800:457，街区宽度上限 1000px，四个店铺热区全部落在屏内。" },
-      { "ver": "v5", "label": "咖啡角、街区动态与结账层级", "note": "星光小店新增咖啡角，四位独立行人加入街景纵深。" },
-      { "ver": "v4", "label": "隐性消费累积与交互真实性", "note": "移除可见边框与余额显示，改为光晕反馈与件数计数。" },
-      { "ver": "v3", "label": "全屏沉浸式叙事", "note": "重构为第一人称全屏交互叙事。" },
-      { "ver": "v2", "label": "心愿街自由探索", "note": "从线性闯关改为自由探索，2.5D 等距视角。" },
-      { "ver": "v1", "label": "线性关卡原型", "note": "四幕线性流程，逐步引入消费心理机制。" }
+      {
+        "ver": "v6",
+        "label": "首页与街区收纳布局（当前版本）",
+        "note": "油画保持 800:457，街区宽度上限 1000px，四个店铺热区全部落在屏内。"
+      },
+      {
+        "ver": "v5",
+        "label": "咖啡角、街区动态与结账层级",
+        "note": "星光小店新增咖啡角，四位独立行人加入街景纵深。"
+      },
+      {
+        "ver": "v4",
+        "label": "隐性消费累积与交互真实性",
+        "note": "移除可见边框与余额显示，改为光晕反馈与件数计数。"
+      },
+      {
+        "ver": "v3",
+        "label": "全屏沉浸式叙事",
+        "note": "重构为第一人称全屏交互叙事。"
+      },
+      {
+        "ver": "v2",
+        "label": "心愿街自由探索",
+        "note": "从线性闯关改为自由探索，2.5D 等距视角。"
+      },
+      {
+        "ver": "v1",
+        "label": "线性关卡原型",
+        "note": "四幕线性流程，逐步引入消费心理机制。"
+      }
     ],
-    "related": ["/2026/11/07/choosing-blog-images/"]
-  },
-  {
-    "slug": "weidingyi",
-    "name": "未定义 · UNDEFINED",
+    "related": [
+      "/2026/11/07/choosing-blog-images/"
+    ],
+    "slug": "spending-trap",
+    "name": "心愿街 · Spending Trap",
     "status": "Active",
-    "kind": "微信小程序",
-    "tagline": "你不止一种答案。自我探索与关系认知小程序的开发记录。",
-    "summary": "从一道日常选择开始，也可以写一份题请朋友作答，比较彼此的理解差异。",
-    "language": "JavaScript",
-    "stack": ["微信小程序", "原创题集", "双人关系镜像"],
-    "topics": ["工具", "写作", "游戏"],
-    "repo": "https://github.com/tance-mang/weidingyi",
-    "since": "2026-11-03",
-    "updated": "2026-11-14",
+    "kind": "互动叙事游戏",
+    "visibility": "private",
+    "tagline": "走进心愿街，在一次次选择中看清消费机制。",
+    "summary": "以日常购物为背景的互动体验游戏，2026 Qoder 高校创造力大赛参赛作品。",
+    "language": "TypeScript",
+    "stack": [
+      "React",
+      "TypeScript",
+      "Vite",
+      "Tailwind CSS v4"
+    ],
+    "topics": [
+      "游戏",
+      "AI",
+      "工具"
+    ],
+    "repo": "https://github.com/tance-mang/spending-trap",
+    "since": "2026-11-06",
+    "updated": "2026-11-15",
     "stars": 1,
     "forks": 0,
-    "license": "私有（开发记录）",
+    "license": "私有（比赛作品记录）"
+  },
+  {
     "background": "常见的性格测试给一个结论就结束了。更想讨论的是：同一个问题，我和我朋友的答案差在哪里，以及为什么。",
     "problem": "既要能自我探索，也要支持自定义题目与双人对照，同时不让题库变成冷冰冰的量表。",
     "implementation": [
@@ -272,24 +398,35 @@
       "题库与结果解释仍在扩充，尚未做稳定性测试记录。"
     ],
     "versions": [],
-    "related": ["/2026/11/05/before-retrying/"]
+    "related": [
+      "/2026/11/05/before-retrying/"
+    ],
+    "slug": "weidingyi",
+    "name": "未定义 · UNDEFINED",
+    "status": "Active",
+    "kind": "微信小程序",
+    "visibility": "private",
+    "tagline": "你不止一种答案。自我探索与关系认知小程序的开发记录。",
+    "summary": "从一道日常选择开始，也可以写一份题请朋友作答，比较彼此的理解差异。",
+    "language": "JavaScript",
+    "stack": [
+      "微信小程序",
+      "原创题集",
+      "双人关系镜像"
+    ],
+    "topics": [
+      "工具",
+      "写作",
+      "游戏"
+    ],
+    "repo": "https://github.com/tance-mang/weidingyi",
+    "since": "2026-11-03",
+    "updated": "2026-11-14",
+    "stars": 1,
+    "forks": 0,
+    "license": "私有（开发记录）"
   },
   {
-    "slug": "xunwei-liusheng",
-    "name": "寻味留声",
-    "status": "In development",
-    "kind": "独立游戏",
-    "tagline": "小体量 2D 斜俯视餐厅经营游戏：NPC 情绪、玩家心声与轻度悬疑。",
-    "summary": "微信小游戏优先，保留原工程文件名与资源 UUID。",
-    "language": "TypeScript",
-    "stack": ["Cocos Creator 3.8.8", "TypeScript", "微信小游戏"],
-    "topics": ["游戏", "工具"],
-    "repo": "https://github.com/tance-mang/xunwei-liusheng",
-    "since": "2026-11-03",
-    "updated": "2026-11-03",
-    "stars": 0,
-    "forks": 0,
-    "license": "私有（开发记录）",
     "background": "想把经营游戏做成表达载体：不只是效率优化，还包括 NPC 情绪、玩家自己的心声与一点悬疑。",
     "problem": "小体量项目要控制范围。首发平台选择直接决定工程改造方式，旧 H5 / TapTap 记录需要作为历史保留而不是推翻。",
     "implementation": [
@@ -306,24 +443,34 @@
       "仓库最后一次推送是 2026-11-03。"
     ],
     "versions": [],
-    "related": ["/2026/05/01/app-story/"]
+    "related": [
+      "/2026/05/01/app-story/"
+    ],
+    "slug": "xunwei-liusheng",
+    "name": "寻味留声",
+    "status": "In development",
+    "kind": "独立游戏",
+    "visibility": "private",
+    "tagline": "小体量 2D 斜俯视餐厅经营游戏：NPC 情绪、玩家心声与轻度悬疑。",
+    "summary": "微信小游戏优先，保留原工程文件名与资源 UUID。",
+    "language": "TypeScript",
+    "stack": [
+      "Cocos Creator 3.8.8",
+      "TypeScript",
+      "微信小游戏"
+    ],
+    "topics": [
+      "游戏",
+      "工具"
+    ],
+    "repo": "https://github.com/tance-mang/xunwei-liusheng",
+    "since": "2026-11-03",
+    "updated": "2026-11-03",
+    "stars": 0,
+    "forks": 0,
+    "license": "私有（开发记录）"
   },
   {
-    "slug": "omni-insight-studio",
-    "name": "Omni Insight Studio",
-    "status": "Active",
-    "kind": "本地研究工具",
-    "tagline": "全域 AI 选品与内容研究工作流，跑在自己电脑上。",
-    "summary": "手动数据分类 + 本地统计 + 自有 AI 服务生成待审核文案，无需自建服务器。",
-    "language": "Python",
-    "stack": ["Streamlit", "SQLite", "Ollama", "CSV / Excel 导入"],
-    "topics": ["AI", "工具", "自动化"],
-    "repo": "https://github.com/tance-mang/omni-insight-studio",
-    "since": "2026-11-03",
-    "updated": "2026-11-08",
-    "stars": 1,
-    "forks": 0,
-    "license": "自定义许可（限制商业分发）",
     "background": "内容研究需要把分散的互动数据、评论需求和产品资料放进一个可查的地方，而不是散在表格和截图里。",
     "problem": "既要避免爬取与平台接口依赖，又想让本地数据能被统计、被 AI 使用，同时数据不出本机。",
     "implementation": [
@@ -341,24 +488,36 @@
       "Windows 本地工具，不含服务端部署方案。"
     ],
     "versions": [],
-    "related": ["/2026/11/07/chatgpt-to-codex/"]
-  },
-  {
-    "slug": "repostyle-memory",
-    "name": "仓库文风 · RepoStyle Memory",
+    "related": [
+      "/2026/11/07/chatgpt-to-codex/"
+    ],
+    "slug": "omni-insight-studio",
+    "name": "Omni Insight Studio",
     "status": "Active",
-    "kind": "Agent Skill",
-    "tagline": "你的仓库，你的文风。让 AI 接着维护，不必每次重新交代。",
-    "summary": "把 README 写法、变更记录与真实测试要求存成可迁移的规则。",
+    "kind": "本地研究工具",
+    "visibility": "public",
+    "tagline": "全域 AI 选品与内容研究工作流，跑在自己电脑上。",
+    "summary": "手动数据分类 + 本地统计 + 自有 AI 服务生成待审核文案，无需自建服务器。",
     "language": "Python",
-    "stack": ["Agent Skills", "Markdown 规则", "变更证据"],
-    "topics": ["Agent", "开源", "工具", "写作"],
-    "repo": "https://github.com/tance-mang/repostyle-memory",
-    "since": "2026-11-07",
-    "updated": "2026-11-07",
+    "stack": [
+      "Streamlit",
+      "SQLite",
+      "Ollama",
+      "CSV / Excel 导入"
+    ],
+    "topics": [
+      "AI",
+      "工具",
+      "自动化"
+    ],
+    "repo": "https://github.com/tance-mang/omni-insight-studio",
+    "since": "2026-11-03",
+    "updated": "2026-11-08",
     "stars": 1,
     "forks": 0,
-    "license": "开源",
+    "license": "自定义许可（限制商业分发）"
+  },
+  {
     "background": "让 AI 开发完项目之后，还要反复解释 README 怎么写、测试怎么记、简介怎么介绍。每一次换工具都要重新交代一遍。",
     "problem": "这些要求属于个人规范，不属于任何模型或工具。需要一种可迁移、有据可查的存放方式。",
     "implementation": [
@@ -373,6 +532,34 @@
       "输出仍取决于宿主模型的遵循能力，规则文件不替代人工校对。"
     ],
     "versions": [],
-    "related": ["/2026/11/04/writing-with-ai/", "/2026/11/07/choosing-blog-images/"]
+    "related": [
+      "/2026/11/04/writing-with-ai/",
+      "/2026/11/07/choosing-blog-images/"
+    ],
+    "slug": "repostyle-memory",
+    "name": "仓库文风 · RepoStyle Memory",
+    "status": "Active",
+    "kind": "Agent Skill",
+    "visibility": "public",
+    "tagline": "你的仓库，你的文风。让 AI 接着维护，不必每次重新交代。",
+    "summary": "把 README 写法、变更记录与真实测试要求存成可迁移的规则。",
+    "language": "Python",
+    "stack": [
+      "Agent Skills",
+      "Markdown 规则",
+      "变更证据"
+    ],
+    "topics": [
+      "Agent",
+      "开源",
+      "工具",
+      "写作"
+    ],
+    "repo": "https://github.com/tance-mang/repostyle-memory",
+    "since": "2026-11-07",
+    "updated": "2026-11-07",
+    "stars": 1,
+    "forks": 0,
+    "license": "MIT"
   }
 ]
