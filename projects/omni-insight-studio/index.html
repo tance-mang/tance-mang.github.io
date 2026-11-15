@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Omni Insight Studio — 作品 · TANCE</title>
+  <meta name="description" content="全域 AI 选品与内容研究工作流，跑在自己电脑上。">
+  <link rel="canonical" href="https://tance-mang.github.io/projects/omni-insight-studio/">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Omni Insight Studio — TANCE Projects">
+  <meta property="og:description" content="全域 AI 选品与内容研究工作流，跑在自己电脑上。">
+  <meta property="og:url" content="https://tance-mang.github.io/projects/omni-insight-studio/">
+  <link rel="alternate" type="application/rss+xml" title="TANCE · Neural Orbit" href="/feed.xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/universe.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Omni Insight Studio",
+   "url":"https://tance-mang.github.io/projects/omni-insight-studio/","description":"全域 AI 选品与内容研究工作流，跑在自己电脑上。",
+   "applicationCategory":"DeveloperApplication","programmingLanguage":"Python",
+   "sameAs":"https://github.com/tance-mang/omni-insight-studio"}
+  </script>
+</head>
+<body>
+  <div class="bg-veil"></div>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+  <div class="bg-grain"></div>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html">Create</a>
+      <a href="/observe.html">Observe</a>
+      <a href="/projects/" class="is-current">Projects</a>
+      <a href="/archives/">Archive</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </header>
+
+  <main class="sub-shell pdetail">
+    <section class="pdetail-hero">
+      <span class="sub-eyebrow">本地研究工具</span>
+      <h1 class="sub-title">Omni Insight Studio</h1>
+      <p class="sub-line">全域 AI 选品与内容研究工作流，跑在自己电脑上。</p>
+      <div class="tag-line" style="margin-top:20px;"><a class="chip" href="/archives/#tag-AI">#AI</a> <a class="chip" href="/archives/#tag-%E5%B7%A5%E5%85%B7">#工具</a> <a class="chip" href="/archives/#tag-%E8%87%AA%E5%8A%A8%E5%8C%96">#自动化</a></div>
+      <div class="pdetail-grid"><div class="pstat"><span class="k">状态</span><span class="v">Active</span></div><div class="pstat"><span class="k">语言</span><span class="v">Python</span></div><div class="pstat"><span class="k">起始</span><span class="v">2026-11-03</span></div><div class="pstat"><span class="k">最近推送</span><span class="v">2026-11-08</span></div><div class="pstat"><span class="k">License</span><span class="v">自定义许可（限制商业分发）</span></div><div class="pstat"><span class="k">Stars / Forks</span><span class="v">1 / 0</span></div></div>
+      <div class="club-actions" style="justify-content:flex-start;margin-top:26px;">
+        <a class="btn" href="https://github.com/tance-mang/omni-insight-studio" target="_blank" rel="noopener">打开仓库 <i class="arrow">→</i></a>
+        <a class="btn btn--ghost" href="/projects/">返回作品星系</a>
+      </div>
+    </section>
+
+    <section class="pblock"><h2>背景</h2><p>内容研究需要把分散的互动数据、评论需求和产品资料放进一个可查的地方，而不是散在表格和截图里。</p></section>
+    <section class="pblock"><h2>问题</h2><p>既要避免爬取与平台接口依赖，又想让本地数据能被统计、被 AI 使用，同时数据不出本机。</p></section>
+    <section class="pblock"><h2>技术实现</h2><ul><li>授权后的 CSV / Excel 导入本地 SQLite，互动评分与图表在本地完成。</li><li>评论摘要进入本地规则统计，不上传原始数据。</li><li>通过自己的 AI 服务（含本地 Ollama）生成待审核文案，人工确认后才使用。</li><li>平台名称只用于数据分类与提示词场景，README 明确说明这不代表官方接口接入。</li></ul></section>
+    <section class="pblock"><h2>实际验证</h2><ul><li>README 提供完整的本地流程图与目录结构，源码公开供学习与个人使用。</li></ul></section>
+    <section class="pblock"><h2>局限与未完成</h2><ul><li>采用限制商业分发的自定义许可，并非 OSI 标准开源许可。</li><li>仅作者或获得书面授权的销售者可以销售软件。</li><li>Windows 本地工具，不含服务端部署方案。</li></ul></section>
+
+    <section class="pblock"><h2>版本记录</h2><p class="signal-note">该仓库没有独立的版本号记录，迭代过程保存在提交历史与 README 中。</p></section>
+    <section class="pblock"><h2>关联记录</h2><div class="related-list"><a href="/2026/11/07/chatgpt-to-codex/"><span>在 Codex 里找回 ChatGPT 的项目讨论</span><span class="rel-date">站内文章</span></a></div></section>
+
+    <p class="signal-note" style="margin-top:40px;">
+      本页内容取自 https://github.com/tance-mang/omni-insight-studio 的 README / CHANGELOG 与 GitHub 仓库元数据，观测日期 2026-11-15。
+      数字与状态会随仓库变化，页面不做推测性补充。
+    </p>
+
+    <footer class="post-foot">
+      <a href="/projects/">← back to galaxy</a>
+      <a href="/">tance</a>
+    </footer>
+  </main>
+
+  <script src="/js/script.js"></script>
+  <script src="/js/universe.js"></script>
+</body>
+</html>

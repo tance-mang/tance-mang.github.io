@@ -3,83 +3,347 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TANCE — Create &amp; Observe</title>
-  <meta name="description" content="Create & Observe — exploring the intersection of technology, creation and thought.">
+  <title>TANCE — Neural Orbit</title>
+  <meta name="description" content="TANCE · Neural Orbit。一个由代码、观察与意识构成的个人数字宇宙：Create 与 Observe 两条主线，交互式思维星图，以及可以直接读的技术记录。">
+  <meta name="theme-color" content="#07050D">
+  <link rel="canonical" href="https://tance-mang.github.io/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="TANCE">
+  <meta property="og:title" content="TANCE — Neural Orbit">
+  <meta property="og:description" content="Create 与 Observe 两条主线，交互式思维星图，以及可以直接读的技术记录。">
+  <meta property="og:url" content="https://tance-mang.github.io/">
+  <meta property="og:image" content="https://tance-mang.github.io/css/images/banner.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="TANCE — Neural Orbit">
+  <meta name="twitter:description" content="A universe of ideas, code and consciousness.">
+  <link rel="alternate" type="application/rss+xml" title="TANCE · Neural Orbit" href="/feed.xml">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2307050D'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23D6AAFF'/%3E%3Cellipse cx='16' cy='16' rx='13' ry='5' fill='none' stroke='%239D70FF' stroke-width='1.4' transform='rotate(-24 16 16)'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/universe.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "TANCE",
+    "url": "https://tance-mang.github.io/",
+    "sameAs": ["https://github.com/tance-mang"],
+    "knowsAbout": ["AI Agent 工程实践", "网络安全", "自动化发布", "中文技术写作"],
+    "description": "个人数字宇宙：Create 与 Observe 两条内容主线。"
+  }
+  </script>
 </head>
-<body class="page-void">
+<body data-universe>
+  <a class="skip-link" href="#manifesto">跳到内容</a>
+  <div class="bg-veil"></div>
   <canvas id="neural-net" aria-hidden="true"></canvas>
+  <div class="bg-grain"></div>
 
-  <main class="void">
-    <header class="brand">
-      <h1 class="brand-title">TANCE</h1>
-      <p class="brand-sub">
-        <span class="brand-sub-en">Create &amp; Observe</span>
-        <span class="brand-sub-zh">创造与观察</span>
+  <nav class="orbit-nav" aria-label="主导航">
+    <a class="nav-mark" href="/">TANCE</a>
+    <div class="nav-links">
+      <a href="#worlds">Create × Observe</a>
+      <a href="#constellation">星图</a>
+      <a href="#stories">文章</a>
+      <a href="#galaxy">作品</a>
+      <a href="/archives/">档案</a>
+      <a href="/orbit/">Orbit</a>
+      <a href="/about.html">About</a>
+    </div>
+  </nav>
+
+  <!-- ============ 01 / HERO ============ -->
+  <header class="hero" id="top">
+    <canvas class="hero-canvas" id="hero-canvas" aria-hidden="true"></canvas>
+    <div class="hero-stack">
+      <h1 class="hero-word">TANCE</h1>
+      <p class="hero-brandline">
+        <span class="orbit-tag">Neural Orbit</span>
+        <span class="zh">创造与观察</span>
       </p>
-    </header>
+      <p class="hero-claim">
+        A universe of ideas, code and consciousness.<br>
+        <em>技术不止是被使用的，它值得被追问能成为什么。</em>
+      </p>
+      <div class="hero-cta">
+        <a class="btn" href="#constellation">Explore My Universe <i class="arrow">→</i></a>
+        <a class="btn btn--ghost" href="#stories">Latest Records <i class="arrow">↓</i></a>
+      </div>
+      <p class="hero-count">
+        <span>记录 <b data-count="posts">—</b></span>
+        <span>作品 <b data-count="projects">—</b></span>
+        <span>主题 <b data-count="topics">—</b></span>
+        <span>最近更新 <b data-count="latest">—</b></span>
+      </p>
+    </div>
+    <div class="scroll-hint" aria-hidden="true">
+      <span>scroll</span>
+      <span class="bar"></span>
+    </div>
+  </header>
 
-    <nav class="duo" aria-label="Primary">
-      <a class="duo-card" href="/create.html" data-card="create">
-        <svg class="card-frame" viewBox="0 0 100 70" preserveAspectRatio="none" aria-hidden="true">
-          <path class="card-frame-path"
-                d="M 0 0 L 90 0 L 100 10 L 100 70 L 10 70 L 0 60 Z"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1"
-                vector-effect="non-scaling-stroke"/>
-        </svg>
-        <div class="card-body">
-          <span class="card-eyebrow">01 / Create</span>
-          <h2 class="card-title">CREATE</h2>
-          <p class="card-line">Turning ideas into reality.</p>
-          <ul class="card-list">
-            <li>开发</li>
-            <li>网络安全</li>
-            <li>AI</li>
-            <li>项目实验</li>
-          </ul>
-          <span class="card-go">enter <i class="arrow">→</i></span>
+  <main>
+    <noscript>
+      <section class="sec sec--tight">
+        <div class="sec-inner">
+          <p class="no-js-note">
+            首页的星图、精选文章、作品星系与实时信号需要 JavaScript 才能从文章内容自动汇总。
+            静态入口始终可用：<a href="/create.html">Create</a> ·
+            <a href="/observe.html">Observe</a> · <a href="/archives/">全部档案</a> ·
+            <a href="/about.html">About</a>。
+          </p>
         </div>
-      </a>
+      </section>
+    </noscript>
 
-      <a class="duo-card" href="/observe.html" data-card="observe">
-        <svg class="card-frame" viewBox="0 0 100 70" preserveAspectRatio="none" aria-hidden="true">
-          <path class="card-frame-path"
-                d="M 10 0 L 100 0 L 100 60 L 90 70 L 0 70 L 0 10 Z"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1"
-                vector-effect="non-scaling-stroke"/>
-        </svg>
-        <div class="card-body">
-          <span class="card-eyebrow">02 / Observe</span>
-          <h2 class="card-title">OBSERVE</h2>
-          <p class="card-line">Thoughts, learning and journeys.</p>
-          <ul class="card-list">
-            <li>成长记录</li>
-            <li>灵感</li>
-            <li>学习过程</li>
-            <li>思考</li>
-          </ul>
-          <span class="card-go">enter <i class="arrow">→</i></span>
+    <!-- ============ 02 / MANIFESTO ============ -->
+    <section class="sec manifesto" id="manifesto">
+      <span class="spine" aria-hidden="true"></span>
+      <div class="sec-inner manifesto-lines">
+        <p class="mline">
+          <span class="en">I don't just use technology.</span>
+          <span class="en">I question <span class="accent">what it can become.</span></span>
+          <span class="zh">我不只是使用技术，我更在意它可能变成什么。</span>
+        </p>
+        <p class="mline">
+          <span class="en">Build it, then doubt it.</span>
+          <span class="zh">做完之后，回到过程里继续怀疑。</span>
+        </p>
+        <p class="mline">
+          <span class="en">Create is what I made.</span>
+          <span class="en">Observe is <span class="accent">what made me change my mind.</span></span>
+          <span class="zh">Create 是我做出来的东西，Observe 是让我改主意的东西。</span>
+        </p>
+        <p class="mline">
+          <span class="en">Every note here is a node.</span>
+          <span class="zh">这里的每一条记录都是一个节点，连起来才是我真正在想的事。</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ 03 / CREATE × OBSERVE ============ -->
+    <section class="sec" id="worlds">
+      <div class="sec-inner">
+        <div class="sec-head">
+          <span class="sec-index">03 /</span>
+          <h2 class="sec-name">Two Worlds</h2>
+          <span class="sec-note" data-count-note="1"></span>
         </div>
-      </a>
-    </nav>
+        <div class="worlds">
+          <a class="world world-create" href="/create.html">
+            <canvas class="world-canvas" data-world="create" aria-hidden="true"></canvas>
+            <span class="world-count"><b data-count="create">—</b> records</span>
+            <span class="world-kicker">01 / Cold violet · structured light</span>
+            <h3 class="world-title">CREATE</h3>
+            <p class="world-line">Turning ideas into reality — 开发 · 网络安全 · AI · 项目实验。</p>
+            <span class="world-go">enter <i class="arrow">→</i></span>
+          </a>
+          <a class="world world-observe" href="/observe.html">
+            <canvas class="world-canvas" data-world="observe" aria-hidden="true"></canvas>
+            <span class="world-count"><b data-count="observe">—</b> records</span>
+            <span class="world-kicker">02 / Dream pink · drifting trail</span>
+            <h3 class="world-title">OBSERVE</h3>
+            <p class="world-line">Thoughts, learning and journeys — 成长记录 · 灵感 · 学习过程 · 思考。</p>
+            <span class="world-go">enter <i class="arrow">→</i></span>
+          </a>
+        </div>
+      </div>
+    </section>
 
-    <footer class="void-foot">
-      <span class="void-foot-line">a silent digital universe</span>
-      <span class="void-foot-meta">
-        <a href="/about.html">about</a>
-        <span class="dot">·</span>
-        <a href="https://github.com/tance-mang" target="_blank" rel="noopener">github</a>
-      </span>
+    <!-- ============ 04 / NEURAL CONSTELLATION ============ -->
+    <section class="sec" id="constellation-section">
+      <div class="sec-inner">
+        <div class="sec-head">
+          <span class="sec-index">04 /</span>
+          <h2 class="sec-name">Neural Constellation</h2>
+          <span class="sec-note">内容决定结构</span>
+        </div>
+        <div class="constellation" id="constellation">
+          <div class="cx-canvas-wrap">
+            <canvas id="cx-canvas" tabindex="0"
+                    aria-label="思维星图：主题、文章与项目的关联图。使用方向键在节点间移动，回车打开选中节点，Esc 复位。"></canvas>
+            <div class="cx-hud" aria-hidden="true"></div>
+            <div class="cx-tools">
+              <button type="button" data-cx="in" aria-label="放大星图">＋</button>
+              <button type="button" data-cx="out" aria-label="缩小星图">－</button>
+              <button type="button" data-cx="home" aria-label="复位星图">◇</button>
+            </div>
+            <div class="cx-panel" aria-live="polite"></div>
+          </div>
+          <div class="cx-fallback" role="group" aria-label="星图节点列表（键盘可用）"></div>
+        </div>
+        <p class="signal-note">
+          这张图是「思想与作品的关联图」：节点来自站内真实的标签与分类，连线来自同一篇文章同时携带的标签，
+          项目节点来自公开仓库的真实主题。它不是任何模型权重的可视化。
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ 05 / FEATURED STORIES ============ -->
+    <section class="sec" id="stories">
+      <div class="sec-inner">
+        <div class="sec-head">
+          <span class="sec-index">05 /</span>
+          <h2 class="sec-name">Featured Stories</h2>
+          <span class="sec-note"><a href="/archives/">全部记录 →</a></span>
+        </div>
+        <div class="story-grid" data-fill="stories"></div>
+      </div>
+    </section>
+
+    <!-- ============ 06 / PROJECT GALAXY ============ -->
+    <section class="sec" id="galaxy">
+      <div class="sec-inner">
+        <div class="sec-head">
+          <span class="sec-index">06 /</span>
+          <h2 class="sec-name">Project Galaxy</h2>
+          <span class="sec-note" data-count-note="2"></span>
+        </div>
+        <div class="galaxy" data-fill="galaxy" data-limit="6"></div>
+        <p class="signal-note">
+          全部项目数据来自公开仓库与其 README / CHANGELOG，观测日期 2026-11-15；
+          状态、局限与未完成项如实列出。<a href="/projects/">查看作品星系 →</a>
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ 07 / EVOLUTION ============ -->
+    <section class="sec" id="evolution">
+      <div class="sec-inner">
+        <div class="sec-head">
+          <span class="sec-index">07 /</span>
+          <h2 class="sec-name">Evolution</h2>
+          <span class="sec-note" data-count-note="3"></span>
+        </div>
+        <div class="evo" data-fill="evo" data-limit="20"></div>
+      </div>
+    </section>
+
+    <!-- ============ 08 / FRAGMENTS ============ -->
+    <section class="sec" id="fragments">
+      <div class="sec-inner">
+        <div class="sec-head">
+          <span class="sec-index">08 /</span>
+          <h2 class="sec-name">Fragments</h2>
+          <span class="sec-note">摘自 Observe 原文</span>
+        </div>
+        <div class="frags" data-fill="frags"></div>
+      </div>
+    </section>
+
+    <!-- ============ 09 / LIVE SIGNAL ============ -->
+    <section class="sec" id="signal">
+      <div class="sec-inner">
+        <div class="sec-head">
+          <span class="sec-index">09 /</span>
+          <h2 class="sec-name">Live Signal</h2>
+          <span class="sec-note" data-signal="state"></span>
+        </div>
+        <div class="signal" data-fill="signal">
+          <div>
+            <h3 class="signal-col-title">最新发布</h3>
+            <div class="signal-list" data-signal="posts"></div>
+          </div>
+          <div>
+            <h3 class="signal-col-title">GitHub 公开活动</h3>
+            <div class="signal-list" data-signal="github"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 10 / ARCHIVE ============ -->
+    <section class="sec" id="archive">
+      <div class="sec-inner">
+        <div class="sec-head">
+          <span class="sec-index">10 /</span>
+          <h2 class="sec-name">Deep Archive</h2>
+          <span class="sec-note"><a href="/archives/">打开完整档案 →</a></span>
+        </div>
+        <div class="arch-preview" data-fill="arch-preview"></div>
+      </div>
+    </section>
+
+    <!-- ============ 11 / ORBIT CLUB ============ -->
+    <section class="sec club" id="club">
+      <span class="club-ring" aria-hidden="true"></span>
+      <span class="club-ring club-ring--inner" aria-hidden="true"></span>
+      <div class="club-card">
+        <span class="sec-index">11 /</span>
+        <h2 class="club-title">ORBIT</h2>
+        <p class="club-sub">进入我的星环。读者空间现在开放的是真实可用的渠道，不是承诺。</p>
+        <ul class="club-list">
+          <li><span class="k">Follow</span><span><a href="https://github.com/tance-mang" target="_blank" rel="noopener">在 GitHub 关注 tance-mang</a>，仓库动态即写作素材。</span></li>
+          <li><span class="k">RSS</span><span><a href="/feed.xml">订阅 /feed.xml</a>，文章与项目更新直接进入阅读器。</span></li>
+          <li><span class="k">留言</span><span><a href="https://github.com/tance-mang/tance-mang.github.io/issues" target="_blank" rel="noopener">在仓库 Issues 留言</a>，带身份与反垃圾能力，公开可见。</span></li>
+          <li><span class="k">Mail</span><span><a href="mailto:tance_mang@qq.com">tance_mang@qq.com</a></span></li>
+          <li><span class="k">Member</span><span><span class="badge-soon">In development</span> 读者徽章、收藏与会员内容需要账户与数据存储，静态托管阶段不会伪装成可用。</span></li>
+        </ul>
+        <div class="club-actions">
+          <a class="btn" href="https://github.com/tance-mang" target="_blank" rel="noopener">Follow on GitHub <i class="arrow">→</i></a>
+          <a class="btn btn--ghost" href="/feed.xml">RSS</a>
+          <a class="btn btn--ghost" href="/orbit/">读者空间</a>
+        </div>
+        <p class="club-note">
+          不展示粉丝数、订阅数或付费人数；没有真实数据的地方保持空白。<br>
+          邮件推送、账户与支付均未接入，接口位置预留但不提供假表单。
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ 12 / THE END? ============ -->
+    <footer class="endmark" id="end">
+      <canvas class="endmark-canvas" aria-hidden="true"></canvas>
+      <p class="endmark-word">TANCE</p>
+      <div class="endmark-foot">
+        <div class="endmark-col">
+          <h3>Navigate</h3>
+          <ul>
+            <li><a href="/">首页 / Neural Orbit</a></li>
+            <li><a href="#constellation-section">思维星图</a></li>
+            <li><a href="/projects/">作品星系</a></li>
+            <li><a href="/orbit/">读者空间</a></li>
+            <li><a href="/about.html">About</a></li>
+          </ul>
+        </div>
+        <div class="endmark-col">
+          <h3>Create</h3>
+          <ul>
+            <li><a href="/create.html">技术与项目记录</a></li>
+            <li><a href="/archives/#tag-Agent">Agent 与自动化</a></li>
+            <li><a href="/archives/#tag-网络安全">网络安全</a></li>
+          </ul>
+        </div>
+        <div class="endmark-col">
+          <h3>Observe</h3>
+          <ul>
+            <li><a href="/observe.html">思考与观察</a></li>
+            <li><a href="/archives/#tag-灵感">灵感碎片</a></li>
+            <li><a href="/archives/#tag-复盘">复盘</a></li>
+          </ul>
+        </div>
+        <div class="endmark-col">
+          <h3>Elsewhere</h3>
+          <ul>
+            <li><a href="https://github.com/tance-mang" target="_blank" rel="noopener">github.com/tance-mang</a></li>
+            <li><a href="mailto:tance_mang@qq.com">tance_mang@qq.com</a></li>
+            <li><a href="/feed.xml">RSS</a></li>
+            <li><a href="/sitemap.xml">sitemap</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="endmark-legal">
+        <span>© 2026 tance-mang</span>
+        <span>GitHub Pages · 静态托管</span>
+        <span><a href="#top">回到星核 ↑</a></span>
+      </p>
     </footer>
   </main>
 
   <script src="/js/script.js"></script>
+  <script src="/js/constellation.js"></script>
+  <script src="/js/universe.js"></script>
 </body>
 </html>

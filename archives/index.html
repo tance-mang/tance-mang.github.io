@@ -3,31 +3,64 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Archives — TANCE</title>
+  <title>Archive — TANCE · Neural Orbit</title>
+  <meta name="description" content="深空档案库：全部文章可按关键词、年份、分类与主题筛选。">
+  <link rel="canonical" href="https://tance-mang.github.io/archives/">
+  <meta property="og:title" content="Archive — TANCE">
+  <meta property="og:description" content="全部技术记录与思考，可按关键词、年份、分类与主题筛选。">
+  <link rel="alternate" type="application/rss+xml" title="TANCE · Neural Orbit" href="/feed.xml">
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/universe.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
+  <a class="skip-link" href="#tools">跳到搜索</a>
+  <div class="bg-veil"></div>
   <canvas id="neural-net" aria-hidden="true"></canvas>
+  <div class="bg-grain"></div>
 
   <header class="sub-header">
     <a href="/" class="sub-logo">TANCE</a>
     <nav class="sub-nav">
       <a href="/create.html">Create</a>
-      <a href="/observe.html" class="is-current">Observe</a>
+      <a href="/observe.html">Observe</a>
+      <a href="/projects/">Projects</a>
+      <a href="/archives/" class="is-current">Archive</a>
       <a href="/about.html">About</a>
     </nav>
   </header>
 
-  <main class="sub-shell">
+  <main class="sub-shell" data-archive-tools>
     <section class="sub-head">
       <span class="sub-eyebrow">— Archives</span>
       <h1 class="sub-title">All notes,<br>in order.</h1>
-      <p class="sub-line">按时间顺序的全部记录。</p>
+      <p class="sub-line">深空档案库 — 按关键词、年份、分类与主题探索全部记录。索引在浏览器里由站内页面实时汇总，不依赖后端。</p>
     </section>
 
+    <section class="tools" id="tools">
+      <label class="search-field">
+        <span class="sr-only">搜索文章</span>
+        <span class="glyph" aria-hidden="true">/</span>
+        <input type="search" placeholder="搜索标题、正文与标签…" autocomplete="off">
+      </label>
+      <div class="filters" data-filters="kind" role="group" aria-label="按分类筛选"></div>
+      <div class="filters" data-filters="year" role="group" aria-label="按年份筛选"></div>
+    </section>
+
+    <section class="tools" style="border-bottom:none;padding-top:0;" aria-label="按主题筛选">
+      <div class="filters" data-filters="tag" role="group"></div>
+    </section>
+
+    <p class="count-line" data-archive-count aria-live="polite">正在汇总索引…</p>
+
+    <!-- Auto Blog Agent 会把新条目的导航插入到下方列表容器的开始标签之后。
+         那个 class 为 entry-list 的 section 开始标签在本文件中必须恰好出现一次，
+         并且不能带任何额外属性，否则发布器会判定标记不唯一而中止。
+         这份列表同时是无 JavaScript 情况下的阅读路径：脚本只会用筛选后的
+         同等结构重绘同一个容器。 -->
+    <span id="entrylist" class="sr-only">全部文章列表</span>
     <section class="entry-list">
       <a href="/2026/11/08/universe-thoughts/" class="entry">
         <span class="entry-date">2026 · 11 · 08</span>
@@ -68,6 +101,17 @@
     </section>
   </main>
 
+  <footer class="foot">
+    <span>a silent digital universe</span>
+    <span>
+      <a href="/">home</a><span class="dot">·</span>
+      <a href="/orbit/">orbit</a><span class="dot">·</span>
+      <a href="https://github.com/tance-mang" target="_blank" rel="noopener">github</a><span class="dot">·</span>
+      <a href="/feed.xml">rss</a>
+    </span>
+  </footer>
+
   <script src="/js/script.js"></script>
+  <script src="/js/universe.js"></script>
 </body>
 </html>

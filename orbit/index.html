@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orbit — 读者星环 · TANCE</title>
+  <meta name="description" content="TANCE 的读者空间：真实可用的关注、订阅与留言渠道，公开资源导航，以及尚未开通的会员能力说明。">
+  <link rel="canonical" href="https://tance-mang.github.io/orbit/">
+  <meta property="og:title" content="Orbit — 读者星环 · TANCE">
+  <meta property="og:description" content="真实可用的关注、订阅与留言渠道；没有开通的能力如实标注。">
+  <link rel="alternate" type="application/rss+xml" title="TANCE · Neural Orbit" href="/feed.xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/universe.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="bg-veil"></div>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+  <div class="bg-grain"></div>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html">Create</a>
+      <a href="/observe.html">Observe</a>
+      <a href="/projects/">Projects</a>
+      <a href="/archives/">Archive</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </header>
+
+  <main class="sub-shell">
+    <section class="sub-head">
+      <span class="sub-eyebrow">— Orbit Club</span>
+      <h1 class="sub-title">进入我的星环。</h1>
+      <p class="sub-line">读者空间不需要注册，也不需要假表单。下面每一项现在点下去都真的会发生事情；还没做的事明确标出来。</p>
+    </section>
+
+    <section class="club" style="margin:0 calc(var(--gutter) * -1);">
+      <span class="club-ring" aria-hidden="true"></span>
+      <span class="club-ring club-ring--inner" aria-hidden="true"></span>
+      <div class="club-card">
+        <h2 class="club-title">ORBIT</h2>
+        <p class="club-sub">先做好真实可用的三件事：关注、订阅、留言。</p>
+        <div class="club-actions">
+          <a class="btn" href="https://github.com/tance-mang" target="_blank" rel="noopener">Follow on GitHub <i class="arrow">→</i></a>
+          <a class="btn btn--ghost" href="/feed.xml">RSS 订阅</a>
+          <a class="btn btn--ghost" href="https://github.com/tance-mang/tance-mang.github.io/issues/new" target="_blank" rel="noopener">留言 / 纠错</a>
+          <a class="btn btn--ghost" href="mailto:tance_mang@qq.com">邮件</a>
+        </div>
+        <p class="club-note">
+          为什么留言走 GitHub Issues：它有真实的身份（GitHub 账号）、可追溯的公开记录与平台自带的垃圾过滤，
+          不需要我另搭一个评论后端。不展示粉丝数、订阅数或任何我无法核对的数字。
+        </p>
+      </div>
+    </section>
+
+    <section class="about-section" style="margin-top:64px;">
+      <h2 class="about-label">Transmission · 更新来自哪里</h2>
+      <div class="signal" data-fill="signal" style="margin-top:18px;">
+        <div>
+          <h3 class="signal-col-title">最新文章 <span data-signal="state"></span></h3>
+          <div class="signal-list" data-signal="posts"></div>
+        </div>
+        <div>
+          <h3 class="signal-col-title">GitHub 公开活动</h3>
+          <div class="signal-list" data-signal="github"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section">
+      <h2 class="about-label">公开资源导航</h2>
+      <div class="about-body">
+        <p>可以直接读、也可以用起来的东西：</p>
+      </div>
+      <ul class="club-list">
+        <li><span class="k">Skill</span><span><a href="https://github.com/tance-mang/chinese-webnovel-skills" target="_blank" rel="noopener">网文工坊</a> — 中文网文写作技能包，MIT。</span></li>
+        <li><span class="k">Skill</span><span><a href="https://github.com/tance-mang/secunpack-skills" target="_blank" rel="noopener">安全拆解工坊</a> — 面向初学者的网络安全学习路径与本机实验。</span></li>
+        <li><span class="k">Tool</span><span><a href="https://github.com/tance-mang/workflow-guardian" target="_blank" rel="noopener">Workflow Guardian</a> — 无人值守 GitHub Actions 的故障报告工具。</span></li>
+        <li><span class="k">Tool</span><span><a href="https://github.com/tance-mang/auto-blog-agent" target="_blank" rel="noopener">Auto Blog Agent</a> — 本站背后的自动写作与发布流程。</span></li>
+        <li><span class="k">Index</span><span><a href="/archives/">全部文章</a> · <a href="/projects/">全部作品</a> · <a href="/feed.xml">feed.xml</a></span></li>
+      </ul>
+    </section>
+
+    <section class="about-section">
+      <h2 class="about-label">尚未开通 · 如实标注</h2>
+      <div class="about-body">
+        <ul class="club-list">
+          <li><span class="k">Member</span><span><span class="badge-soon">In development</span> 会员专属内容与权限分级：需要账户体系与数据存储，静态托管阶段无法真实生效。</span></li>
+          <li><span class="k">Badge</span><span><span class="badge-soon">In development</span> 读者徽章：依赖读者身份数据，待有实际读者需求再设计。</span></li>
+          <li><span class="k">Email push</span><span><span class="badge-soon">Not configured</span> 邮件订阅推送：需要订阅服务与密钥，当前不提供提交入口，以免出现点了没反应的表单。</span></li>
+          <li><span class="k">Payment</span><span><span class="badge-soon">Not configured</span> 付费与支付：没有任何收费计划。</span></li>
+        </ul>
+        <p class="signal-note">接口位置已经预留：这些条目集中在一处，等后端能力具备时替换说明文字即可，不需要重排页面。</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span>a silent digital universe</span>
+    <span>
+      <a href="/">home</a><span class="dot">·</span>
+      <a href="/archives/">archive</a><span class="dot">·</span>
+      <a href="https://github.com/tance-mang" target="_blank" rel="noopener">github</a><span class="dot">·</span>
+      <a href="/feed.xml">rss</a>
+    </span>
+  </footer>
+
+  <script src="/js/script.js"></script>
+  <script src="/js/universe.js"></script>
+</body>
+</html>

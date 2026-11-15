@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>心愿街 · Spending Trap — 作品 · TANCE</title>
+  <meta name="description" content="走进心愿街，在一次次选择中看清消费机制。">
+  <link rel="canonical" href="https://tance-mang.github.io/projects/spending-trap/">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="心愿街 · Spending Trap — TANCE Projects">
+  <meta property="og:description" content="走进心愿街，在一次次选择中看清消费机制。">
+  <meta property="og:url" content="https://tance-mang.github.io/projects/spending-trap/">
+  <link rel="alternate" type="application/rss+xml" title="TANCE · Neural Orbit" href="/feed.xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/universe.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"心愿街 · Spending Trap",
+   "url":"https://tance-mang.github.io/projects/spending-trap/","description":"走进心愿街，在一次次选择中看清消费机制。",
+   "applicationCategory":"DeveloperApplication","programmingLanguage":"TypeScript",
+   "sameAs":"https://github.com/tance-mang/spending-trap"}
+  </script>
+</head>
+<body>
+  <div class="bg-veil"></div>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+  <div class="bg-grain"></div>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html">Create</a>
+      <a href="/observe.html">Observe</a>
+      <a href="/projects/" class="is-current">Projects</a>
+      <a href="/archives/">Archive</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </header>
+
+  <main class="sub-shell pdetail">
+    <section class="pdetail-hero">
+      <span class="sub-eyebrow">互动叙事游戏</span>
+      <h1 class="sub-title">心愿街 · Spending Trap</h1>
+      <p class="sub-line">走进心愿街，在一次次选择中看清消费机制。</p>
+      <div class="tag-line" style="margin-top:20px;"><a class="chip" href="/archives/#tag-%E6%B8%B8%E6%88%8F">#游戏</a> <a class="chip" href="/archives/#tag-AI">#AI</a> <a class="chip" href="/archives/#tag-%E5%B7%A5%E5%85%B7">#工具</a></div>
+      <div class="pdetail-grid"><div class="pstat"><span class="k">状态</span><span class="v">Active</span></div><div class="pstat"><span class="k">语言</span><span class="v">TypeScript</span></div><div class="pstat"><span class="k">起始</span><span class="v">2026-11-06</span></div><div class="pstat"><span class="k">最近推送</span><span class="v">2026-11-15</span></div><div class="pstat"><span class="k">License</span><span class="v">私有（比赛作品记录）</span></div><div class="pstat"><span class="k">Stars / Forks</span><span class="v">1 / 0</span></div></div>
+      <div class="club-actions" style="justify-content:flex-start;margin-top:26px;">
+        <a class="btn" href="https://github.com/tance-mang/spending-trap" target="_blank" rel="noopener">打开仓库 <i class="arrow">→</i></a>
+        <a class="btn btn--ghost" href="/projects/">返回作品星系</a>
+      </div>
+    </section>
+
+    <section class="pblock"><h2>背景</h2><p>消费心理的机制写在文章里很难被感受到。想做一个让玩家先体验、后发现的场景：小额消费、促销优惠和预算取舍都发生在具体情境中。</p></section>
+    <section class="pblock"><h2>问题</h2><p>如果直接把金额和余额摆在界面上，玩家会进入计算模式，机制感就消失了。设计难点是让玩家通过自己的决定逐渐意识到环境如何影响选择。</p></section>
+    <section class="pblock"><h2>技术实现</h2><ul><li>从四幕线性流程重构为自由探索的心愿街，再推进到全屏第一人称叙事。</li><li>店铺热区移除可见边框，改为环境光晕悬浮反馈，四色对应四家店铺。</li><li>隐性消费累积：购物袋只显示件数不显示金额，顶部栏移除现金余额。</li><li>街区加入四位独立行人，步幅随行走距离推进，形成前景层次与纵深。</li><li>油画场景资产保持 800:457 比例，桌面端不放大；UI 由代码驱动而非绘制在背景里。</li></ul></section>
+    <section class="pblock"><h2>实际验证</h2><ul><li>README 中有 v1 到 v6 的完整迭代记录，当前版本为 v6（首页与街区收纳布局）。</li><li>仓库在 2026-11-15 仍在更新。</li></ul></section>
+    <section class="pblock"><h2>局限与未完成</h2><ul><li>这是比赛作品与过程记录，不是商业产品。</li><li>叙事与美术方向仍在调整，公开仓库以迭代记录为主。</li></ul></section>
+
+    <section class="pblock"><h2>版本记录</h2><div class="pvers">
+      <div class="pvers-row">
+        <span class="ver">v6</span>
+        <span class="txt">首页与街区收纳布局（当前版本）<br><span class="signal-when">油画保持 800:457，街区宽度上限 1000px，四个店铺热区全部落在屏内。</span></span>
+      </div>
+      <div class="pvers-row">
+        <span class="ver">v5</span>
+        <span class="txt">咖啡角、街区动态与结账层级<br><span class="signal-when">星光小店新增咖啡角，四位独立行人加入街景纵深。</span></span>
+      </div>
+      <div class="pvers-row">
+        <span class="ver">v4</span>
+        <span class="txt">隐性消费累积与交互真实性<br><span class="signal-when">移除可见边框与余额显示，改为光晕反馈与件数计数。</span></span>
+      </div>
+      <div class="pvers-row">
+        <span class="ver">v3</span>
+        <span class="txt">全屏沉浸式叙事<br><span class="signal-when">重构为第一人称全屏交互叙事。</span></span>
+      </div>
+      <div class="pvers-row">
+        <span class="ver">v2</span>
+        <span class="txt">心愿街自由探索<br><span class="signal-when">从线性闯关改为自由探索，2.5D 等距视角。</span></span>
+      </div>
+      <div class="pvers-row">
+        <span class="ver">v1</span>
+        <span class="txt">线性关卡原型<br><span class="signal-when">四幕线性流程，逐步引入消费心理机制。</span></span>
+      </div></div></section>
+    <section class="pblock"><h2>关联记录</h2><div class="related-list"><a href="/2026/11/07/choosing-blog-images/"><span>博客配图，哪些交给 AI，哪些留给自己选</span><span class="rel-date">站内文章</span></a></div></section>
+
+    <p class="signal-note" style="margin-top:40px;">
+      本页内容取自 https://github.com/tance-mang/spending-trap 的 README / CHANGELOG 与 GitHub 仓库元数据，观测日期 2026-11-15。
+      数字与状态会随仓库变化，页面不做推测性补充。
+    </p>
+
+    <footer class="post-foot">
+      <a href="/projects/">← back to galaxy</a>
+      <a href="/">tance</a>
+    </footer>
+  </main>
+
+  <script src="/js/script.js"></script>
+  <script src="/js/universe.js"></script>
+</body>
+</html>

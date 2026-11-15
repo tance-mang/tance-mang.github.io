@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>TANCE · NEURAL ORBIT</title>
+    <link>https://tance-mang.github.io/</link>
+    <description>A universe of ideas, code and consciousness. Create 与 Observe 两条主线的技术记录与思考。</description>
+    <language>zh-CN</language>
+    <lastBuildDate>Sun, 15 Nov 2026 12:25:58 GMT</lastBuildDate>
+    <managingEditor>tance_mang@qq.com (tance-mang)</managingEditor>
+    <webMaster>tance_mang@qq.com (tance-mang)</webMaster>
+    <atom:link href="https://tance-mang.github.io/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>如果科技能改造整个宇宙</title>
+      <link>https://tance-mang.github.io/2026/11/08/universe-thoughts/</link>
+      <guid isPermaLink="true">https://tance-mang.github.io/2026/11/08/universe-thoughts/</guid>
+      <pubDate>Sun, 08 Nov 2026 04:00:00 GMT</pubDate>
+      <description>从大一想去其他星球生活，到昨晚突然想到 AI 能不能操控地球、改变自然规律、用芯片替代学习。一些暂时无法实现的想法。</description>
+      <category>灵感 / 思考</category>
+    </item>
+    <item>
+      <title>在 Codex 里找回 ChatGPT 的项目讨论</title>
+      <link>https://tance-mang.github.io/2026/11/07/chatgpt-to-codex/</link>
+      <guid isPermaLink="true">https://tance-mang.github.io/2026/11/07/chatgpt-to-codex/</guid>
+      <pubDate>Sat, 07 Nov 2026 04:00:00 GMT</pubDate>
+      <description>一次桌面端验证，看看网页聊天里的项目决策能不能和代码记录一起成为博客素材。</description>
+      <category>Agent / Python / 开源</category>
+    </item>
+    <item>
+      <title>博客配图，哪些交给 AI，哪些留给自己选</title>
+      <link>https://tance-mang.github.io/2026/11/07/choosing-blog-images/</link>
+      <guid isPermaLink="true">https://tance-mang.github.io/2026/11/07/choosing-blog-images/</guid>
+      <pubDate>Sat, 07 Nov 2026 04:00:00 GMT</pubDate>
+      <description>同一篇博客可以让 AI 找封面，也可以由作者挑一段对话放进正文。</description>
+      <category>Agent / Python / 开源</category>
+    </item>
+    <item>
+      <title>给无人值守任务加一份故障报告</title>
+      <link>https://tance-mang.github.io/2026/11/05/workflow-guardian/</link>
+      <guid isPermaLink="true">https://tance-mang.github.io/2026/11/05/workflow-guardian/</guid>
+      <pubDate>Thu, 05 Nov 2026 04:00:00 GMT</pubDate>
+      <description>从博客发布出发，验证独立监测、日志诊断与报告。</description>
+      <category>Agent / Python / 开源</category>
+    </item>
+    <item>
+      <title>自动化失败后，为什么要先查结果再重跑</title>
+      <link>https://tance-mang.github.io/2026/11/05/before-retrying/</link>
+      <guid isPermaLink="true">https://tance-mang.github.io/2026/11/05/before-retrying/</guid>
+      <pubDate>Thu, 05 Nov 2026 04:00:00 GMT</pubDate>
+      <description>一次失败信号可能对应两种发布结果。</description>
+      <category>Agent / Python / 开源</category>
+    </item>
+    <item>
+      <title>Auto Blog Agent：把博客自动化拆成可执行的模块</title>
+      <link>https://tance-mang.github.io/2026/11/04/auto-blog-agent-build/</link>
+      <guid isPermaLink="true">https://tance-mang.github.io/2026/11/04/auto-blog-agent-build/</guid>
+      <pubDate>Wed, 04 Nov 2026 04:00:00 GMT</pubDate>
+      <description>项目结构、运行流程与当前进度：一次基于 Python、Agent Skill 和 GitHub Actions 的开发实践。</description>
+      <category>Agent / Python / 开源</category>
+    </item>
+    <item>
+      <title>让 AI 帮忙记录时，怎样保留真实的自己</title>
+      <link>https://tance-mang.github.io/2026/11/04/writing-with-ai/</link>
+      <guid isPermaLink="true">https://tance-mang.github.io/2026/11/04/writing-with-ai/</guid>
+      <pubDate>Wed, 04 Nov 2026 04:00:00 GMT</pubDate>
+      <description>从一次博客整理出发，讨论自动写作中的身份、事实与表达边界。</description>
+      <category>Agent / Python / 开源</category>
+    </item>
+    <item>
+      <title>让 AI 记住我：一个博客运营 Agent 的工程实践</title>
+      <link>https://tance-mang.github.io/2026/11/03/auto-blog-agent/</link>
+      <guid isPermaLink="true">https://tance-mang.github.io/2026/11/03/auto-blog-agent/</guid>
+      <pubDate>Tue, 03 Nov 2026 04:00:00 GMT</pubDate>
+      <description>从自动写作走向有身份边界、审核机制与长期记忆的博客工作流，记录 Auto Blog Agent 的设计与落地。</description>
+      <category>Agent / Python / 开源</category>
+    </item>
+    <item>
+      <title>从小程序到安全驱动的 AP 应用开发复盘</title>
+      <link>https://tance-mang.github.io/2026/05/01/app-story/</link>
+      <guid isPermaLink="true">https://tance-mang.github.io/2026/05/01/app-story/</guid>
+      <pubDate>Fri, 01 May 2026 04:00:00 GMT</pubDate>
+      <description>一次比赛的技术选型转身，以及我对「安全」这件事的重新理解。</description>
+      <category>网络安全 / Java / Python</category>
+    </item>
+  </channel>
+</rss>

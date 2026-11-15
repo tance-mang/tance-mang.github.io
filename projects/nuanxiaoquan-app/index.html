@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>暖小圈 · WarmCircle — 作品 · TANCE</title>
+  <meta name="description" content="学习 · 生理期 · 记账 三合一的离线优先工具。">
+  <link rel="canonical" href="https://tance-mang.github.io/projects/nuanxiaoquan-app/">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="暖小圈 · WarmCircle — TANCE Projects">
+  <meta property="og:description" content="学习 · 生理期 · 记账 三合一的离线优先工具。">
+  <meta property="og:url" content="https://tance-mang.github.io/projects/nuanxiaoquan-app/">
+  <link rel="alternate" type="application/rss+xml" title="TANCE · Neural Orbit" href="/feed.xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/universe.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"暖小圈 · WarmCircle",
+   "url":"https://tance-mang.github.io/projects/nuanxiaoquan-app/","description":"学习 · 生理期 · 记账 三合一的离线优先工具。",
+   "applicationCategory":"DeveloperApplication","programmingLanguage":"Dart",
+   "sameAs":"https://github.com/tance-mang/nuanxiaoquan-app"}
+  </script>
+</head>
+<body>
+  <div class="bg-veil"></div>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+  <div class="bg-grain"></div>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html">Create</a>
+      <a href="/observe.html">Observe</a>
+      <a href="/projects/" class="is-current">Projects</a>
+      <a href="/archives/">Archive</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </header>
+
+  <main class="sub-shell pdetail">
+    <section class="pdetail-hero">
+      <span class="sub-eyebrow">全栈应用</span>
+      <h1 class="sub-title">暖小圈 · WarmCircle</h1>
+      <p class="sub-line">学习 · 生理期 · 记账 三合一的离线优先工具。</p>
+      <div class="tag-line" style="margin-top:20px;"><a class="chip" href="/archives/#tag-%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8">#网络安全</a> <a class="chip" href="/archives/#tag-%E5%B7%A5%E5%85%B7">#工具</a> <a class="chip" href="/archives/#tag-AI">#AI</a></div>
+      <div class="pdetail-grid"><div class="pstat"><span class="k">状态</span><span class="v">On hold</span></div><div class="pstat"><span class="k">语言</span><span class="v">Dart</span></div><div class="pstat"><span class="k">起始</span><span class="v">2026-04-25</span></div><div class="pstat"><span class="k">最近推送</span><span class="v">2026-05-22</span></div><div class="pstat"><span class="k">License</span><span class="v">Source-available · 非商业</span></div><div class="pstat"><span class="k">Stars / Forks</span><span class="v">1 / 0</span></div></div>
+      <div class="club-actions" style="justify-content:flex-start;margin-top:26px;">
+        <a class="btn" href="https://github.com/tance-mang/nuanxiaoquan-app" target="_blank" rel="noopener">打开仓库 <i class="arrow">→</i></a>
+        <a class="btn btn--ghost" href="/projects/">返回作品星系</a>
+      </div>
+    </section>
+
+    <section class="pblock"><h2>背景</h2><p>记账、生理期记录和学习计划通常是三个互不相干的 App。但真正想知道的恰恰是它们之间的关系：这个阶段的消费变化、经期前后的学习状态。</p></section>
+    <section class="pblock"><h2>问题</h2><p>把三件事放进同一个应用不难，难的是建立关联而不牺牲离线可用性，也不把敏感数据交给云端模型。</p></section>
+    <section class="pblock"><h2>技术实现</h2><ul><li>统计、预测、状态判定全部由本地确定性算法完成，AI 只承担文案生成，断网不降级。</li><li>三者之间建立关联：经前期高消费提醒、经期学习降档、月度三维复盘。</li><li>Android / iOS / Web 三端，服务端为 Spring Boot。</li><li>仓库 README 单独写了安全设计（网络空间安全维度）与离线能力矩阵。</li><li>已完成 ICP 备案（桂ICP备2026007360号-2A）。</li></ul></section>
+    <section class="pblock"><h2>实际验证</h2><ul><li>README 记录了版本号 1.1 与离线能力矩阵。</li><li>备案信息为真实公开记录。</li></ul></section>
+    <section class="pblock"><h2>局限与未完成</h2><ul><li>最近一次推送停在 2026-05-22，当前处于暂停迭代状态。</li><li>公开仓库为源码存档，完整工程与线上服务不在本仓库内。</li></ul></section>
+
+    <section class="pblock"><h2>版本记录</h2><div class="pvers">
+      <div class="pvers-row">
+        <span class="ver">1.1</span>
+        <span class="txt">三合一离线优先版本<br><span class="signal-when">本地算法承担统计与预测，AI 仅生成文案。</span></span>
+      </div></div></section>
+    <section class="pblock"><h2>关联记录</h2><div class="related-list"><a href="/2026/05/01/app-story/"><span>从小程序到安全驱动的 AP 应用开发复盘</span><span class="rel-date">站内文章</span></a></div></section>
+
+    <p class="signal-note" style="margin-top:40px;">
+      本页内容取自 https://github.com/tance-mang/nuanxiaoquan-app 的 README / CHANGELOG 与 GitHub 仓库元数据，观测日期 2026-11-15。
+      数字与状态会随仓库变化，页面不做推测性补充。
+    </p>
+
+    <footer class="post-foot">
+      <a href="/projects/">← back to galaxy</a>
+      <a href="/">tance</a>
+    </footer>
+  </main>
+
+  <script src="/js/script.js"></script>
+  <script src="/js/universe.js"></script>
+</body>
+</html>

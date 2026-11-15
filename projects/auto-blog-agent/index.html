@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auto Blog Agent — 作品 · TANCE</title>
+  <meta name="description" content="让 AI 按我的身份规则写作、独立审核，再按规则发布中文技术博客。">
+  <link rel="canonical" href="https://tance-mang.github.io/projects/auto-blog-agent/">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Auto Blog Agent — TANCE Projects">
+  <meta property="og:description" content="让 AI 按我的身份规则写作、独立审核，再按规则发布中文技术博客。">
+  <meta property="og:url" content="https://tance-mang.github.io/projects/auto-blog-agent/">
+  <link rel="alternate" type="application/rss+xml" title="TANCE · Neural Orbit" href="/feed.xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/universe.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Auto Blog Agent",
+   "url":"https://tance-mang.github.io/projects/auto-blog-agent/","description":"让 AI 按我的身份规则写作、独立审核，再按规则发布中文技术博客。",
+   "applicationCategory":"DeveloperApplication","programmingLanguage":"Python",
+   "sameAs":"https://github.com/tance-mang/auto-blog-agent"}
+  </script>
+</head>
+<body>
+  <div class="bg-veil"></div>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+  <div class="bg-grain"></div>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html">Create</a>
+      <a href="/observe.html">Observe</a>
+      <a href="/projects/" class="is-current">Projects</a>
+      <a href="/archives/">Archive</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </header>
+
+  <main class="sub-shell pdetail">
+    <section class="pdetail-hero">
+      <span class="sub-eyebrow">开源工具</span>
+      <h1 class="sub-title">Auto Blog Agent</h1>
+      <p class="sub-line">让 AI 按我的身份规则写作、独立审核，再按规则发布中文技术博客。</p>
+      <div class="tag-line" style="margin-top:20px;"><a class="chip" href="/archives/#tag-Agent">#Agent</a> <a class="chip" href="/archives/#tag-Python">#Python</a> <a class="chip" href="/archives/#tag-%E5%BC%80%E6%BA%90">#开源</a> <a class="chip" href="/archives/#tag-AI">#AI</a> <a class="chip" href="/archives/#tag-%E8%87%AA%E5%8A%A8%E5%8C%96">#自动化</a> <a class="chip" href="/archives/#tag-%E5%86%99%E4%BD%9C">#写作</a></div>
+      <div class="pdetail-grid"><div class="pstat"><span class="k">状态</span><span class="v">In development</span></div><div class="pstat"><span class="k">语言</span><span class="v">Python</span></div><div class="pstat"><span class="k">起始</span><span class="v">2026-11-02</span></div><div class="pstat"><span class="k">最近推送</span><span class="v">2026-11-12</span></div><div class="pstat"><span class="k">License</span><span class="v">MIT</span></div><div class="pstat"><span class="k">Stars / Forks</span><span class="v">1 / 0</span></div></div>
+      <div class="club-actions" style="justify-content:flex-start;margin-top:26px;">
+        <a class="btn" href="https://github.com/tance-mang/auto-blog-agent" target="_blank" rel="noopener">打开仓库 <i class="arrow">→</i></a>
+        <a class="btn btn--ghost" href="/projects/">返回作品星系</a>
+      </div>
+    </section>
+
+    <section class="pblock"><h2>背景</h2><p>博客更新长期依赖手动整理：想法散在对话和代码记录里，发布时再重新抄一遍。我想把选题、写作、审核、发布变成一个可以被检查的流程，而不是每次都靠记性。</p></section>
+    <section class="pblock"><h2>问题</h2><p>自动写作最容易出的问题不是写不出来，而是四件事：身份漂移（AI 写成通用口吻）、重复发布、token 成本失控，以及失败之后没有人知道发生了什么。</p></section>
+    <section class="pblock"><h2>技术实现</h2><ul><li>身份与编辑规则写在 memory/PROFILE.md 与 EDITORIAL.md，私人素材放在不提交的 private/INBOX.md。</li><li>选题来自 RSS，来源摘录受 allowed_hosts 白名单约束。</li><li>写作与审核是两次独立请求，审核结论落进 review.json，不由同一次输出自我认证。</li><li>历史去重 + 保守预算预留：失败请求同样占用额度，按配置时区在次日重置。</li><li>语言不靠 IP 或时区猜测，由正文样本判定并记录判断依据；证据不足时要求显式配置。</li><li>发布默认关闭，先 Dry Run；正式发布用 GitHub Contents / Git API 在一次提交里同时写入文章与两处导航列表。</li><li>失败由独立监测工作流接管，生成故障报告而不是静默重试。</li></ul></section>
+    <section class="pblock"><h2>实际验证</h2><ul><li>仓库测试在 Actions 的 test.yml 中持续运行：python -m unittest discover -s tests -v。</li><li>离线样例 generated/demo 不调用模型、不写真实历史、永不发布，每次重复运行均可重现。</li><li>Auto blog 工作流按计划（每小时）持续执行，2026-11-15 的运行记录状态为 success。</li></ul></section>
+    <section class="pblock"><h2>局限与未完成</h2><ul><li>README 明确标注：真实模型与真实博客联调尚未完成。</li><li>截至 2026-11-15，本站仓库中还没有由该流程自动产生的发布提交。</li><li>兼容 Chat Completions 的服务需要各自实测，不保证开箱可用。</li><li>在线博客历史自动导入、多语言审核全面验证、Draft PR 与可靠恢复仍未完成。</li></ul></section>
+
+    <section class="pblock"><h2>版本记录</h2><div class="pvers">
+      <div class="pvers-row">
+        <span class="ver">0.1.0</span>
+        <span class="txt">初始 CLI、Skill、RSS、审核、SQLite 与发布接口 <span class="signal-when">2026-11-03</span><br><span class="signal-when">本地测试与离线流程通过；真实模型和无人值守部署未联调。</span></span>
+      </div>
+      <div class="pvers-row">
+        <span class="ver">0.2.0</span>
+        <span class="txt">定位收窄为个人技术博客自动化 <span class="signal-when">2026-11-04</span><br><span class="signal-when">新增文章语言配置与 --language 覆盖；不从 IP、地理位置、时区或身份模板推断语言。</span></span>
+      </div></div></section>
+    <section class="pblock"><h2>关联记录</h2><div class="related-list"><a href="/2026/11/04/auto-blog-agent-build/"><span>Auto Blog Agent：把博客自动化拆成可执行的模块</span><span class="rel-date">站内文章</span></a><a href="/2026/11/03/auto-blog-agent/"><span>让 AI 记住我：一个博客运营 Agent 的工程实践</span><span class="rel-date">站内文章</span></a><a href="/2026/11/05/before-retrying/"><span>自动化失败后，为什么要先查结果再重跑</span><span class="rel-date">站内文章</span></a></div></section>
+
+    <p class="signal-note" style="margin-top:40px;">
+      本页内容取自 https://github.com/tance-mang/auto-blog-agent 的 README / CHANGELOG 与 GitHub 仓库元数据，观测日期 2026-11-15。
+      数字与状态会随仓库变化，页面不做推测性补充。
+    </p>
+
+    <footer class="post-foot">
+      <a href="/projects/">← back to galaxy</a>
+      <a href="/">tance</a>
+    </footer>
+  </main>
+
+  <script src="/js/script.js"></script>
+  <script src="/js/universe.js"></script>
+</body>
+</html>

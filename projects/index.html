@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projects — 作品星系 · TANCE</title>
+  <meta name="description" content="TANCE 的作品星系：公开仓库里的工具、技能包、应用与游戏。每个项目页记录背景、问题、技术实现、实际验证、局限与版本记录。">
+  <link rel="canonical" href="https://tance-mang.github.io/projects/">
+  <meta property="og:title" content="Projects — 作品星系 · TANCE">
+  <meta property="og:description" content="公开仓库里的工具、技能包、应用与游戏，含真实验证状态与未完成部分。">
+  <link rel="alternate" type="application/rss+xml" title="TANCE · Neural Orbit" href="/feed.xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/universe.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <a class="skip-link" href="#galaxy-grid">跳到作品列表</a>
+  <div class="bg-veil"></div>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+  <div class="bg-grain"></div>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html">Create</a>
+      <a href="/observe.html">Observe</a>
+      <a href="/projects/" class="is-current">Projects</a>
+      <a href="/archives/">Archive</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </header>
+
+  <main class="sub-shell">
+    <section class="sub-head">
+      <span class="sub-eyebrow">— Project Galaxy</span>
+      <h1 class="sub-title">作品星系。</h1>
+      <p class="sub-line">每一个都是一次把想法做成可检查东西的尝试。项目页里写清背景、问题、实现方式、验证到什么程度，以及还有什么没做完。</p>
+      <p class="hero-count" style="justify-content:flex-start;margin-top:22px;">
+        <span>公开作品 <b data-count="projects">—</b></span>
+        <span>技术记录 <b data-count="posts">—</b></span>
+      </p>
+    </section>
+
+    <div class="galaxy" id="galaxy-grid" data-fill="galaxy"></div>
+
+    <p class="signal-note" style="margin-top:34px;">
+      数据来源：GitHub 仓库元数据与各项目 README / CHANGELOG，观测日期 2026-11-15。
+      star 与 fork 数为当时公开数值，项目页不做任何推测性补充。
+      新增项目时只需在 <code>data/projects.json</code> 增加一条记录并运行 <code>node tools/gen-projects.mjs</code>。
+    </p>
+  </main>
+
+  <footer class="foot">
+    <span>a silent digital universe</span>
+    <span>
+      <a href="/">home</a><span class="dot">·</span>
+      <a href="/archives/">archive</a><span class="dot">·</span>
+      <a href="https://github.com/tance-mang" target="_blank" rel="noopener">github</a><span class="dot">·</span>
+      <a href="/feed.xml">rss</a>
+    </span>
+  </footer>
+
+  <script src="/js/script.js"></script>
+  <script src="/js/universe.js"></script>
+</body>
+</html>

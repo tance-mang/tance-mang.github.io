@@ -3,21 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Observe — TANCE</title>
-  <meta name="description" content="Thoughts, learning and journeys. 成长记录 / 灵感 / 学习过程 / 思考.">
+  <title>Observe — TANCE · Neural Orbit</title>
+  <meta name="description" content="Observe — 成长记录、灵感、学习过程与思考：那些让我改变主意的东西。">
+  <link rel="canonical" href="https://tance-mang.github.io/observe.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Observe — TANCE">
+  <meta property="og:description" content="Thoughts, learning and journeys — 成长记录 · 灵感 · 学习过程 · 思考.">
+  <link rel="alternate" type="application/rss+xml" title="TANCE · Neural Orbit" href="/feed.xml">
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/universe.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="variant-observe">
+  <a class="skip-link" href="#entrylist">跳到文章列表</a>
+  <div class="bg-veil"></div>
   <canvas id="neural-net" aria-hidden="true"></canvas>
+  <div class="bg-grain"></div>
 
   <header class="sub-header">
     <a href="/" class="sub-logo">TANCE</a>
     <nav class="sub-nav">
       <a href="/create.html">Create</a>
       <a href="/observe.html" class="is-current">Observe</a>
+      <a href="/projects/">Projects</a>
+      <a href="/archives/">Archive</a>
       <a href="/about.html">About</a>
     </nav>
   </header>
@@ -26,9 +37,26 @@
     <section class="sub-head">
       <span class="sub-eyebrow">02 / Observe</span>
       <h1 class="sub-title">Thoughts, learning<br>and journeys.</h1>
-      <p class="sub-line">成长记录 · 灵感 · 学习过程 · 思考 — what I see while walking through the field.</p>
+      <p class="sub-line">成长记录 · 灵感 · 学习过程 · 思考 — what I see while walking through the field. 这里不装作已经有结论。</p>
     </section>
 
+    <section class="tools" aria-label="主题导航">
+      <div class="tag-line" data-fill="topics" data-topics="observe"></div>
+    </section>
+
+    <section class="sec sec--tight" style="padding-left:0;padding-right:0;">
+      <div class="sec-head">
+        <span class="sec-index">◇ /</span>
+        <h2 class="sec-name" style="font-size:clamp(20px,2.6vw,30px);">近期思想碎片</h2>
+        <span class="sec-note">摘自以下原文</span>
+      </div>
+      <div class="frags" data-fill="frags"></div>
+    </section>
+
+    <!-- Auto Blog Agent 会把新条目的导航插入到下方列表容器的开始标签之后。
+         那个 class 为 entry-list 的 section 开始标签在本文件中必须恰好出现一次，
+         且不能带任何额外属性，否则发布器会判定标记不唯一而中止。 -->
+    <span id="entrylist" class="sr-only">Observe 文章列表</span>
     <section class="entry-list">
       <a href="/2026/11/08/universe-thoughts/" class="entry">
         <span class="entry-date">2026 · 11 · 08</span>
@@ -61,6 +89,17 @@
     </section>
   </main>
 
+  <footer class="foot">
+    <span>a silent digital universe</span>
+    <span>
+      <a href="/archives/">archive</a><span class="dot">·</span>
+      <a href="/orbit/">orbit</a><span class="dot">·</span>
+      <a href="https://github.com/tance-mang" target="_blank" rel="noopener">github</a><span class="dot">·</span>
+      <a href="/feed.xml">rss</a>
+    </span>
+  </footer>
+
   <script src="/js/script.js"></script>
+  <script src="/js/universe.js"></script>
 </body>
 </html>

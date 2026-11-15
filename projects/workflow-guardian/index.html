@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workflow Guardian — 作品 · TANCE</title>
+  <meta name="description" content="在看日志之前，先知道无人值守的自动化为什么失败。">
+  <link rel="canonical" href="https://tance-mang.github.io/projects/workflow-guardian/">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Workflow Guardian — TANCE Projects">
+  <meta property="og:description" content="在看日志之前，先知道无人值守的自动化为什么失败。">
+  <meta property="og:url" content="https://tance-mang.github.io/projects/workflow-guardian/">
+  <link rel="alternate" type="application/rss+xml" title="TANCE · Neural Orbit" href="/feed.xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/universe.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Workflow Guardian",
+   "url":"https://tance-mang.github.io/projects/workflow-guardian/","description":"在看日志之前，先知道无人值守的自动化为什么失败。",
+   "applicationCategory":"DeveloperApplication","programmingLanguage":"Python",
+   "sameAs":"https://github.com/tance-mang/workflow-guardian"}
+  </script>
+</head>
+<body>
+  <div class="bg-veil"></div>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+  <div class="bg-grain"></div>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html">Create</a>
+      <a href="/observe.html">Observe</a>
+      <a href="/projects/" class="is-current">Projects</a>
+      <a href="/archives/">Archive</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </header>
+
+  <main class="sub-shell pdetail">
+    <section class="pdetail-hero">
+      <span class="sub-eyebrow">开源工具</span>
+      <h1 class="sub-title">Workflow Guardian</h1>
+      <p class="sub-line">在看日志之前，先知道无人值守的自动化为什么失败。</p>
+      <div class="tag-line" style="margin-top:20px;"><a class="chip" href="/archives/#tag-%E8%87%AA%E5%8A%A8%E5%8C%96">#自动化</a> <a class="chip" href="/archives/#tag-Agent">#Agent</a> <a class="chip" href="/archives/#tag-%E5%BC%80%E6%BA%90">#开源</a> <a class="chip" href="/archives/#tag-Python">#Python</a></div>
+      <div class="pdetail-grid"><div class="pstat"><span class="k">状态</span><span class="v">Active</span></div><div class="pstat"><span class="k">语言</span><span class="v">Python</span></div><div class="pstat"><span class="k">起始</span><span class="v">2026-11-05</span></div><div class="pstat"><span class="k">最近推送</span><span class="v">2026-11-05</span></div><div class="pstat"><span class="k">License</span><span class="v">开源</span></div><div class="pstat"><span class="k">Stars / Forks</span><span class="v">1 / 0</span></div></div>
+      <div class="club-actions" style="justify-content:flex-start;margin-top:26px;">
+        <a class="btn" href="https://github.com/tance-mang/workflow-guardian" target="_blank" rel="noopener">打开仓库 <i class="arrow">→</i></a>
+        <a class="btn btn--ghost" href="/projects/">返回作品星系</a>
+      </div>
+    </section>
+
+    <section class="pblock"><h2>背景</h2><p>博客自动化跑在 Actions 上之后，最早暴露问题的人往往是第二天打开仓库的我。失败静默、漏跑、上游任务初始化失败，都没有稳定的通知路径。</p></section>
+    <section class="pblock"><h2>问题</h2><p>监测不能和被监测的任务共用一条命：如果它自己也依赖同一个工作流，上游一崩就同时失联。</p></section>
+    <section class="pblock"><h2>技术实现</h2><ul><li>独立监测工作流通过 workflow_run 触发，覆盖上游任务初始化失败的情况。</li><li>基础版不需要 AI：报告失败、取消、超时与启动异常，并按依赖 / 构建 / 网络 / 凭据 / 限流 / 上游服务分类。</li><li>独立的漏跑检查，输出 Markdown 报告，可选 SMTP 通知。</li><li>AI 增强为可选项：规则未命中时补充排查建议，只发送预定义症状类别、结果和异常计数，不上传原始日志。</li></ul></section>
+    <section class="pblock"><h2>实际验证</h2><ul><li>GitHub Releases 中有 v1（2026-11-05）。</li><li>在 auto-blog-agent 仓库中已实际接入 guardian 相关监测工作流。</li></ul></section>
+    <section class="pblock"><h2>局限与未完成</h2><ul><li>AI 增强依赖配置，未配置时只有规则分类结果。</li><li>报告针对 Actions 场景，非 GitHub 的调度系统不在覆盖范围。</li></ul></section>
+
+    <section class="pblock"><h2>版本记录</h2><div class="pvers">
+      <div class="pvers-row">
+        <span class="ver">v1</span>
+        <span class="txt">首个发布 <span class="signal-when">2026-11-05</span><br><span class="signal-when">基础版故障报告与漏跑检查。</span></span>
+      </div></div></section>
+    <section class="pblock"><h2>关联记录</h2><div class="related-list"><a href="/2026/11/05/workflow-guardian/"><span>给无人值守任务加一份故障报告</span><span class="rel-date">站内文章</span></a><a href="/2026/11/05/before-retrying/"><span>自动化失败后，为什么要先查结果再重跑</span><span class="rel-date">站内文章</span></a></div></section>
+
+    <p class="signal-note" style="margin-top:40px;">
+      本页内容取自 https://github.com/tance-mang/workflow-guardian 的 README / CHANGELOG 与 GitHub 仓库元数据，观测日期 2026-11-15。
+      数字与状态会随仓库变化，页面不做推测性补充。
+    </p>
+
+    <footer class="post-foot">
+      <a href="/projects/">← back to galaxy</a>
+      <a href="/">tance</a>
+    </footer>
+  </main>
+
+  <script src="/js/script.js"></script>
+  <script src="/js/universe.js"></script>
+</body>
+</html>

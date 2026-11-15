@@ -3,21 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create — TANCE</title>
-  <meta name="description" content="Turning ideas into reality. 开发 / 网络安全 / AI / 项目实验.">
+  <title>Create — TANCE · Neural Orbit</title>
+  <meta name="description" content="Create — 开发、网络安全、AI 与项目实验的技术记录：结构、验证过程与未完成的部分。">
+  <link rel="canonical" href="https://tance-mang.github.io/create.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Create — TANCE">
+  <meta property="og:description" content="Turning ideas into reality — 开发 · 网络安全 · AI · 项目实验.">
+  <link rel="alternate" type="application/rss+xml" title="TANCE · Neural Orbit" href="/feed.xml">
   <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/universe.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
+  <a class="skip-link" href="#entrylist">跳到文章列表</a>
+  <div class="bg-veil"></div>
   <canvas id="neural-net" aria-hidden="true"></canvas>
+  <div class="bg-grain"></div>
 
   <header class="sub-header">
     <a href="/" class="sub-logo">TANCE</a>
     <nav class="sub-nav">
       <a href="/create.html" class="is-current">Create</a>
       <a href="/observe.html">Observe</a>
+      <a href="/projects/">Projects</a>
+      <a href="/archives/">Archive</a>
       <a href="/about.html">About</a>
     </nav>
   </header>
@@ -26,9 +37,17 @@
     <section class="sub-head">
       <span class="sub-eyebrow">01 / Create</span>
       <h1 class="sub-title">Turning ideas<br>into reality.</h1>
-      <p class="sub-line">开发 · 网络安全 · AI · 项目实验 — things I build to make abstract thoughts touchable.</p>
+      <p class="sub-line">开发 · 网络安全 · AI · 项目实验 — things I build to make abstract thoughts touchable. 每篇都写清楚做了什么、验证到什么程度、还有什么没做完。</p>
     </section>
 
+    <section class="tools" aria-label="主题导航">
+      <div class="tag-line" data-fill="topics" data-topics="create"></div>
+    </section>
+
+    <!-- Auto Blog Agent 会把新条目的导航插入到下方列表容器的开始标签之后。
+         那个 class 为 entry-list 的 section 开始标签在本文件中必须恰好出现一次，
+         且不能带任何额外属性，否则发布器会判定标记不唯一而中止。 -->
+    <span id="entrylist" class="sr-only">Create 文章列表</span>
     <section class="entry-list">
       <a href="/2026/11/07/chatgpt-to-codex/" class="entry">
         <span class="entry-date">2026 · 11 · 07</span>
@@ -39,8 +58,28 @@
 <a href="/2026/11/05/workflow-guardian/" class="entry"><span class="entry-date">2026 · 11 · 05</span><div class="entry-body"><h2 class="entry-title">给无人值守任务加一份故障报告</h2><p class="entry-line">从博客发布出发，验证独立监测、日志诊断与报告。</p></div><span class="entry-meta">Create <span class="dot">·</span> 3 min</span></a>
 <a href="/2026/11/04/auto-blog-agent-build/" class="entry"><span class="entry-date">2026 · 11 · 04</span><div class="entry-body"><h2 class="entry-title">Auto Blog Agent：把博客自动化拆成可执行的模块</h2><p class="entry-line">项目结构、运行流程与当前进度：一次基于 Python、Agent Skill 和 GitHub Actions 的开发实践。</p></div><span class="entry-meta">Create <span class="dot">·</span> 4 min</span></a>
     </section>
+
+    <section class="sec sec--tight" style="padding-left:0;padding-right:0;">
+      <div class="sec-head">
+        <span class="sec-index">◇ /</span>
+        <h2 class="sec-name" style="font-size:clamp(20px,2.6vw,30px);">这些记录背后的作品</h2>
+        <span class="sec-note"><a href="/projects/">全部作品 →</a></span>
+      </div>
+      <div class="galaxy" data-fill="galaxy" data-limit="3"></div>
+    </section>
   </main>
 
+  <footer class="foot">
+    <span>a silent digital universe</span>
+    <span>
+      <a href="/archives/">archive</a><span class="dot">·</span>
+      <a href="/orbit/">orbit</a><span class="dot">·</span>
+      <a href="https://github.com/tance-mang" target="_blank" rel="noopener">github</a><span class="dot">·</span>
+      <a href="/feed.xml">rss</a>
+    </span>
+  </footer>
+
   <script src="/js/script.js"></script>
+  <script src="/js/universe.js"></script>
 </body>
 </html>

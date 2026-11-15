@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — 迷航 · TANCE</title>
+  <meta name="description" content="这个坐标上没有内容。回到星核，或者去档案库、作品星系和读者空间。">
+  <meta name="robots" content="noindex">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/universe.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="bg-veil"></div>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+  <div class="bg-grain"></div>
+
+  <main class="lost">
+    <canvas class="lost-canvas" id="hero-canvas" aria-hidden="true"></canvas>
+    <div class="lost-inner">
+      <p class="lost-code">404</p>
+      <h1 class="lost-title">这个坐标上没有内容。</h1>
+      <p class="lost-sub">请求的路径不在站点里：可能文章被移动过，也可能链接来自旧版本页面。下面是确定存在的位置。</p>
+      <div class="lost-actions">
+        <a class="btn" href="/">回到星核 <i class="arrow">→</i></a>
+        <a class="btn btn--ghost" href="/archives/">深空档案库</a>
+        <a class="btn btn--ghost" href="/projects/">作品星系</a>
+        <a class="btn btn--ghost" href="/orbit/">读者空间</a>
+      </div>
+      <p class="lost-sub" style="margin-top:26px;">
+        如果你是从旧链接跳转过来的，可以在
+        <a href="https://github.com/tance-mang/tance-mang.github.io/issues" target="_blank" rel="noopener">仓库 Issues</a>
+        贴出那条链接，我会补上跳转。
+      </p>
+      <p class="signal-note" style="margin-top:22px;">
+        你可能在找：<span data-lost-suggest>正在汇总…</span>
+      </p>
+    </div>
+  </main>
+
+  <script src="/js/script.js"></script>
+  <script src="/js/universe.js"></script>
+  <script>
+    // Newest five records, listed straight from the runtime index.
+    (function () {
+      function ready(fn) {
+        if (window.TANCE) fn();
+        else window.addEventListener('load', function () { if (window.TANCE) fn(); });
+      }
+      ready(function () {
+        window.TANCE.content.on(function (c) {
+          var host = document.querySelector('[data-lost-suggest]');
+          if (!host || !c.posts || !c.posts().length) return;
+          host.textContent = '';
+          c.posts().slice(0, 5).forEach(function (r, i) {
+            var a = document.createElement('a');
+            a.href = r.href;
+            a.textContent = r.title;
+            a.style.color = 'var(--starlight)';
+            host.appendChild(a);
+            if (i < 4) host.appendChild(document.createTextNode(' · '));
+          });
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
