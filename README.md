@@ -120,7 +120,15 @@ node tools/gen-feeds.mjs && git add feed.xml sitemap.xml && git commit -m "feeds
 
 ## 联系方式
 
+两个邮箱按用途分流，数据源是 `data/site.json` 的 `contacts`，`tools/check_site.mjs` 会核对它与 `about.html` 的卡片、复制按钮是否一致。
+
+| 用途 | 标签 | 邮箱 | 覆盖范围 |
+| --- | --- | --- | --- |
+| 个人交流 | Personal | tance_mang@qq.com | 技术交流 · 开源讨论 · 日常联系 |
+| 商务合作 | Business | tance.hub@gmail.com | 项目合作 · 产品咨询 · 商务联系 |
+
 - GitHub：https://github.com/tance-mang
-- Email：tance_mang@qq.com
 - RSS：/feed.xml
 - 留言与纠错：仓库 Issues
+- About 页 `#contact` 展示完整卡片（含可用的复制按钮），首页页脚与读者空间给出简洁入口。
+- 措辞约定：只写 Personal / Business 两种用途，不使用「私人邮箱」「工作室邮箱」「官方商务邮箱」「企业邮箱」这类会把个人品牌说成机构的称呼；商务邮箱也不附带任何尚不存在的商业成果承诺。

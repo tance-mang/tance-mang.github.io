@@ -5,6 +5,24 @@
   "claim": "我使用的技术，和我想让它成为的东西，是两件事。",
   "author": "tance-mang",
   "email": "tance_mang@qq.com",
+  "contacts": [
+    {
+      "key": "personal",
+      "en": "Personal",
+      "zh": "个人交流",
+      "scope": "技术交流 · 开源讨论 · 日常联系",
+      "email": "tance_mang@qq.com",
+      "note": "读者与开发者走这里"
+    },
+    {
+      "key": "business",
+      "en": "Business",
+      "zh": "商务合作",
+      "scope": "项目合作 · 产品咨询 · 商务联系",
+      "email": "tance.hub@gmail.com",
+      "note": "合作与工作室事务走这里"
+    }
+  ],
   "github": "https://github.com/tance-mang",
   "issues": "https://github.com/tance-mang/tance-mang.github.io/issues",
   "baseUrl": "https://tance-mang.github.io",

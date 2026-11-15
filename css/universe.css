@@ -1416,4 +1416,204 @@
   .mline { transform: none; color: var(--ink); }
   .mline .zh { color: var(--ink-soft); }
   #cx-canvas { cursor: default; }
+  .contact-card,
+  .copy-mail { transition: none; }
 }
+
+/* ==========================================================================
+   CONTACT — Personal / Business
+   Two roles, two addresses: the QQ box is for readers and developers,
+   the Gmail box is for cooperation enquiries. Nothing here claims a company.
+   ========================================================================== */
+.contact-head { margin: 4px 0 0; }
+.contact-title { margin: 0; }
+.contact-lede {
+  max-width: 46ch;
+  margin: 14px 0 0;
+  color: var(--ink-soft);
+  font-size: 15.5px;
+  line-height: 1.75;
+}
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 30px;
+}
+
+.contact-card {
+  --accent: var(--nebula-violet);
+  --accent-soft: var(--starlight);
+  --accent-line: rgba(157, 112, 255, 0.45);
+  --accent-glow: rgba(157, 112, 255, 0.55);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 26px 26px 22px;
+  border: 1px solid var(--hair);
+  background:
+    radial-gradient(130% 150% at 0% 0%, rgba(103, 56, 206, 0.18), transparent 58%),
+    var(--surface);
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+  transition: border-color 0.5s var(--ease), box-shadow 0.5s var(--ease), transform 0.5s var(--ease);
+}
+.contact-card--business {
+  --accent: var(--dream-pink);
+  --accent-soft: var(--dream-pink);
+  --accent-line: rgba(242, 168, 236, 0.42);
+  --accent-glow: rgba(242, 168, 236, 0.5);
+  background:
+    radial-gradient(130% 150% at 0% 0%, rgba(242, 168, 236, 0.14), transparent 60%),
+    var(--surface);
+}
+.contact-card:hover,
+.contact-card:focus-within {
+  transform: translateY(-3px);
+  border-color: var(--accent-glow);
+  box-shadow: 0 22px 60px -34px var(--accent);
+}
+
+.contact-role {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.contact-role b { color: var(--accent); font-weight: 500; }
+.contact-role span { color: var(--ink-soft); letter-spacing: 0.12em; text-transform: none; font-size: 12px; }
+
+.contact-scope {
+  margin: 0;
+  color: var(--ink-mute);
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+
+.contact-mail {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-mono);
+  font-size: clamp(14px, 1.4vw, 16px);
+  color: var(--accent-soft);
+  text-decoration: none;
+  word-break: break-all;
+  border-bottom: 1px solid var(--accent-line);
+  padding-bottom: 2px;
+  width: fit-content;
+}
+.contact-mail:hover,
+.contact-mail:focus-visible { color: var(--ink); border-bottom-color: var(--ink); }
+
+.contact-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.copy-mail {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  font: 500 11px/1 var(--font-mono);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--hair);
+  cursor: pointer;
+}
+.copy-mail::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border: 1px solid var(--accent);
+  transform: rotate(45deg);
+}
+.copy-mail:hover,
+.copy-mail:focus-visible { color: var(--ink); border-color: var(--hair-strong); }
+.copy-mail.is-done { color: #A8E6C9; border-color: rgba(168, 230, 201, 0.5); }
+
+.contact-flag {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  color: var(--ink-mute);
+}
+
+@media (max-width: 860px) {
+  .contact-grid { grid-template-columns: 1fr; }
+}
+
+/* --------------------------------------------------------------------------
+   ABOUT sections — the page reuses these class names but never had rules
+   for them, so the whole document used to fall back to browser defaults.
+   -------------------------------------------------------------------------- */
+.about-grid {
+  display: grid;
+  gap: clamp(40px, 6vw, 68px);
+  margin-top: clamp(40px, 6vw, 72px);
+}
+
+.about-section { max-width: 74ch; }
+
+.about-label {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 18px;
+  font: 500 11px/1 var(--font-mono);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--starlight);
+}
+.about-label::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--hair-strong), transparent);
+}
+
+.about-body > * + * { margin-top: 14px; }
+.about-body p,
+.about-body li {
+  color: var(--ink-soft);
+  font-size: 15.5px;
+  line-height: 1.8;
+}
+.about-body strong { color: var(--ink); font-weight: 500; }
+.about-body code {
+  padding: 1px 6px;
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  color: var(--starlight);
+  background: rgba(157, 112, 255, 0.1);
+  border: 1px solid var(--hair);
+}
+
+.about-rows { margin: 0; display: grid; gap: 0; }
+.about-row {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 18px;
+  padding: 13px 0;
+  border-top: 1px solid var(--hair);
+  align-items: baseline;
+}
+.about-row:last-child { border-bottom: 1px solid var(--hair); }
+.about-row dt {
+  font: 500 10.5px/1.6 var(--font-mono);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+.about-row dd { margin: 0; color: var(--ink-soft); font-size: 14.5px; }

@@ -95,6 +95,28 @@ const site = JSON.parse(readFileSync(join(ROOT, 'data/site.json'), 'utf8'));
 if (!Array.isArray(projects)) failures.push('data/projects.json 不是数组');
 if (!site.email) failures.push('data/site.json 缺少 email');
 
+/* ---------- contacts: one source of truth, no misleading labels ---------- */
+const contacts = site.contacts || [];
+if (contacts.length < 2) failures.push('data/site.json 需要 Personal 与 Business 两个联系方式');
+for (const c of contacts) {
+  for (const field of ['key', 'en', 'zh', 'scope', 'email']) {
+    if (!c[field]) failures.push(`contacts.${c.key || '?'}: 缺少字段 ${field}`);
+  }
+  if (c.key === 'personal' && c.email !== site.email) {
+    failures.push('contacts.personal 与站点 email 不一致');
+  }
+  const inAbout = readFileSync(join(ROOT, 'about.html'), 'utf8');
+  if (!inAbout.includes(`mailto:${c.email}`)) failures.push(`about.html 缺少 ${c.email} 的 mailto 链接`);
+  if (!inAbout.includes(`data-copy="${c.email}"`)) failures.push(`about.html 缺少 ${c.email} 的复制按钮`);
+}
+const contactPages = ['about.html', 'index.html', 'orbit/index.html'];
+for (const page of contactPages) {
+  const text = readFileSync(join(ROOT, page), 'utf8');
+  for (const bad of ['官方商务邮箱', '企业邮箱', '商务专用', '私人邮箱', '工作室邮箱']) {
+    if (text.includes(bad)) failures.push(`${page}: 联系方式使用了容易误解的称呼「${bad}」`);
+  }
+}
+
 const allEntries = new Map();
 for (const page of ['create.html', 'observe.html', 'archives/index.html']) {
   const text = readFileSync(join(ROOT, page), 'utf8');

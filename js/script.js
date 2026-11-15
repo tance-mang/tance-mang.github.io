@@ -1061,6 +1061,63 @@
   }
 
   /* ------------------------------------------------------------------ */
+  /* Copy-to-clipboard for the contact addresses                         */
+  /* ------------------------------------------------------------------ */
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:0;left:-9999px;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    var ok = false;
+    try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+    document.body.removeChild(ta);
+    return ok;
+  }
+
+  // Clipboard writes only work on a secure context; fall back to execCommand
+  // and, when even that is refused, say so instead of faking a success.
+  function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      return navigator.clipboard.writeText(text).then(
+        function () { return true; },
+        function () { return legacyCopy(text); }
+      );
+    }
+    return Promise.resolve(legacyCopy(text));
+  }
+
+  function initCopyButtons() {
+    var buttons = document.querySelectorAll('.copy-mail[data-copy]');
+    if (!buttons.length) return;
+
+    var live = document.createElement('span');
+    live.className = 'sr-only';
+    live.setAttribute('role', 'status');
+    live.setAttribute('aria-live', 'polite');
+    document.body.appendChild(live);
+
+    Array.prototype.forEach.call(buttons, function (btn) {
+      var idle = btn.textContent;
+      var reset = null;
+      btn.addEventListener('click', function () {
+        var address = btn.getAttribute('data-copy');
+        copyText(address).then(function (ok) {
+          btn.textContent = ok ? '已复制' : '复制失败';
+          btn.classList.toggle('is-done', ok);
+          live.textContent = ok ? address + ' 已复制到剪贴板' : '浏览器拒绝了剪贴板写入，请选中地址手动复制';
+          clearTimeout(reset);
+          reset = setTimeout(function () {
+            btn.textContent = idle;
+            btn.classList.remove('is-done');
+          }, 2200);
+        });
+      });
+    });
+  }
+
+  /* ------------------------------------------------------------------ */
   /* Boot                                                                */
   /* ------------------------------------------------------------------ */
   function ready(fn) {
@@ -1076,6 +1133,7 @@
 
     initHeaderState();
     initSmoothAnchors();
+    initCopyButtons();
     initReveal();
 
     if (document.querySelector('.post-shell')) initArticle();
