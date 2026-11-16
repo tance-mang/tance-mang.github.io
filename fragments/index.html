@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fragments — TANCE · Neural Orbit</title>
+  <meta name="description" content="思想碎片：从站内已发布文章里逐字摘录的一句话，标注主题与原文出处，可按主题筛选。">
+  <link rel="canonical" href="https://tance-mang.github.io/fragments/">
+  <meta property="og:title" content="Fragments — TANCE">
+  <meta property="og:description" content="一句一句留下的想法：疑问、判断、前后矛盾的地方，全部逐字摘自站内原文。">
+  <link rel="alternate" type="application/rss+xml" title="TANCE · Neural Orbit" href="/feed.xml">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2307050D'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23D6AAFF'/%3E%3Cellipse cx='16' cy='16' rx='13' ry='5' fill='none' stroke='%239D70FF' stroke-width='1.4' transform='rotate(-24 16 16)'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/universe.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="bg-veil"></div>
+  <canvas id="neural-net" aria-hidden="true"></canvas>
+  <div class="bg-grain"></div>
+
+  <header class="sub-header">
+    <a href="/" class="sub-logo">TANCE</a>
+    <nav class="sub-nav">
+      <a href="/create.html">Create</a>
+      <a href="/observe.html">Observe</a>
+      <a href="/projects/">Projects</a>
+      <a href="/archives/">Archive</a>
+      <a href="/fragments/" class="is-current">Fragments</a>
+      <a href="/about.html">About</a>
+    </nav>
+  </header>
+
+  <main class="sub-shell">
+    <section class="sub-head">
+      <span class="sub-eyebrow">— Fragments</span>
+      <h1 class="sub-title">还没写成文章，<br>但已经成句的想法。</h1>
+      <p class="sub-line">每一条都是从站内文章里逐字切出来的一句话，不改写、不拼接；点开出处可以看到它当时的上下文。</p>
+    </section>
+
+    <div class="fx-bar" data-fill="fragments-filters" role="group" aria-label="按主题筛选碎片"></div>
+
+    <p class="fx-count"><span data-fill="fragments-count">—</span> 条碎片 · 摘自站内已发布文章</p>
+
+    <div class="frag-wall" data-fill="fragments-all"></div>
+
+    <noscript>
+      <p class="empty-note">碎片列表需要在浏览器里读取站内文章原文；静态入口见 <a href="/archives/">全部档案</a>。</p>
+    </noscript>
+
+    <section class="fx-about">
+      <h2 class="about-label">这些句子从哪来</h2>
+      <p>程序按句号、问号、分号把文章正文切成句子，跳过包含代码、图片和外部链接的段落，
+        再按是否包含第一人称、判断、疑问来排序，每篇最多取两句。
+        人工挑选的句子会排在前面，并在 <code>data/site.json</code> 里逐字保存，
+        自检脚本会确认它确实出现在所指向的那篇文章中。</p>
+      <p>不想展示的句子和已经写透的话题，都可以放进 <code>hidden</code> 列表；
+        没有文章、只有一句想法时，也能作为独立碎片直接写进数据文件。</p>
+    </section>
+
+    <p class="fx-back"><a class="btn btn--ghost" href="/">回到星域 <i class="arrow">←</i></a>
+      <a class="btn btn--ghost" href="/archives/">全部记录 <i class="arrow">→</i></a></p>
+  </main>
+
+  <footer class="foot">
+    <span>静态托管 · 无后端 · 无追踪</span>
+    <span>
+      <a href="/create.html">create</a><span class="dot">·</span>
+      <a href="/observe.html">observe</a><span class="dot">·</span>
+      <a href="/archives/">archive</a><span class="dot">·</span>
+      <a href="/feed.xml">rss</a>
+    </span>
+  </footer>
+
+  <script src="/js/script.js"></script>
+  <script src="/js/universe.js"></script>
+</body>
+</html>

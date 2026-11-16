@@ -125,6 +125,36 @@ for (const page of ['create.html', 'observe.html', 'archives/index.html']) {
   }
 }
 
+/* ---------- fragments: a curated sentence must be verbatim in its source ---------- */
+const fragCfg = site.fragments || {};
+
+function leafText(file) {
+  const raw = readFileSync(file, 'utf8');
+  const out = [];
+  for (const m of raw.matchAll(/<(p|li|blockquote)[^>]*>([\s\S]*?)<\/\1>/g)) {
+    out.push(m[2].replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim());
+  }
+  return out;
+}
+
+for (const c of fragCfg.curated || []) {
+  const text = String(c.text || '').trim();
+  if (!text) { failures.push('fragments.curated: 有空条目'); continue; }
+  if (!c.from) {
+    if (!c.date) failures.push(`fragments.curated: 独立碎片「${text.slice(0, 18)}…」需要写 date`);
+    continue;
+  }
+  const file = join(ROOT, c.from.replace(/^\/+/, '').replace(/\/+$/, ''), 'index.html');
+  if (!existsSync(file)) {
+    failures.push(`fragments.curated: 出处页面不存在 ${c.from}`);
+  } else if (!leafText(file).some((t) => t.includes(text))) {
+    failures.push(`fragments.curated: 「${text.slice(0, 24)}…」并非 ${c.from} 的原文，不能冒充原话`);
+  }
+  if (!allEntries.has(c.from)) failures.push(`fragments.curated: 出处 ${c.from} 不在任何文章列表中`);
+}
+
+notes.push(`fragments: ${(fragCfg.curated || []).length} 条人工摘录已逐字核对`);
+
 for (const p of projects) {
   const page = join(ROOT, 'projects', p.slug, 'index.html');
   if (!existsSync(page)) failures.push(`缺少项目详情页：/projects/${p.slug}/（运行 node tools/gen-projects.mjs）`);

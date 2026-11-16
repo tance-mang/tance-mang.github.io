@@ -367,37 +367,120 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* FRAGMENTS (real quotes pulled out of the Observe articles)          */
+  /* FRAGMENTS — sentences cut verbatim out of the articles themselves   */
   /* ------------------------------------------------------------------ */
-  function fillFragments(content) {
-    $$('[data-fill="frags"]').forEach(function (wrap) {
-      var rv = animateOnce('frags');
-      var source = content.inSection('observe');
-      var withQuotes = source.filter(function (r) { return r.quotes && r.quotes.length; });
-      wrap.innerHTML = '';
-      if (!withQuotes.length) {
-        // Nothing enriched yet — fall back to the excerpts already in the lists.
-        var excerpted = source.filter(function (r) { return r.excerpt; }).slice(0, 5);
-        if (!excerpted.length) { wrap.innerHTML = '<p class="empty-note">正在读取原文中的片段…</p>'; return; }
-        excerpted.forEach(function (r) { wrap.appendChild(fragCard(r.excerpt, r, rv)); });
-        return;
-      }
-      withQuotes.slice(0, 4).forEach(function (r) {
-        wrap.appendChild(fragCard(r.quotes[0], r, rv));
-      });
-      source.slice(0, 2).forEach(function (r) {
-        if (r.quotes && r.quotes[1]) wrap.appendChild(fragCard(r.quotes[1], r, rv));
-      });
-    });
+  function fragTier(f) {
+    var n = f.text.length;
+    if (n <= 26) return 's';
+    if (n <= 52) return 'm';
+    if (n <= 84) return 'l';
+    return 'xl';
   }
 
-  function fragCard(text, rec, rv) {
-    var a = make('a', 'frag' + (rv || ''));
-    a.href = rec.href;
-    a.appendChild(make('span', 'frag-mark'));
-    a.appendChild(make('p', 'frag-quote', '“' + text + '”'));
-    a.appendChild(make('span', 'frag-src', rec.title + ' · ' + (rec.date || '')));
-    return a;
+  // A stable per-sentence offset: re-rendering must not shuffle the wall.
+  function fragSeed(str) {
+    var h = 0;
+    for (var i = 0; i < str.length; i++) h = (h * 131 + str.charCodeAt(i)) & 0xffff;
+    return h;
+  }
+
+  function fragCard(f, cls) {
+    var node = make('article', 'frag frag--' + fragTier(f) + (cls || ''));
+    var seed = fragSeed(f.text);
+    node.style.setProperty('--dx', ((seed % 18) - 9) + 'px');
+    node.style.setProperty('--dy', ((seed >> 4) % 13) - 6 + 'px');
+    node.appendChild(make('span', 'frag-mark'));
+    node.appendChild(make('p', 'frag-text', f.text));
+    var foot = make('footer', 'frag-foot');
+    foot.appendChild(make('span', 'frag-topic', f.topic));
+    var src = make('span', 'frag-src');
+    if (f.href) {
+      var a = make('a', '', f.title);
+      a.href = f.href;
+      src.appendChild(a);
+      src.appendChild(make('span', 'frag-date', f.date || ''));
+    } else {
+      src.appendChild(make('span', 'frag-stand', '独立记录 · ' + (f.date || '')));
+    }
+    foot.appendChild(src);
+    node.appendChild(foot);
+    return node;
+  }
+
+  function fillFragments(content) {
+    var list = content.fragments();
+    $$('[data-fill="frags"]').forEach(function (wrap) {
+      var rv = animateOnce('frags');
+      var shown = list.slice(0, T.small ? 9 : 12);
+      wrap.innerHTML = '';
+      if (!shown.length) {
+        wrap.appendChild(make('p', 'empty-note', '还没有可摘录的原文句子。'));
+        return;
+      }
+      shown.forEach(function (f, i) {
+        var card = fragCard(f, rv);
+        if (i === 0) card.classList.add('frag--hero');
+        wrap.appendChild(card);
+      });
+      if (list.length > shown.length) {
+        var more = make('a', 'frags-more');
+        more.href = '/fragments/';
+        more.appendChild(make('span', 'fm-label', '展开更多碎片'));
+        more.appendChild(make('span', 'fm-count', '站内共 ' + list.length + ' 条'));
+        more.appendChild(make('span', 'arrow', '→'));
+        wrap.appendChild(more);
+      }
+    });
+    $$('[data-fill="fragments-all"]').forEach(function (wrap) {
+      var rv = animateOnce('frag-all');
+      wrap.innerHTML = '';
+      if (!list.length) {
+        wrap.appendChild(make('p', 'empty-note', '还没有可摘录的原文句子。'));
+        return;
+      }
+      list.forEach(function (f, i) {
+        var card = fragCard(f, rv);
+        if (i === 0) card.classList.add('frag--hero');
+        wrap.appendChild(card);
+      });
+    });
+    $$('[data-fill="fragments-count"]').forEach(function (node) {
+      node.textContent = String(list.length);
+    });
+    $$('[data-fill="fragments-filters"]').forEach(function (wrap) {
+      if (wrap.dataset.done) return;
+      var topics = {};
+      list.forEach(function (f) { topics[f.topic] = (topics[f.topic] || 0) + 1; });
+      var rows = Object.keys(topics).map(function (k) { return { topic: k, n: topics[k] }; })
+        .sort(function (a, b) { return b.n - a.n || (a.topic < b.topic ? -1 : 1); });
+      if (rows.length < 2) return;
+      wrap.dataset.done = '1';
+      wrap.innerHTML = '';
+      var all = make('button', 'fx is-on');
+      all.type = 'button';
+      all.appendChild(make('span', '', '全部'));
+      all.appendChild(make('span', 'count', String(list.length)));
+      wrap.appendChild(all);
+      rows.forEach(function (x) {
+        var b = make('button', 'fx');
+        b.type = 'button';
+        b.dataset.topic = x.topic;
+        b.appendChild(make('span', '', x.topic));
+        b.appendChild(make('span', 'count', String(x.n)));
+        wrap.appendChild(b);
+      });
+      var wall = wrap.parentNode.querySelector('[data-fill="fragments-all"]');
+      wrap.addEventListener('click', function (e) {
+        var btn = e.target.closest('.fx');
+        if (!btn || !wall) return;
+        $$('.fx', wrap).forEach(function (b) { b.classList.toggle('is-on', b === btn); });
+        var want = btn.dataset.topic || '';
+        $$('.frag', wall).forEach(function (card) {
+          var topic = card.querySelector('.frag-topic');
+          card.hidden = !!want && (!topic || topic.textContent !== want);
+        });
+      });
+    });
   }
 
   /* ------------------------------------------------------------------ */
@@ -677,47 +760,105 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* Topic overview — the homepage's own reading of the tag cloud        */
+  /* Topic islands — weight follows volume, so the shape comes from data  */
   /* ------------------------------------------------------------------ */
+  function topicRows(content) {
+    var map = content.tagMap();
+    var notes = (content.site || {}).topicNotes || {};
+    return Object.keys(map)
+      .filter(function (k) { return k !== 'Create' && k !== 'Observe'; })
+      .map(function (k) {
+        var hrefs = map[k].hrefs || [];
+        var recs = hrefs.map(content.find).filter(Boolean)
+          .sort(function (a, b) { return a.date < b.date ? 1 : -1; });
+        var projects = (map[k].projects || []).map(function (p) {
+          return typeof p === 'string' ? { slug: p } : p;
+        });
+        return {
+          tag: k,
+          posts: hrefs.length,
+          projectList: projects,
+          projects: projects.length,
+          first: hrefs[0] || '',
+          line: notes[k] || '',
+          latest: recs.length ? recs[0] : null,
+          total: hrefs.length + projects.length
+        };
+      })
+      .filter(function (x) { return x.total > 0; })
+      .sort(function (a, b) { return b.total - a.total || (a.tag < b.tag ? -1 : 1); });
+  }
+
+  function isleMeta(x) {
+    var meta = make('span', 'isle-meta');
+    var bits = [];
+    if (x.posts) bits.push(x.posts + ' 篇记录');
+    if (x.projects) bits.push(x.projects + ' 个项目');
+    meta.textContent = bits.join(' · ');
+    return meta;
+  }
+
   function fillTopicOverview(content) {
     $$('[data-fill="topic-overview"]').forEach(function (wrap) {
-      var map = content.tagMap();
-      var notes = (content.site || {}).topicNotes || {};
-      var rows = Object.keys(map)
-        .filter(function (k) { return k !== 'Create' && k !== 'Observe'; })
-        .map(function (k) {
-          var hrefs = map[k].hrefs || [];
-          var recs = hrefs.map(content.find).filter(Boolean)
-            .sort(function (a, b) { return a.date < b.date ? 1 : -1; });
-          return {
-            tag: k,
-            posts: hrefs.length,
-            projects: (map[k].projects || []).length,
-            line: notes[k] || (recs.length ? '最近一篇：' + recs[0].title : ''),
-            latest: recs.length ? recs[0].date : ''
-          };
-        })
-        .filter(function (x) { return x.posts + x.projects > 0; })
-        .sort(function (a, b) { return (b.posts + b.projects) - (a.posts + a.projects); })
-        .slice(0, 12);
-
-      var top = rows.length ? rows[0].posts + rows[0].projects : 1;
+      var rv = animateOnce('topics');
+      var rows = topicRows(content);
       wrap.innerHTML = '';
-      rows.forEach(function (x) {
-        var total = x.posts + x.projects;
-        var a = make('a', 'tp');
+      if (!rows.length) {
+        wrap.appendChild(make('p', 'empty-note', '还没有可用于统计主题的标签。'));
+        return;
+      }
+      var top = rows[0].total || 1;
+      // Two feature islands at most, then mid-size ones; the tail becomes chips
+      // so a remainder of 7 or 17 themes still closes the line without a hole.
+      var bigCount = rows.length >= 6 ? 2 : rows.length >= 3 ? 1 : 0;
+      var big = rows.slice(0, bigCount);
+      var midCount = rows.length > bigCount + 6 ? rows.length - bigCount - 6 : Math.max(0, rows.length - bigCount - 3);
+      var mid = rows.slice(bigCount, bigCount + midCount);
+      var tail = rows.slice(bigCount + midCount);
+
+      var band = make('div', 'isles');
+      if (T.small) band.classList.add('isles--compact');
+      big.concat(mid).forEach(function (x) {
+        var a = make('a', 'isle isle--' + (x === big[0] ? 'hero' : x.total >= top * 0.55 ? 'big' : 'mid') + (rv || ''));
         a.href = '/archives/#tag-' + encodeURIComponent(x.tag);
-        a.appendChild(make('span', 'tp-tag', '#' + x.tag));
-        a.appendChild(make('span', 'tp-line', x.line || '这个主题还没有写简介。'));
-        var meta = make('span', 'tp-meta');
-        meta.textContent = x.posts + ' 篇记录' + (x.projects ? ' · ' + x.projects + ' 个项目' : '');
-        a.appendChild(meta);
-        var bar = make('span', 'tp-bar');
-        bar.appendChild(make('i'));
-        bar.firstChild.style.setProperty('--w', Math.round(total / top * 100) + '%');
-        a.appendChild(bar);
-        wrap.appendChild(a);
+        a.style.setProperty('--w', Math.max(24, Math.round(x.total / top * 100)) + '%');
+        a.appendChild(make('span', 'isle-orbit'));
+        var body = make('div', 'isle-body');
+        var t = make('h3', 'isle-tag', '#' + x.tag);
+        body.appendChild(t);
+        var line = make('p', 'isle-line');
+        line.textContent = x.line || (x.latest ? '最近一篇：' + x.latest.title : '这个主题还没有写简介。');
+        body.appendChild(line);
+        body.appendChild(isleMeta(x));
+        if (x.latest && x.posts) {
+          var lat = make('span', 'isle-latest');
+          lat.appendChild(make('span', 'il-k', x.latest.date || ''));
+          lat.appendChild(make('span', 'il-t', x.latest.title));
+          body.appendChild(lat);
+        }
+        a.appendChild(body);
+        if (x.projects) {
+          var dots = make('span', 'isle-dots');
+          for (var i = 0; i < Math.min(x.projects, 6); i++) dots.appendChild(make('i'));
+          a.appendChild(dots);
+        }
+        band.appendChild(a);
       });
+      if (tail.length) {
+        var cluster = make('div', 'isle-cluster' + (rv || ''));
+        cluster.appendChild(make('span', 'cluster-label', '其他主题'));
+        var list = make('div', 'cluster-tags');
+        tail.forEach(function (x) {
+          var c = make('a', 'isle-chip');
+          c.href = '/archives/#tag-' + encodeURIComponent(x.tag);
+          c.appendChild(make('span', '', '#' + x.tag));
+          c.appendChild(make('span', 'count', String(x.total)));
+          list.appendChild(c);
+        });
+        cluster.appendChild(list);
+        band.appendChild(cluster);
+      }
+      wrap.appendChild(band);
     });
   }
 

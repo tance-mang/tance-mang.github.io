@@ -9,6 +9,7 @@
   'use strict';
 
   function el(sel, root) { return (root || document).querySelector(sel); }
+  function els(sel, root) { return [].slice.call((root || document).querySelectorAll(sel)); }
 
   var SHELL = { topic: 0.5, project: 0.84, post: 1.14 };
   var FOCAL = 2.35;          // in shell units; smaller = stronger perspective
@@ -57,14 +58,16 @@
     posts.forEach(function (p) {
       add({
         id: p.href, kind: 'post', label: p.title, weight: 1,
-        href: p.href, date: p.date, meta: p.category || (p.section === 'create' ? 'Create' : 'Observe')
+        href: p.href, date: p.date, world: p.section === 'create' ? 'create' : 'observe',
+        meta: p.category || (p.section === 'create' ? 'Create' : 'Observe')
       });
     });
 
     (content.projects || []).forEach(function (pr) {
       add({
         id: '/projects/' + pr.slug + '/', kind: 'project', label: pr.name, weight: 2,
-        href: '/projects/' + pr.slug + '/', slug: pr.slug, meta: pr.status || 'project'
+        href: '/projects/' + pr.slug + '/', slug: pr.slug, world: 'create',
+        meta: pr.status || 'project'
       });
     });
 
@@ -76,10 +79,18 @@
       .slice(0, 22);
 
     topics.forEach(function (t) {
+      var sides = {};
+      t.hrefs.forEach(function (h) {
+        var rec = content.find(h);
+        if (rec) sides[rec.section === 'create' ? 'create' : 'observe'] = 1;
+      });
+      if (t.projects.length) sides.create = 1;
+      var keys = Object.keys(sides);
       add({
         id: 'topic:' + t.tag, kind: 'topic', label: t.tag,
         weight: 1 + (t.hrefs.length + t.projects.length) * 0.6,
         count: t.hrefs.length + t.projects.length,
+        world: keys.length > 1 ? 'both' : (keys[0] || 'both'),
         href: (WORLD_TAGS[t.tag] || {}).href || '/archives/#tag-' + encodeURIComponent(t.tag),
         hrefs: t.hrefs, projects: t.projects
       });
@@ -178,8 +189,20 @@
 
     graph.nodes.forEach(function (n) {
       n.phase = hash(n.id) * Math.PI * 2;
-      n.r = n.kind === 'topic' ? 5.2 + Math.min(7, (n.count || 1) * 1.1)
-        : n.kind === 'project' ? 5.4 : 3.1;
+      // Node bodies are not interchangeable dots: a topic is a star with a
+      // halo or a small cluster, a project is a cut stone, a record is a tick
+      // or a bookmark. The kind is fixed by data, the variant by a stable hash.
+      var v = hash(n.id + 'shape');
+      if (n.kind === 'topic') {
+        n.r = 5.4 + Math.min(7, (n.count || 1) * 1.1);
+        n.shape = (n.count || 1) >= 5 ? 'core' : v < 0.5 ? 'halo' : 'cluster';
+      } else if (n.kind === 'project') {
+        n.r = 5.4;
+        n.shape = v < 0.34 ? 'diamond' : v < 0.67 ? 'hexagon' : 'capsule';
+      } else {
+        n.r = 3.2;
+        n.shape = v < 0.4 ? 'tick' : v < 0.72 ? 'bookmark' : 'particle';
+      }
     });
   }
 
@@ -230,6 +253,9 @@
     var w = 0, h = 0, dpr = 1;
     var PITCH_MAX = 1.25;
     var cam = { yaw: 0.5, pitch: -0.2, zoom: 1, tyaw: 0.5, tpitch: -0.2, tzoom: 1 };
+    // Pointer parallax shifts the projection centre a little; it is an offset,
+    // not a second camera, so it composes with drag and zoom without fighting.
+    var par = { x: 0, y: 0, tx: 0, ty: 0 };
     var spin = !reduced;
     var vel = { yaw: 0, pitch: 0 };
     var hover = null, selected = null, pulse = null;
@@ -259,7 +285,7 @@
       if (!graph) return;
       var cy = Math.cos(cam.yaw), sy = Math.sin(cam.yaw);
       var cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch);
-      var u = unit(), sx = spread(), ox = w / 2, oy = h / 2;
+      var u = unit(), sx = spread(), ox = w / 2 + par.x, oy = h / 2 + par.y;
       graph.nodes.forEach(function (n) {
         var x1 = n.vx * cy + n.vz * sy;
         var z1 = -n.vx * sy + n.vz * cy;
@@ -276,6 +302,119 @@
     // Larger z2 is further from the camera; k shrinks with it.
     function depthFade(n) {
       return Math.max(0.22, Math.min(1, (1.45 - n.sz) / 2.9));
+    }
+
+    // Create / Observe is the axis the site is built on. The switch dims the
+    // other side rather than removing nodes, so the shape stays legible.
+    var mode = 'all';
+
+    function dimmed(n) {
+      if (!n || mode === 'all') return 1;
+      return !n.world || n.world === 'both' || n.world === mode ? 1 : 0.16;
+    }
+
+    /* Node bodies are cut differently per kind: a topic is a star with a
+       corona or a small cluster, a project is a faceted stone, a record is a
+       tick or a bookmark. Same ink, different shapes. */
+    function drawBody(n, r, color, strong) {
+      var x = n.sx, y = n.sy;
+      ctx.fillStyle = color;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = strong ? 1.3 : 1;
+      var s = Math.max(1.4, r);
+      switch (n.shape) {
+        case 'core':
+          ctx.beginPath();
+          ctx.arc(x, y, s * 0.46, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          var arm = s * (strong ? 1.5 : 1.15);
+          ctx.moveTo(x - arm, y); ctx.lineTo(x + arm, y);
+          ctx.moveTo(x, y - arm); ctx.lineTo(x, y + arm);
+          ctx.globalAlpha *= 0.55;
+          ctx.stroke();
+          break;
+        case 'halo':
+          ctx.beginPath();
+          ctx.arc(x, y, s * 0.42, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(x, y, s * 0.95, 0, Math.PI * 2);
+          ctx.globalAlpha *= 0.5;
+          ctx.stroke();
+          break;
+        case 'cluster':
+          ctx.beginPath();
+          ctx.arc(x, y, s * 0.36, 0, Math.PI * 2);
+          ctx.fill();
+          for (var i = 0; i < 3; i++) {
+            var a = n.phase + i * 2.09;
+            ctx.beginPath();
+            ctx.arc(x + Math.cos(a) * s * 0.85, y + Math.sin(a) * s * 0.85, s * 0.16, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          break;
+        case 'diamond':
+          ctx.beginPath();
+          ctx.moveTo(x, y - s * 0.72);
+          ctx.lineTo(x + s * 0.52, y);
+          ctx.lineTo(x, y + s * 0.72);
+          ctx.lineTo(x - s * 0.52, y);
+          ctx.closePath();
+          ctx.fill();
+          break;
+        case 'hexagon':
+          ctx.beginPath();
+          for (var k = 0; k < 6; k++) {
+            var ang = k * Math.PI / 3 - Math.PI / 6;
+            var px = x + Math.cos(ang) * s * 0.62;
+            var py = y + Math.sin(ang) * s * 0.62;
+            if (k) ctx.lineTo(px, py); else ctx.moveTo(px, py);
+          }
+          ctx.closePath();
+          ctx.fill();
+          break;
+        case 'capsule':
+          ctx.beginPath();
+          ctx.moveTo(x - s * 0.5, y - s * 0.26);
+          ctx.lineTo(x + s * 0.5, y - s * 0.26);
+          ctx.arc(x + s * 0.5, y, s * 0.26, -Math.PI / 2, Math.PI / 2);
+          ctx.lineTo(x - s * 0.5, y + s * 0.26);
+          ctx.arc(x - s * 0.5, y, s * 0.26, Math.PI / 2, -Math.PI / 2);
+          ctx.closePath();
+          ctx.fill();
+          break;
+        case 'bookmark':
+          ctx.beginPath();
+          ctx.moveTo(x - s * 0.34, y - s * 0.5);
+          ctx.lineTo(x + s * 0.34, y - s * 0.5);
+          ctx.lineTo(x + s * 0.34, y + s * 0.5);
+          ctx.lineTo(x, y + s * 0.22);
+          ctx.lineTo(x - s * 0.34, y + s * 0.5);
+          ctx.closePath();
+          ctx.fill();
+          break;
+        case 'tick':
+          ctx.beginPath();
+          ctx.moveTo(x, y - s * 0.5);
+          ctx.lineTo(x, y + s * 0.34);
+          ctx.stroke();
+          break;
+        case 'particle':
+          ctx.beginPath();
+          ctx.arc(x, y, s * 0.28, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.moveTo(x - s * 0.7, y - s * 0.3);
+          ctx.lineTo(x - s * 0.12, y);
+          ctx.globalAlpha *= 0.45;
+          ctx.stroke();
+          break;
+        default:
+          ctx.beginPath();
+          ctx.arc(x, y, s * 0.4, 0, Math.PI * 2);
+          ctx.fill();
+      }
     }
 
     function pick(px, py) {
@@ -326,25 +465,39 @@
         var s = byId[l.a], t = byId[l.b];
         if (!s || !t) return;
         var on = lit && (l.a === lit.id || l.b === lit.id);
-        var fade = Math.min(depthFade(s), depthFade(t));
+        var side = Math.min(dimmed(s), dimmed(t));
+        var fade = Math.min(depthFade(s), depthFade(t)) * side;
         var breathe = reduced ? 1 : 0.8 + Math.sin(now * 0.0005 + s.phase) * 0.2;
         ctx.beginPath();
-        if (l.kind === 'co') {
-          var mx = (s.sx + t.sx) / 2 + (s.sy - t.sy) * 0.12;
-          var my = (s.sy + t.sy) / 2 + (t.sx - s.sx) * 0.12;
+        var bow = hash(l.a + l.b) - 0.5;
+        if (l.kind === 'co' || l.kind === 'project') {
+          // soft arcs: topic↔topic co-occurrence and topic→project links
+          var amp = l.kind === 'co' ? 0.2 : 0.13;
+          var mx = (s.sx + t.sx) / 2 - (t.sx - s.sx) * bow * amp;
+          var my = (s.sy + t.sy) / 2 - (t.sy - s.sy) * bow * amp;
           ctx.moveTo(s.sx, s.sy);
           ctx.quadraticCurveTo(mx, my, t.sx, t.sy);
+        } else if (Math.abs(bow) > 0.3) {
+          // a third of the record links are filaments with a slight drift
+          var fx = (s.sx + t.sx) / 2 + (s.sy - t.sy) * bow * 0.28;
+          var fy = (s.sy + t.sy) / 2 + (t.sx - s.sx) * bow * 0.28;
+          ctx.moveTo(s.sx, s.sy);
+          ctx.quadraticCurveTo(fx, fy, t.sx, t.sy);
         } else {
           ctx.moveTo(s.sx, s.sy);
           ctx.lineTo(t.sx, t.sy);
         }
-        ctx.lineWidth = on ? 1.5 : (l.kind === 'co' ? 0.6 : 0.75);
+        ctx.lineWidth = on ? 1.5 : (l.kind === 'project' ? 0.9 : l.kind === 'co' ? 0.6 : 0.7);
+        ctx.setLineDash(l.kind === 'co' && !on ? [3, 6] : []);
         ctx.strokeStyle = on
           ? 'rgba(242,168,236,' + (0.7 + fade * 0.25).toFixed(3) + ')'
           : (l.kind === 'co'
-            ? 'rgba(124,155,214,' + (0.26 * fade * breathe).toFixed(3) + ')'
-            : 'rgba(214,170,255,' + (0.34 * fade * breathe).toFixed(3) + ')');
+            ? 'rgba(124,155,214,' + (0.3 * fade * breathe).toFixed(3) + ')'
+            : l.kind === 'project'
+              ? 'rgba(214,170,255,' + (0.44 * fade * breathe).toFixed(3) + ')'
+              : 'rgba(157,112,255,' + (0.34 * fade * breathe).toFixed(3) + ')');
         ctx.stroke();
+        ctx.setLineDash([]);
       });
 
       if (pulse) {
@@ -365,29 +518,40 @@
       var narrow = w < 720;
       order.forEach(function (n) {
         var fade = depthFade(n);
+        var side = dimmed(n);
         var isLit = lit && n.id === lit.id;
         var isNear = litSet[n.id] && lit && n.id !== lit.id;
         var amp = reduced ? 0 : 1 + Math.sin(now * 0.0009 + n.phase) * 0.12;
         var r = n.r * n.sk * cam.zoom * amp * (isLit ? 1.7 : 1);
         var sp = sprite[n.kind] || sprite.post;
 
-        if (sp) {
+        if (sp && side > 0.5) {
           var halo = r * (isLit ? 7.5 : n.kind === 'post' ? 4 : 5.2);
-          ctx.globalAlpha = Math.min(1, fade * (isLit ? 0.92 : n.kind === 'post' ? 0.5 : 0.68));
+          ctx.globalAlpha = Math.min(1, fade * side * (isLit ? 0.92 : n.kind === 'post' ? 0.5 : 0.68));
           ctx.drawImage(sp, n.sx - halo / 2, n.sy - halo / 2, halo, halo);
         }
-        ctx.globalAlpha = Math.min(1, fade + (isLit ? 0.4 : 0.12));
-        ctx.beginPath();
-        ctx.arc(n.sx, n.sy, Math.max(0.9, r * 0.5), 0, Math.PI * 2);
-        ctx.fillStyle = isLit || isNear ? '#F4EEFF'
-          : n.kind === 'topic' ? '#E7D8FF' : n.kind === 'project' ? '#F2A8EC' : '#9D70FF';
-        ctx.fill();
+
+        // Major topics breathe: a ring that expands and fades on a slow cycle.
+        if (n.kind === 'topic' && (n.count || 0) >= 5 && !reduced && side > 0.5) {
+          var cyc = ((now * 0.00022 + n.phase) % 1 + 1) % 1;
+          ctx.beginPath();
+          ctx.arc(n.sx, n.sy, r * (1.1 + cyc * 2.2), 0, Math.PI * 2);
+          ctx.strokeStyle = 'rgba(126,208,255,' + (0.3 * (1 - cyc) * fade).toFixed(3) + ')';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+
+        ctx.globalAlpha = Math.min(1, (fade + (isLit ? 0.4 : 0.12)) * side);
+        drawBody(n, r,
+          isLit || isNear ? '#F4EEFF'
+            : n.kind === 'topic' ? '#E7D8FF' : n.kind === 'project' ? '#F2A8EC' : '#9D70FF',
+          isLit || isNear);
         ctx.globalAlpha = 1;
 
         // Topics name the structure; projects when they are close enough to
         // read; records only the one you are looking at. Twenty long titles in
         // a rotating sphere is fog, not a map.
-        var wantLabel = n.kind === 'topic' || (n.kind === 'project' && n.sk > 1.02) || isLit;
+        var wantLabel = side > 0.5 && (n.kind === 'topic' || (n.kind === 'project' && n.sk > 1.02) || isLit);
         if (wantLabel && !narrow) {
           var text = n.label.length > 14 ? n.label.slice(0, 13) + '…' : n.label;
           var size = isLit ? 13 : 11;
@@ -435,6 +599,8 @@
       cam.yaw += (cam.tyaw - cam.yaw) * 0.12;
       cam.pitch += (cam.tpitch - cam.pitch) * 0.12;
       cam.zoom += (cam.tzoom - cam.zoom) * 0.12;
+      par.x += (par.tx - par.x) * 0.07;
+      par.y += (par.ty - par.y) * 0.07;
     }
 
     function tick(now) {
@@ -465,7 +631,7 @@
 
     /* Bring a node to the front of the volume: solve yaw/pitch that put it on
        the camera axis instead of sliding a flat sheet around. */
-    function focus(node) {
+    function focus(node, deep) {
       if (!node) return;
       var twoPi = Math.PI * 2;
       var wantYaw = Math.atan2(node.vx, -node.vz);
@@ -473,9 +639,9 @@
       var wantPitch = clamp(Math.atan2(-node.vy, flat), -PITCH_MAX, PITCH_MAX);
       cam.tyaw = cam.tyaw + (((wantYaw - cam.tyaw) % twoPi + twoPi * 1.5) % twoPi - Math.PI);
       cam.tpitch = wantPitch;
-      cam.tzoom = Math.max(cam.tzoom, 1.3);
+      cam.tzoom = Math.max(cam.tzoom, deep ? 1.95 : 1.3);
       vel.yaw = vel.pitch = 0;
-      holdSpin(12000);
+      holdSpin(deep ? 22000 : 12000);
     }
 
     function reset() {
@@ -511,10 +677,20 @@
         var text = world ? world.line : (notes[node.label] || (hrefs.length
           ? '站内有 ' + hrefs.length + ' 篇记录带着这个标签' + (first ? '，最近的一篇写于 ' + (first.date || '') + '。' : '。')
           : '这个标签目前只挂在项目上，还没有对应的记录。'));
+        // A topic panel ends with one of the author's own sentences, taken
+        // verbatim from an article that actually carries this tag.
+        var quote = null;
+        if (T.content.fragments) {
+          var pool = T.content.fragments();
+          for (var i = 0; i < pool.length; i++) {
+            if (pool[i].href && hrefs.indexOf(pool[i].href) >= 0) { quote = pool[i]; break; }
+          }
+        }
         return {
           kind: '主题', cls: 'topic', name: node.label,
           text: text,
           meta: hrefs.length + ' 篇记录 · ' + projs + ' 个项目',
+          quote: quote,
           cta: world
             ? { href: world.href, label: '进入这一侧' }
             : { href: node.href, label: '进入主题' }
@@ -564,6 +740,18 @@
         meta.className = 'cx-panel-meta';
         meta.textContent = d.meta;
         panel.appendChild(meta);
+      }
+      if (d.quote) {
+        var q = document.createElement('blockquote');
+        q.className = 'cx-panel-quote';
+        q.textContent = d.quote.text;
+        var who = document.createElement('cite');
+        var link = document.createElement('a');
+        link.href = d.quote.href;
+        link.textContent = '出自《' + d.quote.title + '》';
+        who.appendChild(link);
+        q.appendChild(who);
+        panel.appendChild(q);
       }
       var go = document.createElement('a');
       go.className = 'cx-panel-go';
@@ -726,6 +914,11 @@
       }
 
       var n = pick(p.x, p.y);
+      if (!reduced) {
+        par.tx = (p.x / Math.max(1, w) - 0.5) * Math.min(30, w * 0.028);
+        par.ty = (p.y / Math.max(1, h) - 0.5) * Math.min(22, h * 0.035);
+        if (!running) { par.x = par.tx; par.y = par.ty; drawIfStatic(); }
+      }
       if (n !== hover) {
         hover = n;
         canvas.classList.toggle('is-target', !!n);
@@ -769,6 +962,7 @@
     canvas.addEventListener('pointercancel', release);
     canvas.addEventListener('pointerleave', function () {
       hover = null;
+      par.tx = par.ty = 0;
       canvas.classList.remove('is-target');
     });
 
@@ -779,6 +973,56 @@
       holdSpin(3500);
       drawIfStatic();
     }, { passive: false });
+
+    /* Double-click pulls a node to the front of the volume and holds it there;
+       double-clicking empty space gives the whole field back. */
+    canvas.addEventListener('dblclick', function (e) {
+      if (!graph) return;
+      var p = local(e);
+      var n = pick(p.x, p.y);
+      if (n) {
+        selected = n;
+        describe(n);
+        focus(n, true);
+      } else {
+        cam.tzoom = 1;
+        cam.tyaw = 0.5;
+        cam.tpitch = -0.2;
+        selected = null;
+        showDefault();
+        holdSpin(12000);
+      }
+      drawIfStatic();
+    });
+
+    var modeBtns = els('[data-cx-mode]', root);
+
+    function paintLens() {
+      var lens = el('[data-cx-lens]', root);
+      if (!lens) return;
+      lens.textContent = mode === 'all' ? '视角：全部'
+        : (mode === 'create' ? '视角：Create 一侧' : '视角：Observe 一侧');
+    }
+
+    function setMode(next) {
+      mode = next;
+      modeBtns.forEach(function (b) {
+        var on = b.dataset.cxMode === mode;
+        b.classList.toggle('is-on', on);
+        b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      if (hud) hud.dataset.mode = mode;
+      paintLens();
+      drawIfStatic();
+    }
+
+    modeBtns.forEach(function (b) {
+      b.setAttribute('aria-pressed', b.dataset.cxMode === 'all' ? 'true' : 'false');
+      b.addEventListener('click', function () {
+        setMode(b.dataset.cxMode);
+        holdSpin(12000);
+      });
+    });
 
     canvas.addEventListener('keydown', function (e) {
       if (!graph) return;
@@ -903,10 +1147,12 @@
         start();
         if (hud) {
           hud.innerHTML = '<span>节点 <b></b> · 连线 <b></b></span>' +
-            '<span>拖动旋转 · 滚轮或双指缩放 · 点击节点</span>';
+            '<span>拖动旋转 · 滚轮或双指缩放 · 单击选中 · 双击聚焦</span>' +
+            '<span data-cx-lens></span>';
           var b = hud.querySelectorAll('b');
           b[0].textContent = graph.nodes.length;
           b[1].textContent = graph.links.length;
+          paintLens();
         }
       });
   }

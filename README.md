@@ -11,6 +11,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Articles](https://img.shields.io/badge/articles-12-brightgreen)](archives/index.html)
 [![Projects](https://img.shields.io/badge/projects-10-blue)](projects/index.html)
+[![Fragments](https://img.shields.io/badge/fragments-32-9D70FF)](fragments/index.html)
 [![Build](https://img.shields.io/badge/build-none-lightgrey)](#-内容如何自动更新)
 [![Issues Welcome](https://img.shields.io/badge/issues-welcome-success)](https://github.com/tance-mang/tance-mang.github.io/issues)
 
@@ -63,6 +64,7 @@ node tools/serve.mjs          # http://localhost:8080
 index.html                    13 区块首页
 create.html observe.html      两个内容入口，也是文章列表的真实存放处
 archives/index.html           档案库（关键词 + 年份 + 分类 + 主题筛选）
+fragments/index.html          思想碎片档案（逐字摘录，按主题筛选）
 about.html                    个人数字档案，含 #contact 联系卡片
 orbit/index.html              联系与内容入口：GitHub / RSS / Issue / 记录 / 两个邮箱
 projects/index.html           作品星系
@@ -72,10 +74,10 @@ _template-post.html           新文章模板，也是 Auto Blog Agent 的写入
 css/style.css                 设计令牌 + 全站基础 + 文章阅读系统
 css/universe.css              首页区块、星图、作品、星环、404、联系卡片
 js/script.js                  内容索引 + 星轨背景 + 阅读系统（每页都加载）
-js/universe.js                首页与派生区块的渲染
-js/constellation.js           3D 星域装置：三层纵深、拖动旋转缩放、节点简介面板
+js/universe.js                首页与派生区块的渲染（星屑墙、主题星岛、信号、时间线）
+js/constellation.js           3D 星域装置：三层纵深、形状与连线类型、视角切换、节点简介面板
 data/projects.json            项目数据（真实仓库元数据，含可见性）
-data/site.json                站点文案、主题说明、联系方式、精选与里程碑、离线快照
+data/site.json                站点文案、主题说明、联系方式、精选与里程碑、碎片摘录控制、离线快照
 tools/                        生成器、仓库数据同步、自检、发布契约测试、本地服务器
 feed.xml sitemap.xml robots.txt LICENSE CHANGELOG.md
 ```
@@ -93,6 +95,7 @@ feed.xml sitemap.xml robots.txt LICENSE CHANGELOG.md
 
 - `data/site.json` 的 `featured`：精选文章位；留空时自动取最新记录，填入 `href` 列表则按指定顺序展示。
 - `data/site.json` 的 `milestones`：站点里程碑，与文章、仓库推送时间合并进演化时间线；只写已经发生的事。
+- `data/site.json` 的 `fragments`：思想碎片的摘录控制。`auto` 设定每篇取几句、句长区间；`curated` 把指定原话置顶并排在前；`hidden` 排除断章取义或重复的句子。摘录一律从文章 `p / li / blockquote` 的原文里整句切出，**不改写、不润色、不拼接**；不属于任何文章的独立碎片需要单独写 `date`。`node tools/check_site.mjs` 会逐字复核每条 `curated`，出处对不上就 FAIL。
 
 ## 🌌 3D 星域装置
 
@@ -100,8 +103,10 @@ feed.xml sitemap.xml robots.txt LICENSE CHANGELOG.md
 
 - **三层纵深**：主题壳（0.5）、项目壳（0.84）、记录壳（1.14）。记录与项目按所属主题方向聚簇，前中后景由透视与远近衰减区分，绘制顺序按深度排序（远→近）。
 - **数据来源只有站内真实内容**：主题取自 `content.tagMap()`，项目取自 `data/projects.json`，记录取自文章索引；连线来自同一篇文章、同一仓库或共现两次以上的主题。当前规模 44 节点 / 105 连线（22 个主题 + 10 个项目 + 12 篇记录）。
-- **交互**：鼠标与触摸拖动旋转（带惯性衰减）、滚轮与双指缩放、缓慢自转（交互后暂停）、点击节点、方向键在空间中就近步进、Enter 打开节点、Esc 复位。
-- **节点简介面板**：点击任意节点后，星图**下方**的卡片显示名称、一两句说明（主题用 `data/site.json` 的 `topicNotes`，项目用 tagline 与状态，记录用摘要）和一个跳转按钮。不弹窗、不遮挡页面。
+- **交互**：鼠标与触摸拖动旋转（带惯性衰减）、滚轮与双指缩放、缓慢自转（交互后暂停）、单击选中节点、双击节点聚焦并锁定自转、双击空白处回到全景、方向键在空间中就近步进、Enter 打开、Esc 复位。指针移动时整团星域带轻微视差。
+- **形状与连线有含义**：主题是带日冕的核星 / 晕星 / 簇星（数量 ≥5 的主题加一圈呼吸光环），项目是菱形 / 六边形 / 胶囊，记录是短竖线 / 小旗标 / 微粒；连线按关系分四类——同篇共现（弧线，未点亮时为虚线）、项目—主题（弧）、主题—记录（纤维）、其余为直线。悬停一个节点会同时点亮它与相邻的连线。
+- **视角切换**：星图上方「全部 / Create / Observe」三个按钮，切到某一侧时另一侧节点降到 16% 亮度、连线同步变暗，HUD 显示当前视角。这只是阅读透镜，不改变任何数据。
+- **节点简介面板**：点击任意节点后，星图**下方**的卡片显示名称、一两句说明（主题用 `data/site.json` 的 `topicNotes`，项目用 tagline 与状态，记录用摘要）、一个跳转按钮；主题卡片还会附一句该主题下的原文摘录并链回出处。不弹窗、不遮挡页面。
 - 无法使用 Canvas 时退化为芯片列表，内容与链接保持一致。
 
 ## 🔧 工具与自检
@@ -115,15 +120,19 @@ python tools/test_publish_contract.py # Auto Blog Agent 发布契约回归测试
 node tools/serve.mjs                  # 本地服务器（对齐 GitHub Pages 行为）
 ```
 
-最近一次验证（2026-11-15，Windows 10 / Node v24.22.1 / Python 3，基于 `b780bab` 的本轮改版工作副本，本地 `tools/serve.mjs`，无网络与 CPU 限速）：
+最近一次验证（2026-11-16，Windows 10 / Node v24.22.1 / Python 3，本轮工作副本，本地 `tools/serve.mjs`，无网络与 CPU 限速）：
 
 | 命令 | 退出码 | 结果 |
 | --- | --- | --- |
-| `node tools/check_site.mjs` | 0 | 31 个 HTML 页面 · 12 篇文章 · 10 个项目 · feed 12 条 · sitemap 29 条 |
+| `node tools/check_site.mjs` | 0 | 32 个 HTML 页面 · 12 篇文章 · 10 个项目 · 8 条人工摘录逐字核对通过 · feed 12 条 · sitemap 30 条 |
 | `python tools/test_publish_contract.py` | 0 | 9 项测试全部通过（模板逐字节比对 + 列表页标记 + 插入后可解析） |
-| `node tools/sync-github.mjs --dry-run` | 0 | 10/10 仓库可达（7 rest + 3 gh 私有），本轮无字段差异 |
-| Chrome 性能轨迹（首页） | — | LCP 512 ms · CLS 0.00 |
+| `node tools/gen-feeds.mjs` | 0 | `feed.xml` 12 条 · `sitemap.xml` 30 条（含 `/fragments/`） |
+| Chrome 性能轨迹（首页） | — | LCP 319 ms · CLS 0.00 |
 | Lighthouse（桌面端，首页） | — | 无障碍 100 · 最佳实践 100 · SEO 100 · Agentic 100（58 项通过，0 项失败） |
+| Chrome 实机版式检查（首页 + `/fragments/`） | — | 390 / 1063 / 1625 / 2400 px 四种视口：碎片墙 9–12 张卡片零重叠、主题星岛每行填满、页面无横向滚动、控制台无报错 |
+| Chrome 交互检查（星图） | — | 单击主题节点 → 面板附原文摘录并链回 `/2026/11/08/universe-thoughts/`；双击节点聚焦、双击空白复位；Observe 视角下 HUD 显示「视角：Observe 一侧」且另一侧变暗 |
+
+`node tools/sync-github.mjs` 本轮未重跑（仓库元数据无改动），最近一次结果为 2026-11-15 的 10/10 仓库可达、无字段差异。
 
 限制说明：以上为本地单次测量，非 CI 持续结果；本仓库没有配置任何 GitHub Actions 工作流。线上实时信号依赖 GitHub 事件 API 配额，配额耗尽时页面会显示离线快照并在控制台留下一次请求失败记录。
 
@@ -147,7 +156,7 @@ node tools/serve.mjs                  # 本地服务器（对齐 GitHub Pages �
   ```
   可以另加一个只在 push 后回写这两个文件的 Actions 任务，但本仓库刻意没有添加，以免改动线上部署链路。
 - 9 篇既有文章地址保持原样（`/2026/MM/DD/<slug>/`），没有重命名、没有删除、没有内容改写。
-- `create.html` / `observe.html` / `about.html` / `archives/` 地址不变；新增路径只有 `/projects/`、`/projects/<slug>/`、`/orbit/`、`404.html`。
+- `create.html` / `observe.html` / `about.html` / `archives/` 地址不变；新增路径只有 `/projects/`、`/projects/<slug>/`、`/orbit/`、`/fragments/`、`404.html`。
 
 ## 📊 数据与真实性
 
@@ -155,6 +164,7 @@ node tools/serve.mjs                  # 本地服务器（对齐 GitHub Pages �
 - 仓库可见性一并记录在 `data/projects.json`。私有仓库在项目页与卡片上直接标注「私有仓库」，按钮退化为不可点的说明，不给出访客打不开的链接。
 - 实时信号读取 GitHub 公开事件 API；失败或配额耗尽时自动切换为 `data/site.json` 的快照，并显示「离线快照 + 原因 + 日期」。
 - 未展示任何粉丝数、订阅数、使用量或推测性成果。
+- 思想碎片（首页与 `/fragments/`）里的每一句都是站内文章的原文整句，出处链接指向那句话所在的页面；`tools/check_site.mjs` 逐字核对人工摘录，对不上就自检失败。写作模型生成的句子不会被当作个人原话展示。
 
 ## ⏳ 尚未完成 / 需要配置
 
@@ -170,6 +180,7 @@ node tools/serve.mjs                  # 本地服务器（对齐 GitHub Pages �
 
 完整记录见 [CHANGELOG.md](CHANGELOG.md)。
 
+- **2026-11-16 · 思想碎片档案 + 主题星岛 + 星图形状分化** — 新增 `/fragments/` 档案页（32 条逐字摘录，8 个真实主题可筛选），首页 Fragments 改为 12 张错落星屑卡片 + 展开入口；主题概况换成不规则星岛（主岛 / 大岛 / 中岛 + 尾部标签芯片，行尾不留空缺）；星图节点与连线按类型分化形状并加入「全部 / Create / Observe」视角透镜、双击聚焦与相邻连线点亮；主题面板附一句原文摘录；全站子页导航扩为 6 项；首页区块改为四种版心宽度，作品区改为横向滑动画廊；`tools/check_site.mjs` 新增摘录逐字核对，并修复每段背景雾霭外扩造成的横向溢出。
 - **2026-11-15 · 银河纵深 + 3D 星域 + 内容自动联动** — 背景改为四层纵深（深空底层 / 斜向银河雾带 / 大尺度星轨弧线 / 星点与神经连接），删除漂浮光晕；首屏重排为入口终端式构图；思维星图升级为真三维装置（三层壳、透视衰减、拖动旋转与惯性、缩放、缓慢自转），点击节点在星图**下方**展开简介卡片；新增主题概况区块，首页扩为 13 区块；`tools/sync-github.mjs` 刷新仓库元数据与观测日期，私有仓库改为如实标注并去掉打不开的链接；全站文案重写；9 篇旧文章的页面外壳补齐背景层与统一导航（正文一字未改）；`/orbit/` 从「读者会员中心」改为联系与内容入口，删除会员 / 徽章 / 支付 / 邮件推送条目。
 - **2026-11-15 · Neural Orbit V2** — 首页扩为 12 区块；新增可交互思维星图、`/projects/`（10 个项目详情页）、`/archives/` 筛选、`/orbit/` 读者空间与 `404.html`；旧文章在不改一个文件的前提下获得完整阅读系统；视觉令牌化。
 - **2026-11-15 · 联系方式分流** — About 页 `#contact` 拆成 Personal / 个人交流与 Business / 商务合作两张卡片，带真实可用的复制按钮；首页页脚与读者空间给简洁入口。

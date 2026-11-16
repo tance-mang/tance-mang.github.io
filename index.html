@@ -49,6 +49,7 @@
       <a href="#stories">记录</a>
       <a href="#galaxy">作品</a>
       <a href="#topics">主题</a>
+      <a href="#fragments">碎片</a>
       <a href="/archives/">档案</a>
       <a href="/orbit/">Orbit</a>
       <a href="/about.html">About</a>
@@ -174,8 +175,13 @@
         </div>
         <div class="constellation" id="constellation">
           <div class="cx-canvas-wrap">
+            <div class="cx-core" aria-hidden="true">
+              <span class="cx-core-ring cx-core-ring--a"></span>
+              <span class="cx-core-ring cx-core-ring--b"></span>
+              <span class="cx-core-ring cx-core-ring--c"></span>
+            </div>
             <canvas id="cx-canvas" tabindex="0"
-                    aria-label="立体星域：主题、项目与记录分布在一个可旋转的空间里。拖动旋转，滚轮或双指缩放，方向键换节点，回车打开选中节点，Esc 复位。"></canvas>
+                    aria-label="立体星域：主题、项目与记录分布在一个可旋转的空间里。拖动旋转，滚轮或双指缩放，方向键换节点，回车打开选中节点，双击节点聚焦，Esc 复位。"></canvas>
             <div class="cx-hud" aria-hidden="true"></div>
             <div class="cx-tools">
               <button type="button" data-cx="in" aria-label="放大星域">＋</button>
@@ -189,20 +195,26 @@
               <span>中 · 项目</span>
               <span>远 · 记录</span>
             </div>
+            <div class="cx-modes" role="group" aria-label="按哪一侧看这片星域">
+              <button type="button" data-cx-mode="all" class="is-on" aria-pressed="true">全部</button>
+              <button type="button" data-cx-mode="create" aria-pressed="false">Create</button>
+              <button type="button" data-cx-mode="observe" aria-pressed="false">Observe</button>
+            </div>
           </div>
           <div class="cx-panel" aria-live="polite"></div>
           <div class="cx-fallback" role="group" aria-label="星域节点列表（键盘可用）"></div>
         </div>
         <p class="signal-note">
-          三层结构：主题在最外圈，项目在中层，记录在最里层。节点来自站内真实的标签与分类，
-          连线来自同一篇文章同时携带的标签，项目节点来自公开仓库的真实主题。
-          拖动可以旋转，滚轮或双指缩放，点任何一个节点，下面会说明它是什么。
+          三层结构：主题在最里圈，项目在中层，记录挂在最外圈。节点来自站内真实的标签与分类，
+          连线来自同一篇文章同时携带的标签，项目节点来自仓库自己的主题。
+          不同类型的节点形状不同：主题是带日冕的星，项目是切面的菱形或六边形，记录是短竖线或小旗标。
+          拖动旋转，滚轮或双指缩放，单击选中，双击聚焦，双击空白处回到全景。
         </p>
       </div>
     </section>
 
     <!-- ============ 05 / RECORDS ============ -->
-    <section class="sec" id="stories">
+    <section class="sec sec--wide" id="stories">
       <div class="sec-inner">
         <div class="sec-head">
           <span class="sec-index">05 /</span>
@@ -214,7 +226,7 @@
     </section>
 
     <!-- ============ 06 / WORKS ============ -->
-    <section class="sec" id="galaxy">
+    <section class="sec sec--bleed" id="galaxy">
       <div class="sec-inner">
         <div class="sec-head">
           <span class="sec-index">06 /</span>
@@ -222,6 +234,7 @@
           <span class="sec-note" data-count-note="2"></span>
         </div>
         <div class="galaxy" data-fill="galaxy" data-limit="6"></div>
+        <p class="galaxy-hint" aria-hidden="true"><i></i>横向滑动或拖动查看</p>
         <p class="signal-note">
           项目数据来自仓库元数据与 README / CHANGELOG；仓库还没公开的会直接写明，页面上的链接都打得开。
           状态、技术栈、局限与未完成项写在各自的项目页里。<a href="/projects/">全部作品 →</a>
@@ -242,26 +255,34 @@
     </section>
 
     <!-- ============ 08 / FRAGMENTS ============ -->
-    <section class="sec" id="fragments">
+    <section class="sec sec--narrow frags-sec" id="fragments">
       <div class="sec-inner">
         <div class="sec-head">
           <span class="sec-index">08 /</span>
           <h2 class="sec-name">Fragments</h2>
-          <span class="sec-note">摘自站内原文</span>
+          <span class="sec-note">摘自站内原文 · 逐字未改</span>
         </div>
         <div class="frags" data-fill="frags"></div>
+        <p class="signal-note">
+          每张卡片是一句完整的话，直接从对应文章里切出来，不做改写、不做润色；
+          链接指向原文，可以看到那句话当时的上下文。<a href="/fragments/">全部碎片 →</a>
+        </p>
       </div>
     </section>
 
     <!-- ============ 09 / TOPICS ============ -->
-    <section class="sec" id="topics">
+    <section class="sec sec--wide" id="topics">
       <div class="sec-inner">
         <div class="sec-head">
           <span class="sec-index">09 /</span>
           <h2 class="sec-name">Topics</h2>
           <span class="sec-note" data-count-note="4"></span>
         </div>
-        <div class="topics" data-fill="topic-overview"></div>
+        <div class="topic-isles" data-fill="topic-overview"></div>
+        <p class="signal-note">
+          面积按主题的真实数量分配：写得多的占大块，只有一两篇的收成小标签。
+          每个标签都指向按该主题筛选后的档案，没有用来补位的假主题。
+        </p>
       </div>
     </section>
 
@@ -287,7 +308,7 @@
     </section>
 
     <!-- ============ 11 / ARCHIVE ============ -->
-    <section class="sec" id="archive">
+    <section class="sec sec--reading" id="archive">
       <div class="sec-inner">
         <div class="sec-head">
           <span class="sec-index">11 /</span>
@@ -335,6 +356,7 @@
             <li><a href="/">首页 / Neural Orbit</a></li>
             <li><a href="#constellation-section">立体星域</a></li>
             <li><a href="#topics">主题概况</a></li>
+            <li><a href="/fragments/">思想碎片</a></li>
             <li><a href="/projects/">作品</a></li>
             <li><a href="/orbit/">联系与记录入口</a></li>
             <li><a href="/about.html">About</a></li>

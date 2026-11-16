@@ -122,6 +122,7 @@ function page(p) {
       <a href="/observe.html">Observe</a>
       <a href="/projects/" class="is-current">Projects</a>
       <a href="/archives/">Archive</a>
+      <a href="/fragments/">Fragments</a>
       <a href="/about.html">About</a>
     </nav>
   </header>

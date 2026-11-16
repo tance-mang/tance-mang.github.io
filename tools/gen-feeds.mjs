@@ -108,6 +108,7 @@ const urls = [
   { loc: '/create.html', pri: '0.9', change: 'weekly', date: siteDate },
   { loc: '/observe.html', pri: '0.9', change: 'weekly', date: siteDate },
   { loc: '/archives/', pri: '0.8', change: 'weekly', date: siteDate },
+  { loc: '/fragments/', pri: '0.7', change: 'weekly', date: siteDate },
   { loc: '/projects/', pri: '0.8', change: 'monthly', date: siteDate },
   { loc: '/orbit/', pri: '0.7', change: 'monthly', date: siteDate },
   { loc: '/about.html', pri: '0.7', change: 'monthly', date: siteDate }
