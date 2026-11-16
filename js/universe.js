@@ -40,15 +40,6 @@
     return Math.round(days / 365) + ' 年前';
   }
 
-  function relTime(iso) {
-    if (!iso) return '';
-    var d = new Date(iso);
-    var mins = Math.round((Date.now() - d.getTime()) / 60000);
-    if (mins < 60) return mins + ' 分钟前';
-    if (mins < 1440) return Math.round(mins / 60) + ' 小时前';
-    return Math.round(mins / 1440) + ' 天前';
-  }
-
   // Sections re-render as article data arrives. The entrance animation should
   // only play on the very first pass, otherwise content flickers back to zero.
   var firstPass = {};
@@ -159,7 +150,7 @@
     var posts = content.posts();
     var create = posts.filter(function (r) { return r.section === 'create'; }).length;
     var observe = posts.length - create;
-    var tags = Object.keys(content.tagMap()).length;
+    var topics = Object.keys(content.tagMap()).length;
 
     $$('[data-count]').forEach(function (node) {
       var key = node.dataset.count;
@@ -168,7 +159,7 @@
         create: create,
         observe: observe,
         projects: (content.projects || []).length,
-        topics: tags,
+        topics: topics,
         latest: posts.length ? posts[0].date : '—'
       }[key];
       if (val !== undefined) node.textContent = val;
@@ -176,10 +167,8 @@
 
     $$('.sec-note[data-count-note]').forEach(function (node) {
       var n = parseInt(node.dataset.countNote, 10);
-      node.textContent = n === 1 ? '按标签自动分成两侧 · 共 ' + posts.length + ' 篇'
-        : n === 2 ? '来自 ' + (content.projects || []).length + ' 个公开仓库'
-        : n === 4 ? '共 ' + tags + ' 个主题，取自站内真实标签'
-        : '记录与仓库时间线合并 · 最近 ' + ymd(posts.length ? posts[0].date : '');
+      node.textContent = n === 2 ? (content.projects || []).length + ' 个项目'
+        : '最近 ' + ymd(posts.length ? posts[0].date : '');
     });
   }
 
@@ -202,7 +191,7 @@
       (lead ? 'Featured · ' : '') + (rec.section === 'create' ? 'Create' : 'Observe') +
       (rec.category ? ' / ' + rec.category : ''));
     var h = make('h3', 'story-title', rec.title);
-    var p = make('p', 'story-excerpt', rec.excerpt || '摘要将在读取原文后自动出现。');
+    var p = make('p', 'story-excerpt', rec.excerpt || '—');
     var foot = make('div', 'story-foot');
     foot.appendChild(make('span', '', rec.dateLabel || rec.date));
     foot.appendChild(make('span', 'meta-dot', '·'));
@@ -257,34 +246,24 @@
   /* ------------------------------------------------------------------ */
   /* PROJECT GALAXY                                                      */
   /* ------------------------------------------------------------------ */
+  /* The card is a doorway, not an abstract: name, one line in the author's own
+     words, the few tags that identify the stack, and a way in. Status, versions
+     and limits live on the project page. */
   function projectCard(p, rv) {
     var a = make('a', 'pcard' + (rv || ''));
     a.href = '/projects/' + p.slug + '/';
     a.innerHTML =
       '<span class="pcard-visual"></span>' +
       '<span class="pcard-top"><span class="pcard-name"></span><span class="status"></span></span>' +
-      '<span class="pcard-desc"><span class="d"></span><span class="s"></span></span>' +
+      '<span class="pcard-desc"><span class="d"></span></span>' +
       '<span class="pcard-stack"></span>' +
-      '<span class="pcard-foot"></span>';
+      '<span class="pcard-foot"><span class="pcard-go">查看项目 <i class="arrow">→</i></span></span>';
     a.querySelector('.pcard-name').textContent = p.name;
     var st = a.querySelector('.status');
     st.textContent = p.status || 'active';
     st.classList.add(p.status === 'Active' ? 'status--live' : p.status === 'In development' ? 'status--wip' : 'status--arch');
     a.querySelector('.d').textContent = p.tagline || '';
-    if (p.summary) {
-      var s = make('span', 's');
-      s.style.color = 'var(--nebula-violet)';
-      s.style.fontSize = '12px';
-      s.textContent = p.summary;
-      a.querySelector('.pcard-desc').appendChild(s);
-    }
-    (p.stack || []).slice(0, 5).forEach(function (t) { a.querySelector('.pcard-stack').appendChild(make('span', '', t)); });
-    var foot = a.querySelector('.pcard-foot');
-    foot.appendChild(make('span', '', (p.language || '—')));
-    if (p.visibility === 'private') foot.appendChild(make('span', 'pcard-priv', '私有仓库'));
-    if (p.stars) foot.appendChild(make('span', '', '★ ' + p.stars));
-    if (p.forks) foot.appendChild(make('span', '', '⑂ ' + p.forks));
-    foot.appendChild(make('span', '', 'since ' + (p.since || '').slice(0, 10)));
+    (p.stack || []).slice(0, 3).forEach(function (t) { a.querySelector('.pcard-stack').appendChild(make('span', '', t)); });
     return a;
   }
 
@@ -293,7 +272,7 @@
       var list = (content.projects || []).slice();
       if (wrap.dataset.limit) list = list.slice(0, parseInt(wrap.dataset.limit, 10));
       if (!list.length) {
-        wrap.innerHTML = '<p class="empty-note">项目数据尚未载入。</p>';
+        wrap.innerHTML = '<p class="empty-note">还没有内容。</p>';
         return;
       }
       wrap.innerHTML = '';
@@ -414,7 +393,7 @@
       var shown = list.slice(0, T.small ? 9 : 12);
       wrap.innerHTML = '';
       if (!shown.length) {
-        wrap.appendChild(make('p', 'empty-note', '还没有可摘录的原文句子。'));
+        wrap.appendChild(make('p', 'empty-note', '还没有内容。'));
         return;
       }
       shown.forEach(function (f, i) {
@@ -426,7 +405,7 @@
         var more = make('a', 'frags-more');
         more.href = '/fragments/';
         more.appendChild(make('span', 'fm-label', '展开更多碎片'));
-        more.appendChild(make('span', 'fm-count', '站内共 ' + list.length + ' 条'));
+        more.appendChild(make('span', 'fm-count', '共 ' + list.length + ' 条'));
         more.appendChild(make('span', 'arrow', '→'));
         wrap.appendChild(more);
       }
@@ -435,7 +414,7 @@
       var rv = animateOnce('frag-all');
       wrap.innerHTML = '';
       if (!list.length) {
-        wrap.appendChild(make('p', 'empty-note', '还没有可摘录的原文句子。'));
+        wrap.appendChild(make('p', 'empty-note', '还没有内容。'));
         return;
       }
       list.forEach(function (f, i) {
@@ -484,133 +463,8 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* LIVE SIGNAL — real GitHub activity, honestly labelled               */
+  /* Full archive tools                                                  */
   /* ------------------------------------------------------------------ */
-  var signalRequested = false;
-
-  function fillSignal(content) {
-    $$('[data-fill="signal"]').forEach(function (wrap) {
-      var sec = wrap.closest('.sec') || wrap;
-      var postsCol = wrap.querySelector('[data-signal="posts"]');
-      var ghCol = sec.querySelector('[data-signal="github"]') || wrap.querySelector('[data-signal="github"]');
-      var state = sec.querySelector('[data-signal="state"]');
-
-      if (postsCol) {
-        postsCol.innerHTML = '';
-        content.posts().slice(0, 5).forEach(function (r) {
-          var a = make('a', 'signal-item');
-          a.href = r.href;
-          a.appendChild(make('span', 'signal-when', r.date));
-          a.appendChild(make('span', '', r.title));
-          postsCol.appendChild(a);
-        });
-      }
-
-      if (!ghCol || !state) return;
-      if (ghCol.dataset.filled || signalRequested) return;
-
-      var snapshot = (content.site && content.site.snapshot) || {};
-      var showSnapshot = function (why) {
-        state.innerHTML = '';
-        var dot = make('span', 'beacon is-idle');
-        state.appendChild(dot);
-        state.appendChild(make('span', '', '离线快照 · ' + (snapshot.date || '—') + (why ? '（' + why + '）' : '')));
-        ghCol.innerHTML = '';
-        (snapshot.activity || []).forEach(function (row) {
-          var a = make('a', 'signal-item');
-          a.href = row.href || ('https://github.com/tance-mang/' + (row.repo || ''));
-          a.appendChild(make('span', 'signal-when', row.date || ''));
-          a.appendChild(make('span', '', row.text || ''));
-          ghCol.appendChild(a);
-        });
-        if (!snapshot.activity || !snapshot.activity.length) {
-          ghCol.appendChild(make('p', 'signal-note', '未配置快照数据。'));
-        }
-        ghCol.dataset.filled = '1';
-      };
-
-      if (!window.fetch) { showSnapshot('浏览器不支持 fetch'); return; }
-
-      signalRequested = true;
-      fetch('https://api.github.com/users/tance-mang/events/public?per_page=40')
-        .then(function (r) {
-          if (!r.ok) throw new Error('HTTP ' + r.status);
-          return r.json();
-        })
-        .then(function (events) {
-          var rows = [];
-          events.forEach(function (e) {
-            var text = null;
-            if (e.type === 'PushEvent') {
-              var c = (e.payload.commits || []).slice(-1)[0];
-              text = 'push 到 ' + e.repo.name.split('/')[1] + '：' +
-                (c && c.message ? c.message.split('\n')[0].slice(0, 58) : (e.payload.size || 0) + ' commits');
-            } else if (e.type === 'CreateEvent' && e.payload.ref_type === 'repository') {
-              text = '新建仓库 ' + e.repo.name.split('/')[1];
-            } else if (e.type === 'ReleaseEvent') {
-              text = '发布 ' + e.payload.release.tag_name + ' · ' + e.repo.name.split('/')[1];
-            } else if (e.type === 'WatchEvent' || e.type === 'ForkEvent') {
-              text = e.type === 'ForkEvent' ? '被 fork：' + e.repo.name.split('/')[1] : null;
-            } else if (e.type === 'IssueCommentEvent' || e.type === 'IssuesEvent') {
-              text = e.type === 'IssuesEvent'
-                ? e.payload.action + ' issue · ' + e.repo.name.split('/')[1]
-                : '评论 · ' + e.repo.name.split('/')[1];
-            }
-            if (!text) return;
-            rows.push({ when: e.created_at, text: text, repo: e.repo.name.split('/')[1] });
-          });
-          if (!rows.length) throw new Error('no public events');
-          state.innerHTML = '';
-          state.appendChild(make('span', 'beacon'));
-          var synced = new Date();
-          state.appendChild(make('span', '', '实时 · 同步于 ' +
-            synced.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }) +
-            ' · 来源 GitHub Events API'));
-          ghCol.innerHTML = '';
-          rows.slice(0, 6).forEach(function (row) {
-            var a = make('a', 'signal-item');
-            a.href = 'https://github.com/tance-mang/' + row.repo;
-            a.appendChild(make('span', 'signal-when', relTime(row.when)));
-            a.appendChild(make('span', '', row.text));
-            ghCol.appendChild(a);
-          });
-          var note = make('p', 'signal-note',
-            '以上为 GitHub 公开事件流，每次访问实时拉取；速率限制耗尽时自动回落到快照。');
-          ghCol.appendChild(note);
-          ghCol.dataset.filled = '1';
-        })
-        .catch(function (err) { showSnapshot(err.message); });
-    });
-  }
-
-  /* ------------------------------------------------------------------ */
-  /* ARCHIVE preview + full archive tools                                */
-  /* ------------------------------------------------------------------ */
-  function fillArchivePreview(content) {
-    $$('[data-fill="arch-preview"]').forEach(function (wrap) {
-      var byYear = {};
-      content.posts().forEach(function (r) {
-        var y = (r.date || '未知').slice(0, 4);
-        (byYear[y] = byYear[y] || []).push(r);
-      });
-      wrap.innerHTML = '';
-      Object.keys(byYear).sort().reverse().slice(0, 2).forEach(function (y) {
-        var g = make('div', 'arch-year-group');
-        g.appendChild(make('h3', 'arch-year', y));
-        var rows = make('div', 'arch-rows');
-        byYear[y].slice(0, 8).forEach(function (r) {
-          var a = make('a', 'arch-row');
-          a.href = r.href;
-          a.appendChild(make('span', '', r.title));
-          a.appendChild(make('span', 'ar-date', r.date.slice(5)));
-          rows.appendChild(a);
-        });
-        g.appendChild(rows);
-        wrap.appendChild(g);
-      });
-    });
-  }
-
   function initArchiveTools(content) {
     var root = $('[data-archive-tools]');
     if (!root) return;
@@ -647,7 +501,10 @@
         kindBox.appendChild(filterChip(k, k, 'kind',
           content.posts().filter(function (r) { return kindsOf(r) === k; }).length));
       });
-      Object.keys(tags).sort(function (a, b) { return tags[b] - tags[a]; }).slice(0, 14).forEach(function (t) {
+      tagBox.appendChild(filterChip('全部主题', '', 'tag', content.posts().length));
+      Object.keys(tags).sort(function (a, b) {
+        return tags[b] - tags[a] || (a < b ? -1 : 1);
+      }).forEach(function (t) {
         tagBox.appendChild(filterChip('#' + t, t, 'tag', tags[t]));
       });
     }
@@ -663,10 +520,28 @@
       b.dataset.filterValue = value;
       b.addEventListener('click', function () {
         state[key] = state[key] === value ? '' : value;
+        if (key === 'tag') writeHash(state.tag);
         syncPressed(key);
         render();
       });
       return b;
+    }
+
+    // #tag-<topic> is the link every other page uses to point at one topic,
+    // so choosing a topic here has to keep that same shape.
+    function writeHash(tag) {
+      if (tag) {
+        var want = '#tag-' + encodeURIComponent(tag);
+        if (location.hash !== want) history.replaceState(null, '', want);
+      } else if (location.hash) {
+        history.replaceState(null, '', location.pathname);
+      }
+    }
+
+    function readHash() {
+      var m = /^#tag-(.+)$/.exec(location.hash);
+      state.tag = m ? decodeURIComponent(m[1]) : '';
+      syncPressed('tag');
     }
 
     // Only the chips of the group that changed re-evaluate their pressed state,
@@ -716,7 +591,7 @@
       countLine.textContent = '';
       countLine.appendChild(make('span', '', '显示 '));
       countLine.appendChild(make('b', '', rows.length));
-      countLine.appendChild(make('span', '', ' / 共 ' + total + ' 篇 · 主题 ' + Object.keys(content.tagMap()).length + ' 个'));
+      countLine.appendChild(make('span', '', ' / 共 ' + total + ' 篇'));
     }
 
     if (input) {
@@ -724,12 +599,12 @@
     }
     content.on(function () {
       buildFilters();
+      readHash();
       render();
-      if (location.hash.indexOf('#tag-') === 0) {
-        state.tag = decodeURIComponent(location.hash.slice(5));
-        syncPressed('tag');
-        render();
-      }
+    });
+    window.addEventListener('hashchange', function () {
+      readHash();
+      render();
     });
   }
 
@@ -789,79 +664,6 @@
       .sort(function (a, b) { return b.total - a.total || (a.tag < b.tag ? -1 : 1); });
   }
 
-  function isleMeta(x) {
-    var meta = make('span', 'isle-meta');
-    var bits = [];
-    if (x.posts) bits.push(x.posts + ' 篇记录');
-    if (x.projects) bits.push(x.projects + ' 个项目');
-    meta.textContent = bits.join(' · ');
-    return meta;
-  }
-
-  function fillTopicOverview(content) {
-    $$('[data-fill="topic-overview"]').forEach(function (wrap) {
-      var rv = animateOnce('topics');
-      var rows = topicRows(content);
-      wrap.innerHTML = '';
-      if (!rows.length) {
-        wrap.appendChild(make('p', 'empty-note', '还没有可用于统计主题的标签。'));
-        return;
-      }
-      var top = rows[0].total || 1;
-      // Two feature islands at most, then mid-size ones; the tail becomes chips
-      // so a remainder of 7 or 17 themes still closes the line without a hole.
-      var bigCount = rows.length >= 6 ? 2 : rows.length >= 3 ? 1 : 0;
-      var big = rows.slice(0, bigCount);
-      var midCount = rows.length > bigCount + 6 ? rows.length - bigCount - 6 : Math.max(0, rows.length - bigCount - 3);
-      var mid = rows.slice(bigCount, bigCount + midCount);
-      var tail = rows.slice(bigCount + midCount);
-
-      var band = make('div', 'isles');
-      if (T.small) band.classList.add('isles--compact');
-      big.concat(mid).forEach(function (x) {
-        var a = make('a', 'isle isle--' + (x === big[0] ? 'hero' : x.total >= top * 0.55 ? 'big' : 'mid') + (rv || ''));
-        a.href = '/archives/#tag-' + encodeURIComponent(x.tag);
-        a.style.setProperty('--w', Math.max(24, Math.round(x.total / top * 100)) + '%');
-        a.appendChild(make('span', 'isle-orbit'));
-        var body = make('div', 'isle-body');
-        var t = make('h3', 'isle-tag', '#' + x.tag);
-        body.appendChild(t);
-        var line = make('p', 'isle-line');
-        line.textContent = x.line || (x.latest ? '最近一篇：' + x.latest.title : '这个主题还没有写简介。');
-        body.appendChild(line);
-        body.appendChild(isleMeta(x));
-        if (x.latest && x.posts) {
-          var lat = make('span', 'isle-latest');
-          lat.appendChild(make('span', 'il-k', x.latest.date || ''));
-          lat.appendChild(make('span', 'il-t', x.latest.title));
-          body.appendChild(lat);
-        }
-        a.appendChild(body);
-        if (x.projects) {
-          var dots = make('span', 'isle-dots');
-          for (var i = 0; i < Math.min(x.projects, 6); i++) dots.appendChild(make('i'));
-          a.appendChild(dots);
-        }
-        band.appendChild(a);
-      });
-      if (tail.length) {
-        var cluster = make('div', 'isle-cluster' + (rv || ''));
-        cluster.appendChild(make('span', 'cluster-label', '其他主题'));
-        var list = make('div', 'cluster-tags');
-        tail.forEach(function (x) {
-          var c = make('a', 'isle-chip');
-          c.href = '/archives/#tag-' + encodeURIComponent(x.tag);
-          c.appendChild(make('span', '', '#' + x.tag));
-          c.appendChild(make('span', 'count', String(x.total)));
-          list.appendChild(c);
-        });
-        cluster.appendChild(list);
-        band.appendChild(cluster);
-      }
-      wrap.appendChild(band);
-    });
-  }
-
   /* ------------------------------------------------------------------ */
   /* Shared nav highlight + spine                                        */
   /* ------------------------------------------------------------------ */
@@ -880,7 +682,6 @@
     initHero();
     initWorlds();
     initNav();
-    if (T.lit) T.lit('.mline', 'is-lit', 0.55);
 
     var cx = $('#constellation');
     if (cx && window.TANCEConstellation) window.TANCEConstellation.mount(cx);
@@ -893,10 +694,7 @@
       fillGalaxy(content);
       fillEvolution(content);
       fillFragments(content);
-      fillSignal(content);
-      fillArchivePreview(content);
       fillTopicIndex(content);
-      fillTopicOverview(content);
       if (T.reveal) T.reveal();
     }
     // Content keeps arriving as articles are read in the background; coalesce

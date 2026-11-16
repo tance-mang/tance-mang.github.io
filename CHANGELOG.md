@@ -7,6 +7,29 @@
 
 ---
 
+## 2026-11-16 · 首页精简与开发者报告清理
+
+**变更**
+
+- 首页从 13 区块精简为 7 块：Hero + Create/Observe、Celestial Archive / 3D 星域、Records、Projects（横向画廊）、Evolution、Fragments、Orbit。删除 Manifesto、Topics、Signal、Archive Preview 四节。
+- 全站删除「开发者写给自己的说明」：移除自动化机制解释、数据真实性声明、布局规则描述、验收报告式文案、空泛品牌口号、未实现功能的道歉说明。保留访客需要的操作提示与内容本身。
+- 星图 UI 精简：删除节点类型说明与结构描述段落，只保留计数与「全部记录 →」入口；面板内移除「站内有 N 篇记录带着这个标签…」「这一句原样取自《…》」「这个项目还没有写简介」「这篇还没有摘要」等解释性文字；HUD 不再显示节点/连线数量；退出按钮文案从「退出这个主题，回到整片星域」改为「退出主题」。
+- 项目卡片精简：名称 + 一行简介 + 少量标签 + 可选状态 + 入口链接，无溢出、无裁切。作品区提示从「横向拖动 · 查看项目详情 →」合并为「横向拖动 · [全部作品 →](/projects/)」。
+- Fragments 页面删除 `<section class="fx-about">` 整段摘录算法说明；副标题从「每一条都是从站内文章里逐字切出来的一句话，不改写、不拼接；点开出处可以看到它当时的上下文。」改为「从文章里摘出来的一句话，点开可以看到它当时的上下文。」；计数行删除「· 摘自站内已发布文章」。
+- Orbit 页面删除整个 Live Signal 区块（该区块暴露 GitHub API HTTP 403 错误）；联系信息只保留 GitHub、RSS、Personal（tance_mang@qq.com）、Business（tance.hub@gmail.com），删除会员计划与未完成功能相关条目。
+- 档案页副标题删除「索引在浏览器里由站内页面实时汇总，不依赖后端。」；项目页描述删除「以及还有什么没做完；没有公开的仓库会标出来，不给访问者一个打不开的链接。」；About 页 Identity 与 Works 章节删除「它不是模板博客」「首页的节点由站内真实标签和仓库主题决定」「少数仓库还没有公开，页面上会直接说明，不放打不开的链接」；How this site works 删除 Auto Blog Agent 详细解释与「实时信号区读取 GitHub 公开事件 API…」段落；Studio 章节删除「备案信息」提及；404 页面简化为「链接可能来自旧版本页面。下面是站内确定存在的位置。」
+- 星图操作提示精简为：「拖动探索 · 滚轮缩放 · 点击查看 · 双击主题走进去」。
+- 档案页主题筛选升级为 hash 路由：选择主题后 URL 变为 `#tag-<topic>`，支持深链接与后退/前进导航。
+- CSS 删除约 45 个孤儿规则块（`.frame-tag-*`、`.manifesto*`、`.mline*`、`.spine*`、`.cx-core*`、`.cx-depth*`、`.topic-isles`、`.isles`、`.isle*`、`.cluster-*`、`.signal*`、`.arch-preview*`、`.beacon*`、`.fx-about*`、`.arch-year*`、`.arch-row*`、`.world-topics`、`.frag--tether-off`、`.il-k`、`.il-t`、`.is-idle`、`.sec--reading`、grid utilities 等）。恢复仍在使用的 `.cx-tools` 与 `.cx-hint` 规则。修复 `@media (prefers-reduced-motion: reduce)` 中引用的类名（`.cx-core-ring` → `.club-ring`）。
+- 进入主题时增加视觉反馈：Canvas 外框与面板边框收紧发光，强化「走进一个地方」的空间感。
+
+**修复**
+
+- `js/universe.js` 中 `fillCounts()` 删除 `tags` 变量声明后遗留引用，导致控制台报 "tags is not defined"。改为声明 `topics` 并更新引用。
+- 首页 `<footer>` 开始标签在替换 Works 与 Orbit 之间内容时被误删，现已恢复。
+
+---
+
 ## 2026-11-16 · 思想碎片档案 + 主题星岛 + 星图形状分化
 
 **新增**

@@ -11,9 +11,26 @@
   function el(sel, root) { return (root || document).querySelector(sel); }
   function els(sel, root) { return [].slice.call((root || document).querySelectorAll(sel)); }
 
-  var SHELL = { topic: 0.5, project: 0.84, post: 1.14 };
+  var SHELL = { topic: 0.58, project: 0.9, post: 1.16, fragment: 1.42 };
   var FOCAL = 2.35;          // in shell units; smaller = stronger perspective
   var GOLDEN = 2.39996323;
+  // Article titles stay hidden until the camera is close enough to read them.
+  // Below this zoom a record is a cluster of light, which is the honest scale.
+  var LABEL_ZOOM = 1.42;
+
+  /* Palette V3 · violet nebula, with the ink split by space rather than mixed:
+     violet holds the structure, blue the far distance and the security topics,
+     pink the dust and the fragments, star-white only for the lit node. */
+  var INK = {
+    core: '#F5F0FF',
+    topic: '#D9B3FF',
+    project: '#F29CCF',
+    post: '#8F59F7',
+    fragment: '#E8B1EC',
+    far: '#598BD8',
+    near: '#90BCEB',
+    gold: '#E6CFA6'
+  };
 
   function hash(str) {
     var h = 2166136261;
@@ -67,6 +84,9 @@
       add({
         id: '/projects/' + pr.slug + '/', kind: 'project', label: pr.name, weight: 2,
         href: '/projects/' + pr.slug + '/', slug: pr.slug, world: 'create',
+        // A champagne mark is earned, not decorative: only projects with more
+        // than one published version get one, so it means "this was iterated".
+        key: (pr.versions || []).length >= 2,
         meta: pr.status || 'project'
       });
     });
@@ -113,6 +133,21 @@
       t.projects.forEach(function (s) { link(tid, '/projects/' + s + '/', 1.4, 'project'); });
     });
 
+    /* Fragments are the outermost material: sentences that already exist on
+       /fragments/, hung off the record they were taken from. Only the newest
+       ones become shards — the shell has to stay readable. */
+    (content.fragments ? content.fragments() : []).forEach(function (f, i) {
+      if (i >= 10 || !f.href || !index[f.href]) return;
+      var id = 'frag:' + i + ':' + f.href;
+      if (index[id]) return;
+      add({
+        id: id, kind: 'fragment', label: f.text, weight: 0.4,
+        href: '/fragments/', src: f.href, text: f.text, date: f.date,
+        topic: f.topic, world: index[f.href].world, sourceTitle: f.title
+      });
+      link(id, f.href, 0.6, 'frag');
+    });
+
     for (var i = 0; i < topics.length; i++) {
       for (var j = i + 1; j < topics.length; j++) {
         var A = topics[i].hrefs, B = topics[j].hrefs;
@@ -144,12 +179,25 @@
     var topics = graph.nodes.filter(function (n) { return n.kind === 'topic'; });
     var byId = index;
 
+    /* Topics sit on three inclined lanes instead of one random shell. Separate
+       orbits are what makes the middle of the field legible: you can see which
+       ring a topic belongs to, and the core has a clear space to sit in. */
+    var ORBITS = [
+      { tilt: 0.14, rise: 0.05, r: 0.94 },
+      { tilt: -0.38, rise: 0.18, r: 1.03 },
+      { tilt: 0.46, rise: -0.13, r: 1.12 }
+    ];
     topics.forEach(function (n, i) {
-      var d = fibDir(i, topics.length);
-      var wobble = 0.86 + hash(n.id) * 0.3;
-      n.vx = d.x * SHELL.topic * wobble;
-      n.vy = d.y * SHELL.topic * wobble;
-      n.vz = d.z * SHELL.topic * wobble;
+      var o = ORBITS[i % ORBITS.length];
+      var a = (i / Math.max(3, topics.length)) * Math.PI * 2 + hash(n.id) * 0.55;
+      var rr = SHELL.topic * o.r * (0.94 + hash(n.id + 'lane') * 0.12);
+      var x = Math.cos(a) * rr;
+      var y = o.rise * rr + (hash(n.id + 'lift') - 0.5) * 0.1;
+      var z = Math.sin(a) * rr;
+      n.orbit = i % ORBITS.length;
+      n.vx = x;
+      n.vy = y * Math.cos(o.tilt) - z * Math.sin(o.tilt);
+      n.vz = y * Math.sin(o.tilt) + z * Math.cos(o.tilt);
     });
 
     function homeDir(node) {
@@ -166,7 +214,7 @@
     }
 
     graph.nodes.forEach(function (n) {
-      if (n.kind === 'topic') return;
+      if (n.kind === 'topic' || n.kind === 'fragment') return;
       var h = hash(n.id);
       var base = homeDir(n);
       if (!base) {
@@ -187,21 +235,42 @@
       n.vz = dir.z * rr;
     });
 
+    /* Shards drift just outside the record they were lifted from, so the outer
+       dust is anchored to something real instead of being decoration. */
+    graph.nodes.forEach(function (n) {
+      if (n.kind !== 'fragment') return;
+      var src = index[n.src];
+      var h = hash(n.id);
+      var base = src ? norm(src) : fibDir(Math.floor(h * 997), 997);
+      var dir = norm({
+        x: base.x + (h - 0.5) * 0.5,
+        y: base.y + (hash(n.id + 'y') - 0.5) * 0.5,
+        z: base.z + (hash(n.id + 'z') - 0.5) * 0.5
+      });
+      var rr = SHELL.fragment * (0.92 + h * 0.2);
+      n.vx = dir.x * rr;
+      n.vy = dir.y * rr * 0.62;
+      n.vz = dir.z * rr;
+    });
+
     graph.nodes.forEach(function (n) {
       n.phase = hash(n.id) * Math.PI * 2;
-      // Node bodies are not interchangeable dots: a topic is a star with a
-      // halo or a small cluster, a project is a cut stone, a record is a tick
-      // or a bookmark. The kind is fixed by data, the variant by a stable hash.
+      // Node bodies are not interchangeable dots: a topic is a ringed star, a
+      // project is a cut crystal, a record is a micro cluster, a fragment is a
+      // shard. The kind is fixed by data, the variant by a stable hash.
       var v = hash(n.id + 'shape');
       if (n.kind === 'topic') {
-        n.r = 5.4 + Math.min(7, (n.count || 1) * 1.1);
+        n.r = 5.6 + Math.min(7, (n.count || 1) * 1.1);
         n.shape = (n.count || 1) >= 5 ? 'core' : v < 0.5 ? 'halo' : 'cluster';
       } else if (n.kind === 'project') {
-        n.r = 5.4;
-        n.shape = v < 0.34 ? 'diamond' : v < 0.67 ? 'hexagon' : 'capsule';
+        n.r = 6.6;
+        n.shape = v < 0.4 ? 'crystal' : v < 0.72 ? 'prism' : 'hexagon';
+      } else if (n.kind === 'fragment') {
+        n.r = 4.4;
+        n.shape = 'shard';
       } else {
-        n.r = 3.2;
-        n.shape = v < 0.4 ? 'tick' : v < 0.72 ? 'bookmark' : 'particle';
+        n.r = 3.6;
+        n.shape = v < 0.55 ? 'swarm' : 'bookmark';
       }
     });
   }
@@ -211,9 +280,10 @@
   /* ------------------------------------------------------------------ */
   function sprites() {
     var spec = {
-      topic: ['rgba(244,238,255,0.9)', 'rgba(214,170,255,0.26)', 'rgba(157,112,255,0)'],
-      project: ['rgba(255,236,251,0.85)', 'rgba(242,168,236,0.22)', 'rgba(242,168,236,0)'],
-      post: ['rgba(214,170,255,0.8)', 'rgba(157,112,255,0.18)', 'rgba(124,155,214,0)']
+      topic: ['rgba(245,240,255,0.9)', 'rgba(217,179,255,0.28)', 'rgba(143,89,247,0)'],
+      project: ['rgba(255,236,251,0.86)', 'rgba(242,156,207,0.24)', 'rgba(242,156,207,0)'],
+      post: ['rgba(217,179,255,0.8)', 'rgba(143,89,247,0.2)', 'rgba(89,139,216,0)'],
+      fragment: ['rgba(232,177,236,0.72)', 'rgba(242,156,207,0.16)', 'rgba(232,177,236,0)']
     };
     var out = {};
     Object.keys(spec).forEach(function (k) {
@@ -231,6 +301,189 @@
     });
     return out;
   }
+
+  /* ------------------------------------------------------------------ */
+  /* 2b. The Archive Core                                                */
+  /* ------------------------------------------------------------------ */
+  /* One design object, drawn in two places: at the centre of the star   */
+  /* field and as the hero's body at the top of the page. Scrolling down  */
+  /* should read as approaching the same region of one universe, not as    */
+  /* opening a second widget. Deliberately not a sphere: an irregular     */
+  /* faceted nucleus, seven translucent rings on different inclinations,  */
+  /* and a few light filaments. Every ring is split into a far run and a  */
+  /* near run per frame, so real nodes pass behind it and in front of it.  */
+
+  var TAU = Math.PI * 2;
+
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  // The star field and the hero share one transform, so "in front of the
+  // rings" means the same thing for both.
+  function mkView(cam, w, h, u, sw) {
+    return {
+      cy: Math.cos(cam.yaw), sy: Math.sin(cam.yaw),
+      cp: Math.cos(cam.pitch), sp: Math.sin(cam.pitch),
+      u: u, sw: sw,
+      ox: w / 2 + (cam.px || 0), oy: h / 2 + (cam.py || 0)
+    };
+  }
+
+  function proj(view, vx, vy, vz, out) {
+    var x1 = vx * view.cy + vz * view.sy;
+    var z1 = -vx * view.sy + vz * view.cy;
+    var y2 = vy * view.cp - z1 * view.sp;
+    var z2 = vy * view.sp + z1 * view.cp;
+    var k = FOCAL / Math.max(0.35, FOCAL + z2);
+    out.sx = view.ox + x1 * view.sw * view.u * k;
+    out.sy = view.oy + y2 * view.u * k;
+    out.sk = k;
+    out.sz = z2;
+    return out;
+  }
+
+  var CORE = (function () {
+    var rings = [];
+    for (var i = 0; i < 7; i++) {
+      var h = hash('core-ring-' + i);
+      rings.push({
+        r: 0.058 + i * 0.0205 + h * 0.013,
+        tiltX: -0.55 + h * 1.7 + i * 0.12,
+        roll: hash('core-roll-' + i) * TAU,
+        rate: (i % 2 ? -1 : 1) * (0.5 + h),
+        wob: 0.05 + hash('core-wob-' + i) * 0.11,
+        lobes: 2 + (i % 3),
+        ph: hash('core-ph-' + i) * TAU,
+        gap: hash('core-gap-' + i) * TAU,
+        gapW: 0.5 + (i % 4) * 0.34,
+        oy: (hash('core-oy-' + i) - 0.5) * 0.035,
+        w: 0.55 + (i % 3) * 0.4,
+        alpha: 0.34 - i * 0.022,
+        ink: i === 4 ? 'rgba(144,188,235,1)' : i % 3 === 1 ? 'rgba(166,108,249,1)' : 'rgba(217,179,255,1)'
+      });
+    }
+    var verts = [];
+    for (var j = 0; j < 9; j++) {
+      var d = fibDir(j, 9);
+      var s = 0.82 + hash('core-v-' + j) * 0.5;
+      verts.push({ x: d.x * s, y: d.y * s * 1.15, z: d.z * s });
+    }
+    return { rings: rings, verts: verts, r: 0.05 };
+  })();
+
+  function coreRings(view, now, still) {
+    var passes = { far: [], near: [] };
+    var STEPS = 54;
+    CORE.rings.forEach(function (ring) {
+      var roll = still ? ring.roll : ring.roll + now * 0.000016 * ring.rate;
+      var cx = Math.cos(ring.tiltX), sx = Math.sin(ring.tiltX);
+      var cz = Math.cos(roll), sz = Math.sin(roll);
+      var run = null, cls = null, i;
+      for (i = 0; i < STEPS; i++) {
+        var a = (i / STEPS) * TAU;
+        var rel = ((a - ring.gap) % TAU + TAU) % TAU;
+        if (rel < ring.gapW) { run = null; cls = null; continue; }
+        var rr = ring.r * (1 + ring.wob * Math.sin(a * ring.lobes + ring.ph));
+        var x = Math.cos(a) * rr, z = Math.sin(a) * rr;
+        var y1 = -z * sx, z1 = z * cx;
+        var p = proj(view, x * cz - y1 * sz, y1 * cz + x * sz, z1 + ring.oy, {});
+        var c = p.sz >= 0 ? 'far' : 'near';
+        if (c !== cls) { run = []; passes[c].push({ run: run, ring: ring }); cls = c; }
+        run.push(p);
+      }
+    });
+    return passes;
+  }
+
+  function strokeCore(ctx, passes, which, gain, zoom) {
+    var list = passes[which], i, j;
+    for (i = 0; i < list.length; i++) {
+      var item = list[i], pts = item.run, ring = item.ring;
+      if (pts.length < 2) continue;
+      ctx.beginPath();
+      ctx.moveTo(pts[0].sx, pts[0].sy);
+      for (j = 1; j < pts.length; j++) ctx.lineTo(pts[j].sx, pts[j].sy);
+      var side = which === 'near' ? 1 : 0.5;
+      ctx.strokeStyle = ring.ink;
+      ctx.globalAlpha = clamp(ring.alpha * side * gain, 0, 1);
+      ctx.lineWidth = ring.w * side * (0.75 + zoom * 0.3);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function paintNucleus(ctx, view, halo, now, gain, still) {
+    var breath = still ? 1 : 1 + Math.sin(now * 0.00055) * 0.04;
+    var spin = still ? 0.4 : now * 0.000035;
+    var cs = Math.cos(spin), sn = Math.sin(spin);
+    var r = CORE.r * breath;
+    var pts = CORE.verts.map(function (v) {
+      var x = v.x * r, z = v.z * r;
+      return proj(view, x * cs + z * sn, v.y * r, -x * sn + z * cs, {});
+    });
+    var ox = 0, oy = 0, rad = 0;
+    pts.forEach(function (p) { ox += p.sx; oy += p.sy; });
+    ox /= pts.length; oy /= pts.length;
+    pts.forEach(function (p) { rad = Math.max(rad, Math.hypot(p.sx - ox, p.sy - oy)); });
+    var sorted = pts.slice().sort(function (a, b) {
+      return Math.atan2(a.sy - oy, a.sx - ox) - Math.atan2(b.sy - oy, b.sx - ox);
+    });
+
+    if (halo) {
+      var size = rad * (6.4 + (still ? 0 : Math.sin(now * 0.0004) * 0.5));
+      ctx.globalAlpha = 0.5 * gain;
+      ctx.drawImage(halo, ox - size / 2, oy - size / 2, size, size);
+      ctx.globalAlpha = 1;
+    }
+    var g = ctx.createRadialGradient(ox - rad * 0.3, oy - rad * 0.35, rad * 0.1, ox, oy, rad * 1.05);
+    g.addColorStop(0, 'rgba(245,240,255,' + (0.92 * gain).toFixed(3) + ')');
+    g.addColorStop(0.42, 'rgba(166,108,249,' + (0.5 * gain).toFixed(3) + ')');
+    g.addColorStop(1, 'rgba(32,16,71,' + (0.16 * gain).toFixed(3) + ')');
+    ctx.beginPath();
+    sorted.forEach(function (p, i) { if (i) ctx.lineTo(p.sx, p.sy); else ctx.moveTo(p.sx, p.sy); });
+    ctx.closePath();
+    ctx.fillStyle = g;
+    ctx.fill();
+    ctx.globalAlpha = 0.55 * gain;
+    ctx.strokeStyle = 'rgba(232,177,236,0.9)';
+    ctx.lineWidth = 0.9;
+    ctx.stroke();
+
+    // facet seams
+    ctx.globalAlpha = 0.3 * gain;
+    ctx.beginPath();
+    for (var i = 0; i < sorted.length; i++) {
+      ctx.moveTo(sorted[i].sx, sorted[i].sy);
+      ctx.lineTo(sorted[(i + 3) % sorted.length].sx, sorted[(i + 3) % sorted.length].sy);
+    }
+    ctx.strokeStyle = 'rgba(245,240,255,0.75)';
+    ctx.lineWidth = 0.6;
+    ctx.stroke();
+
+    // filaments: a few strands running out of the body along the ring planes
+    var fn = 6;
+    ctx.lineWidth = 0.7;
+    for (var k = 0; k < fn; k++) {
+      var a = (k / fn) * TAU + (still ? 0 : now * 0.00003);
+      var len = 0.15 + hash('core-fil-' + k) * 0.07;
+      var dy = (hash('core-fy-' + k) - 0.5) * 0.1;
+      var p0 = proj(view, Math.cos(a) * r * 1.2, dy * 0.5, Math.sin(a) * r * 1.2, {});
+      var p1 = proj(view, Math.cos(a) * len, dy, Math.sin(a) * len, {});
+      ctx.beginPath();
+      ctx.moveTo(p0.sx, p0.sy);
+      ctx.quadraticCurveTo((p0.sx + p1.sx) / 2 + (p0.sy - p1.sy) * 0.14,
+        (p0.sy + p1.sy) / 2 + (p1.sx - p0.sx) * 0.14, p1.sx, p1.sy);
+      ctx.globalAlpha = 0.22 * gain;
+      ctx.strokeStyle = k % 3 === 0 ? 'rgba(144,188,235,1)' : 'rgba(232,177,236,1)';
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // The hero and the star field draw the same body out of the same numbers.
+  window.TANCEArchiveCore = {
+    CORE: CORE, mkView: mkView, proj: proj, rings: coreRings,
+    strokes: strokeCore, nucleus: paintNucleus, sprites: sprites
+  };
 
   /* ------------------------------------------------------------------ */
   /* 3. Mount                                                            */
@@ -262,8 +515,6 @@
     var pointers = {}, dragging = null, pinch = null;
     var raf = null, running = false, last = 0;
 
-    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
-
     function unit() { return Math.min(h * 0.4, w * 0.32) * cam.zoom; }
 
     // A wide, short canvas needs the volume stretched sideways or the field
@@ -281,22 +532,41 @@
     }
 
     // world → screen, once per frame; everything else reads the cache.
+    var view = null;
+    var coreFrame = { far: [], near: [] };
+
+    function syncView() {
+      view = mkView({ yaw: cam.yaw, pitch: cam.pitch, px: par.x, py: par.y },
+        w, h, unit(), spread());
+    }
+
+    function toScreen(vx, vy, vz, out) {
+      return proj(view, vx, vy, vz, out);
+    }
+
     function project() {
       if (!graph) return;
-      var cy = Math.cos(cam.yaw), sy = Math.sin(cam.yaw);
-      var cp = Math.cos(cam.pitch), sp = Math.sin(cam.pitch);
-      var u = unit(), sx = spread(), ox = w / 2 + par.x, oy = h / 2 + par.y;
-      graph.nodes.forEach(function (n) {
-        var x1 = n.vx * cy + n.vz * sy;
-        var z1 = -n.vx * sy + n.vz * cy;
-        var y2 = n.vy * cp - z1 * sp;
-        var z2 = n.vy * sp + z1 * cp;
-        var k = FOCAL / Math.max(0.35, FOCAL + z2);
-        n.sx = ox + x1 * sx * u * k;
-        n.sy = oy + y2 * u * k;
-        n.sk = k;
-        n.sz = z2;
-      });
+      syncView();
+      graph.nodes.forEach(function (n) { toScreen(n.vx, n.vy, n.vz, n); });
+    }
+
+    /* Zooming in should reveal structure instead of inflating one object, and
+       entering a topic has to push the core back without switching it off. */
+    function coreGain() {
+      return clamp(1.25 - (cam.zoom - 1) * 0.34, 0.55, 1.25) * focusGain();
+    }
+
+    function drawCoreFar(now) {
+      coreFrame = coreRings(view, now, reduced);
+      strokeCore(ctx, coreFrame, 'far', coreGain(), cam.zoom);
+    }
+
+    function drawCoreNear() {
+      strokeCore(ctx, coreFrame, 'near', coreGain(), cam.zoom);
+    }
+
+    function drawNucleus(now) {
+      paintNucleus(ctx, view, sprite.topic, now, coreGain(), reduced);
     }
 
     // Larger z2 is further from the camera; k shrinks with it.
@@ -311,6 +581,40 @@
     function dimmed(n) {
       if (!n || mode === 'all') return 1;
       return !n.world || n.world === 'both' || n.world === mode ? 1 : 0.16;
+    }
+
+    /* Entering a topic: the camera pushes in and everything that is not part of
+       that topic falls back to a whisper, so the panel is describing the part
+       of the sky you are actually looking at. */
+    var entered = null;
+    var near = {};
+
+    function markReachable(node) {
+      near = {};
+      if (!node) return;
+      near[node.id] = 1;
+      graph.links.forEach(function (l) {
+        if (l.a !== node.id && l.b !== node.id) return;
+        var other = byId[l.a === node.id ? l.b : l.a];
+        if (!other) return;
+        near[other.id] = 1;
+        // a project/article reached through the topic keeps its own halo of
+        // second-order links, so the cluster reads complete rather than cut off
+        graph.links.forEach(function (m) {
+          if (m.a !== other.id && m.b !== other.id) return;
+          var second = byId[m.a === other.id ? m.b : m.a];
+          if (second) near[second.id] = 1;
+        });
+      });
+    }
+
+    function focusGain() {
+      return entered ? 0.3 : 1;
+    }
+
+    function inFocus(n) {
+      if (!entered) return 1;
+      return near[n.id] ? 1 : 0.12;
     }
 
     /* Node bodies are cut differently per kind: a topic is a star with a
@@ -354,14 +658,41 @@
             ctx.fill();
           }
           break;
-        case 'diamond':
+        case 'crystal':
+          // a cut stone: one bright table facet over a darker body
           ctx.beginPath();
-          ctx.moveTo(x, y - s * 0.72);
-          ctx.lineTo(x + s * 0.52, y);
-          ctx.lineTo(x, y + s * 0.72);
-          ctx.lineTo(x - s * 0.52, y);
+          ctx.moveTo(x, y - s * 0.86);
+          ctx.lineTo(x + s * 0.5, y - s * 0.2);
+          ctx.lineTo(x + s * 0.3, y + s * 0.8);
+          ctx.lineTo(x - s * 0.42, y + s * 0.62);
+          ctx.lineTo(x - s * 0.56, y - s * 0.28);
           ctx.closePath();
           ctx.fill();
+          ctx.globalAlpha *= 0.55;
+          ctx.beginPath();
+          ctx.moveTo(x - s * 0.56, y - s * 0.28);
+          ctx.lineTo(x + s * 0.06, y - s * 0.02);
+          ctx.lineTo(x + s * 0.5, y - s * 0.2);
+          ctx.moveTo(x + s * 0.06, y - s * 0.02);
+          ctx.lineTo(x - s * 0.42, y + s * 0.62);
+          ctx.stroke();
+          break;
+        case 'prism':
+          ctx.beginPath();
+          ctx.moveTo(x - s * 0.52, y - s * 0.5);
+          ctx.lineTo(x + s * 0.2, y - s * 0.78);
+          ctx.lineTo(x + s * 0.58, y - s * 0.1);
+          ctx.lineTo(x + s * 0.16, y + s * 0.82);
+          ctx.lineTo(x - s * 0.46, y + s * 0.34);
+          ctx.closePath();
+          ctx.fill();
+          ctx.globalAlpha *= 0.5;
+          ctx.beginPath();
+          ctx.moveTo(x - s * 0.52, y - s * 0.5);
+          ctx.lineTo(x + s * 0.58, y - s * 0.1);
+          ctx.moveTo(x + s * 0.58, y - s * 0.1);
+          ctx.lineTo(x - s * 0.46, y + s * 0.34);
+          ctx.stroke();
           break;
         case 'hexagon':
           ctx.beginPath();
@@ -374,15 +705,31 @@
           ctx.closePath();
           ctx.fill();
           break;
-        case 'capsule':
+        case 'shard':
+          // a torn strip of the archive: long, thin, never round
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(n.phase * 0.6);
           ctx.beginPath();
-          ctx.moveTo(x - s * 0.5, y - s * 0.26);
-          ctx.lineTo(x + s * 0.5, y - s * 0.26);
-          ctx.arc(x + s * 0.5, y, s * 0.26, -Math.PI / 2, Math.PI / 2);
-          ctx.lineTo(x - s * 0.5, y + s * 0.26);
-          ctx.arc(x - s * 0.5, y, s * 0.26, Math.PI / 2, -Math.PI / 2);
+          ctx.moveTo(-s * 0.16, -s * 0.95);
+          ctx.lineTo(s * 0.14, -s * 0.2);
+          ctx.lineTo(s * 0.05, s * 0.98);
+          ctx.lineTo(-s * 0.2, s * 0.28);
           ctx.closePath();
+          ctx.globalAlpha *= 0.72;
           ctx.fill();
+          ctx.restore();
+          break;
+        case 'swarm':
+          // a record is a micro cluster, not a dot
+          for (var q = 0; q < 4; q++) {
+            var sa = n.phase + q * 1.57;
+            var sd = s * (q === 0 ? 0 : 0.52 + hash(n.id + 'sp' + q) * 0.4);
+            ctx.beginPath();
+            ctx.arc(x + Math.cos(sa) * sd, y + Math.sin(sa) * sd * 0.8,
+              q === 0 ? s * 0.24 : s * 0.13, 0, Math.PI * 2);
+            ctx.fill();
+          }
           break;
         case 'bookmark':
           ctx.beginPath();
@@ -394,26 +741,22 @@
           ctx.closePath();
           ctx.fill();
           break;
-        case 'tick':
-          ctx.beginPath();
-          ctx.moveTo(x, y - s * 0.5);
-          ctx.lineTo(x, y + s * 0.34);
-          ctx.stroke();
-          break;
-        case 'particle':
-          ctx.beginPath();
-          ctx.arc(x, y, s * 0.28, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.beginPath();
-          ctx.moveTo(x - s * 0.7, y - s * 0.3);
-          ctx.lineTo(x - s * 0.12, y);
-          ctx.globalAlpha *= 0.45;
-          ctx.stroke();
-          break;
         default:
           ctx.beginPath();
           ctx.arc(x, y, s * 0.4, 0, Math.PI * 2);
           ctx.fill();
+      }
+      // Champagne, in the smallest possible mark: earned by projects that have
+      // more than one published version. Never a fill, never on screen in bulk.
+      if (n.key) {
+        ctx.globalAlpha = Math.min(1, ctx.globalAlpha + 0.1) * 0.9;
+        ctx.strokeStyle = 'rgba(230,207,166,1)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(x + s * 0.86, y - s * 0.86);
+        ctx.lineTo(x + s * 1.3, y - s * 0.86);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
       }
     }
 
@@ -447,6 +790,12 @@
       return false;
     }
 
+    // Both lenses multiply: a Create-only view inside an entered topic should
+    // not light up the Observe side again.
+    function veil(n) {
+      return Math.min(dimmed(n), inFocus(n));
+    }
+
     function draw(now) {
       if (!graph) return;
       ctx.clearRect(0, 0, w, h);
@@ -460,19 +809,23 @@
       // Painter's order: far shell first so the near nodes sit on top of it.
       var order = graph.nodes.slice().sort(function (a, b) { return b.sz - a.sz; });
 
+      // The back half of the core goes under everything, so nodes and links can
+      // cross in front of it the way they would in a real volume.
+      drawCoreFar(now);
+
       // edges first, so nodes read as objects floating in front of them
       graph.links.forEach(function (l) {
         var s = byId[l.a], t = byId[l.b];
         if (!s || !t) return;
         var on = lit && (l.a === lit.id || l.b === lit.id);
-        var side = Math.min(dimmed(s), dimmed(t));
+        var side = Math.min(veil(s), veil(t));
         var fade = Math.min(depthFade(s), depthFade(t)) * side;
         var breathe = reduced ? 1 : 0.8 + Math.sin(now * 0.0005 + s.phase) * 0.2;
         ctx.beginPath();
         var bow = hash(l.a + l.b) - 0.5;
-        if (l.kind === 'co' || l.kind === 'project') {
+        if (l.kind === 'co' || l.kind === 'project' || l.kind === 'frag') {
           // soft arcs: topic↔topic co-occurrence and topic→project links
-          var amp = l.kind === 'co' ? 0.2 : 0.13;
+          var amp = l.kind === 'co' ? 0.2 : l.kind === 'frag' ? 0.24 : 0.13;
           var mx = (s.sx + t.sx) / 2 - (t.sx - s.sx) * bow * amp;
           var my = (s.sy + t.sy) / 2 - (t.sy - s.sy) * bow * amp;
           ctx.moveTo(s.sx, s.sy);
@@ -490,12 +843,14 @@
         ctx.lineWidth = on ? 1.5 : (l.kind === 'project' ? 0.9 : l.kind === 'co' ? 0.6 : 0.7);
         ctx.setLineDash(l.kind === 'co' && !on ? [3, 6] : []);
         ctx.strokeStyle = on
-          ? 'rgba(242,168,236,' + (0.7 + fade * 0.25).toFixed(3) + ')'
+          ? 'rgba(242,156,207,' + (0.7 + fade * 0.25).toFixed(3) + ')'
           : (l.kind === 'co'
-            ? 'rgba(124,155,214,' + (0.3 * fade * breathe).toFixed(3) + ')'
+            ? 'rgba(89,139,216,' + (0.32 * fade * breathe).toFixed(3) + ')'
             : l.kind === 'project'
-              ? 'rgba(214,170,255,' + (0.44 * fade * breathe).toFixed(3) + ')'
-              : 'rgba(157,112,255,' + (0.34 * fade * breathe).toFixed(3) + ')');
+              ? 'rgba(217,179,255,' + (0.44 * fade * breathe).toFixed(3) + ')'
+              : l.kind === 'frag'
+                ? 'rgba(232,177,236,' + (0.26 * fade * breathe).toFixed(3) + ')'
+                : 'rgba(143,89,247,' + (0.34 * fade * breathe).toFixed(3) + ')');
         ctx.stroke();
         ctx.setLineDash([]);
       });
@@ -514,11 +869,14 @@
         } else pulse = null;
       }
 
+      drawNucleus(now);
+
       var boxes = [];
       var narrow = w < 720;
+      var closeUp = cam.zoom >= LABEL_ZOOM;
       order.forEach(function (n) {
         var fade = depthFade(n);
-        var side = dimmed(n);
+        var side = veil(n);
         var isLit = lit && n.id === lit.id;
         var isNear = litSet[n.id] && lit && n.id !== lit.id;
         var amp = reduced ? 0 : 1 + Math.sin(now * 0.0009 + n.phase) * 0.12;
@@ -526,7 +884,7 @@
         var sp = sprite[n.kind] || sprite.post;
 
         if (sp && side > 0.5) {
-          var halo = r * (isLit ? 7.5 : n.kind === 'post' ? 4 : 5.2);
+          var halo = r * (isLit ? 7.5 : n.kind === 'post' ? 4 : n.kind === 'fragment' ? 3.2 : 5.2);
           ctx.globalAlpha = Math.min(1, fade * side * (isLit ? 0.92 : n.kind === 'post' ? 0.5 : 0.68));
           ctx.drawImage(sp, n.sx - halo / 2, n.sy - halo / 2, halo, halo);
         }
@@ -536,32 +894,43 @@
           var cyc = ((now * 0.00022 + n.phase) % 1 + 1) % 1;
           ctx.beginPath();
           ctx.arc(n.sx, n.sy, r * (1.1 + cyc * 2.2), 0, Math.PI * 2);
-          ctx.strokeStyle = 'rgba(126,208,255,' + (0.3 * (1 - cyc) * fade).toFixed(3) + ')';
+          ctx.strokeStyle = 'rgba(144,188,235,' + (0.3 * (1 - cyc) * fade).toFixed(3) + ')';
           ctx.lineWidth = 1;
           ctx.stroke();
         }
 
         ctx.globalAlpha = Math.min(1, (fade + (isLit ? 0.4 : 0.12)) * side);
         drawBody(n, r,
-          isLit || isNear ? '#F4EEFF'
-            : n.kind === 'topic' ? '#E7D8FF' : n.kind === 'project' ? '#F2A8EC' : '#9D70FF',
+          isLit || isNear ? INK.core
+            : n.kind === 'topic' ? INK.topic
+              : n.kind === 'project' ? INK.project
+                : n.kind === 'fragment' ? INK.fragment : INK.post,
           isLit || isNear);
         ctx.globalAlpha = 1;
 
-        // Topics name the structure; projects when they are close enough to
-        // read; records only the one you are looking at. Twenty long titles in
-        // a rotating sphere is fog, not a map.
-        var wantLabel = side > 0.5 && (n.kind === 'topic' || (n.kind === 'project' && n.sk > 1.02) || isLit);
-        if (wantLabel && !narrow) {
-          var text = n.label.length > 14 ? n.label.slice(0, 13) + '…' : n.label;
+        /* Topics name the structure. Projects name themselves when they are
+           close enough to read. A record is a cluster of light until you
+           actually fly into it — that is what makes zooming feel like
+           discovery instead of like scaling a flat image. */
+        var wantLabel = side > 0.5 && (
+          isLit ||
+          n.kind === 'topic' ||
+          (n.kind === 'project' && (n.sk > 1.02 || closeUp)) ||
+          (n.kind === 'post' && (closeUp || entered === n))
+        );
+        if (wantLabel) {
+          var max = isLit ? 26 : n.kind === 'post' ? 18 : narrow ? 9 : 14;
+          var text = n.label.length > max ? n.label.slice(0, max - 1) + '…' : n.label;
           var size = isLit ? 13 : 11;
+          if (narrow && !isLit && !closeUp) size = 10;
           ctx.font = (isLit ? '600 ' : '') + size + 'px "JetBrains Mono", monospace';
           var tw = ctx.measureText(text).width;
           var box = { x: n.sx - tw / 2 - 4, y: n.sy - r * 0.5 - size - 12, w: tw + 8, h: size + 5 };
           if (!collides(boxes, box) || isLit) {
             boxes.push(box);
-            ctx.globalAlpha = Math.max(0.35, fade);
-            ctx.fillStyle = isLit ? '#F4EEFF' : 'rgba(214,170,255,0.95)';
+            ctx.globalAlpha = Math.max(0.35, fade) * side;
+            ctx.fillStyle = isLit ? INK.core
+              : n.kind === 'post' ? 'rgba(166,108,249,0.95)' : 'rgba(217,179,255,0.95)';
             ctx.textAlign = 'center';
             ctx.fillText(text, n.sx, n.sy - r * 0.5 - 9);
             ctx.globalAlpha = 1;
@@ -569,10 +938,13 @@
         }
       });
 
+      // The front half of the core closes over the field.
+      drawCoreNear();
+
       if (lit) {
         ctx.beginPath();
         ctx.arc(lit.sx, lit.sy, Math.max(14, lit.r * lit.sk * cam.zoom + 6), 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(242,168,236,0.55)';
+        ctx.strokeStyle = 'rgba(242,156,207,0.55)';
         ctx.lineWidth = 1;
         ctx.stroke();
       }
@@ -630,18 +1002,45 @@
     }
 
     /* Bring a node to the front of the volume: solve yaw/pitch that put it on
-       the camera axis instead of sliding a flat sheet around. */
+       the camera axis instead of sliding a flat sheet around. When entering a
+       topic the aim is deliberately off-axis, so the node lands to one side and
+       the archive core stays in frame behind it. */
     function focus(node, deep) {
       if (!node) return;
       var twoPi = Math.PI * 2;
       var wantYaw = Math.atan2(node.vx, -node.vz);
       var flat = Math.hypot(node.vx, node.vz);
       var wantPitch = clamp(Math.atan2(-node.vy, flat), -PITCH_MAX, PITCH_MAX);
+      if (deep) { wantYaw -= 0.3; wantPitch -= 0.2; }
       cam.tyaw = cam.tyaw + (((wantYaw - cam.tyaw) % twoPi + twoPi * 1.5) % twoPi - Math.PI);
-      cam.tpitch = wantPitch;
-      cam.tzoom = Math.max(cam.tzoom, deep ? 1.95 : 1.3);
+      cam.tpitch = clamp(wantPitch, -PITCH_MAX, PITCH_MAX);
+      cam.tzoom = Math.max(cam.tzoom, deep ? 2.05 : 1.3);
       vel.yaw = vel.pitch = 0;
-      holdSpin(deep ? 22000 : 12000);
+      holdSpin(deep ? 26000 : 12000);
+    }
+
+    /* Entering is more than a camera move: the rest of the field falls back to
+       a whisper and the panel switches to that topic's own development
+       timeline. Nothing is removed, so leaving is instant and lossless. */
+    function enter(node) {
+      if (!node) return;
+      entered = node;
+      markReachable(node);
+      selected = node;
+      describe(node);
+      focus(node, true);
+      root.classList.add('is-entered');
+      if (hud) el('[data-cx-inside]', hud).textContent = '已进入：' + node.label + ' · Esc 退出';
+      drawIfStatic();
+    }
+
+    function exit() {
+      if (!entered) return;
+      entered = null;
+      near = {};
+      root.classList.remove('is-entered');
+      if (hud) el('[data-cx-inside]', hud).textContent = '';
+      reset();
     }
 
     function reset() {
@@ -666,17 +1065,49 @@
       return (stop > max * 0.45 ? cut.slice(0, stop + 1) : cut.trim() + '…');
     }
 
+    /* What belongs to a topic, in the order it actually happened. Every entry
+       is a real date from an article, a repository or a published version — the
+       timeline is assembled, never written. */
+    function topicTimeline(node) {
+      var out = [];
+      (node.hrefs || []).forEach(function (h) {
+        var rec = T.content.find(h);
+        if (rec && rec.date) out.push({ date: rec.date, what: rec.title, href: h, kind: '记录' });
+      });
+      (node.projects || []).forEach(function (slug) {
+        var pr = (T.content.projects || []).filter(function (x) {
+          return x.slug === slug;
+        })[0];
+        if (!pr) return;
+        var page = '/projects/' + slug + '/';
+        if (pr.since) out.push({ date: pr.since, what: pr.name + ' 开始', href: page, kind: '项目' });
+        (pr.versions || []).forEach(function (v) {
+          if (v.date) out.push({ date: v.date, what: v.ver + ' ' + v.label, href: page, kind: '版本' });
+        });
+        if (pr.updated && pr.updated !== pr.since) {
+          out.push({ date: pr.updated, what: pr.name + ' 最近一次更新', href: page, kind: '项目' });
+        }
+      });
+      out.sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : 0; });
+      var seen = {}, uniq = [];
+      out.forEach(function (e) {
+        var k = e.date + '|' + e.what;
+        if (seen[k]) return;
+        seen[k] = 1;
+        uniq.push(e);
+      });
+      return uniq;
+    }
+
     function info(node) {
       var site = (T.content.site || {});
       if (node.kind === 'topic') {
         var notes = site.topicNotes || {};
         var hrefs = node.hrefs || [];
-        var projs = (node.projects || []).length;
+        var projs = node.projects || [];
         var world = WORLD_TAGS[node.label];
         var first = hrefs.length ? T.content.find(hrefs[0]) : null;
-        var text = world ? world.line : (notes[node.label] || (hrefs.length
-          ? '站内有 ' + hrefs.length + ' 篇记录带着这个标签' + (first ? '，最近的一篇写于 ' + (first.date || '') + '。' : '。')
-          : '这个标签目前只挂在项目上，还没有对应的记录。'));
+        var text = world ? world.line : (notes[node.label] || '');
         // A topic panel ends with one of the author's own sentences, taken
         // verbatim from an article that actually carries this tag.
         var quote = null;
@@ -686,14 +1117,34 @@
             if (pool[i].href && hrefs.indexOf(pool[i].href) >= 0) { quote = pool[i]; break; }
           }
         }
+        var items = [];
+        projs.forEach(function (slug) {
+          var pr = (T.content.projects || []).filter(function (x) { return x.slug === slug; })[0];
+          items.push({ label: pr ? pr.name : slug, href: '/projects/' + slug + '/', tag: '项目' });
+        });
+        hrefs.slice(0, 8).forEach(function (h) {
+          var rec = T.content.find(h);
+          if (rec) items.push({ label: rec.title, href: h, tag: rec.date || '记录' });
+        });
         return {
           kind: '主题', cls: 'topic', name: node.label,
           text: text,
-          meta: hrefs.length + ' 篇记录 · ' + projs + ' 个项目',
+          meta: hrefs.length + ' 篇记录 · ' + projs.length + ' 个项目',
+          items: items,
+          timeline: topicTimeline(node),
           quote: quote,
           cta: world
             ? { href: world.href, label: '进入这一侧' }
             : { href: node.href, label: '进入主题' }
+        };
+      }
+      if (node.kind === 'fragment') {
+        return {
+          kind: '碎片', cls: 'frag', name: node.sourceTitle || '思想碎片',
+          text: '',
+          meta: [node.date, node.topic].filter(Boolean).join(' · '),
+          quote: { text: node.text, href: node.src, title: node.sourceTitle },
+          cta: { href: node.src, label: '回到原文' }
         };
       }
       if (node.kind === 'project') {
@@ -703,7 +1154,7 @@
         var bits = [p.status, p.visibility === 'private' ? '私有仓库' : p.language, p.updated ? '更新 ' + p.updated : ''].filter(Boolean);
         return {
           kind: '项目', cls: 'project', name: node.label,
-          text: sentence(p.tagline || p.background, 150) || '这个项目还没有写简介。',
+          text: sentence(p.tagline || p.background, 150),
           meta: bits.join(' · '),
           cta: { href: node.href, label: '查看项目' }
         };
@@ -712,53 +1163,85 @@
       var tags = (rec.tags || []).slice(0, 3).join(' · ');
       return {
         kind: '记录', cls: 'record', name: node.label,
-        text: sentence(rec.excerpt || rec.plain, 160) || '这篇还没有摘要，打开就是原文。',
+        text: sentence(rec.excerpt || rec.plain, 160),
         meta: [rec.date, rec.minutes ? rec.minutes + ' min' : '', tags].filter(Boolean).join(' · '),
         cta: { href: node.id, label: '打开记录' }
       };
     }
 
+    function h(tag, cls, text) {
+      var e = document.createElement(tag);
+      if (cls) e.className = cls;
+      if (text !== undefined && text !== null) e.textContent = text;
+      return e;
+    }
+
+    /* The panel is the reading surface for whatever the camera is looking at.
+       An entered topic gets its own projects, records and development timeline;
+       anything else gets a name, two sentences and one way in. */
     function describe(node) {
       if (!node) return;
       var d = info(node);
       panel.hidden = false;
       panel.innerHTML = '';
-      var chip = document.createElement('span');
-      chip.className = 'cx-panel-kind is-' + d.cls;
-      chip.textContent = d.kind;
-      var name = document.createElement('h3');
-      name.className = 'cx-panel-name';
-      name.textContent = d.name;
-      var desc = document.createElement('p');
-      desc.className = 'cx-panel-desc';
-      desc.textContent = d.text;
-      panel.appendChild(chip);
-      panel.appendChild(name);
-      panel.appendChild(desc);
-      if (d.meta) {
-        var meta = document.createElement('p');
-        meta.className = 'cx-panel-meta';
-        meta.textContent = d.meta;
-        panel.appendChild(meta);
+      panel.appendChild(h('span', 'cx-panel-kind is-' + d.cls, d.kind));
+      panel.appendChild(h('h3', 'cx-panel-name', d.name));
+      if (d.text) panel.appendChild(h('p', 'cx-panel-desc', d.text));
+      if (d.meta) panel.appendChild(h('p', 'cx-panel-meta', d.meta));
+
+      if (d.items && d.items.length) {
+        var list = h('div', 'cx-panel-items');
+        d.items.forEach(function (it) {
+          var a = h('a', 'cx-item');
+          a.href = it.href;
+          a.appendChild(h('span', 'cx-item-tag', it.tag));
+          a.appendChild(h('span', 'cx-item-label', it.label));
+          list.appendChild(a);
+        });
+        panel.appendChild(list);
       }
+
       if (d.quote) {
-        var q = document.createElement('blockquote');
-        q.className = 'cx-panel-quote';
-        q.textContent = d.quote.text;
-        var who = document.createElement('cite');
-        var link = document.createElement('a');
-        link.href = d.quote.href;
-        link.textContent = '出自《' + d.quote.title + '》';
-        who.appendChild(link);
-        q.appendChild(who);
+        var q = h('blockquote', 'cx-panel-quote', d.quote.text);
+        var cite = h('cite');
+        var from = h('a', null, '出自《' + d.quote.title + '》');
+        from.href = d.quote.href;
+        cite.appendChild(from);
+        q.appendChild(cite);
         panel.appendChild(q);
       }
-      var go = document.createElement('a');
-      go.className = 'cx-panel-go';
+
+      if (d.timeline && d.timeline.length) {
+        panel.appendChild(h('p', 'cx-panel-sub', '时间线'));
+        var tl = h('ol', 'cx-timeline');
+        d.timeline.slice(0, 12).forEach(function (e) {
+          var li = h('li', 'cx-tl-item');
+          li.appendChild(h('time', 'cx-tl-date', e.date));
+          li.appendChild(h('span', 'cx-tl-kind', e.kind));
+          var what = h('a', 'cx-tl-what', e.what);
+          what.href = e.href;
+          li.appendChild(what);
+          tl.appendChild(li);
+        });
+        if (d.timeline.length > 12) {
+          tl.appendChild(h('li', 'cx-tl-more', '还有 ' + (d.timeline.length - 12) + ' 条'));
+        }
+        panel.appendChild(tl);
+      }
+
+      var go = h('a', 'cx-panel-go');
       go.href = d.cta.href;
       go.innerHTML = '<span></span><i class="arrow">→</i>';
       go.firstChild.textContent = d.cta.label;
       panel.appendChild(go);
+
+      // A doorway needs a way back out, and double-tap is not reliable on touch.
+      if (entered && node.kind === 'topic') {
+        var out = h('button', 'cx-panel-exit', '退出主题');
+        out.type = 'button';
+        out.addEventListener('click', exit);
+        panel.appendChild(out);
+      }
     }
 
     function describeLink(link) {
@@ -780,8 +1263,8 @@
       var desc = document.createElement('p');
       desc.className = 'cx-panel-desc';
       desc.textContent = shared.length
-        ? '这两个主题共享 ' + shared.length + ' 篇记录，连线不是画上去的，是同一批文章同时带着它们。'
-        : '这两个主题在站内有关联，但没有完全相同的文章。';
+        ? '共享 ' + shared.length + ' 篇记录。'
+        : '有关联，但没有完全相同的记录。';
       panel.appendChild(chip);
       panel.appendChild(name);
       panel.appendChild(desc);
@@ -801,30 +1284,16 @@
 
     function showDefault() {
       if (!graph) return;
-      var counts = { topic: 0, project: 0, post: 0 };
+      var counts = { topic: 0, project: 0, post: 0, fragment: 0 };
       graph.nodes.forEach(function (n) { counts[n.kind]++; });
       panel.hidden = false;
       panel.innerHTML = '';
-      var chip = document.createElement('span');
-      chip.className = 'cx-panel-kind';
-      chip.textContent = 'Star Field';
-      var name = document.createElement('h3');
-      name.className = 'cx-panel-name';
-      name.textContent = '这一团是我自己的内容结构';
-      var desc = document.createElement('p');
-      desc.className = 'cx-panel-desc';
-      desc.textContent = '主题在内圈，项目在中层，记录挂在自己对应的主题外面。'
-        + '拖动可以旋转，滚轮或双指缩放，点任意一个节点看它是什么。';
-      var meta = document.createElement('p');
-      meta.className = 'cx-panel-meta';
-      meta.textContent = counts.topic + ' 个主题 · ' + counts.project + ' 个项目 · ' +
-        counts.post + ' 篇记录 · ' + graph.links.length + ' 条真实关联';
-      panel.appendChild(chip);
-      panel.appendChild(name);
-      panel.appendChild(desc);
-      panel.appendChild(meta);
-      var go = document.createElement('a');
-      go.className = 'cx-panel-go';
+      panel.appendChild(h('span', 'cx-panel-kind', 'Celestial Archive'));
+      panel.appendChild(h('h3', 'cx-panel-name',
+        counts.topic + ' 个主题 · ' + counts.project + ' 个项目 · ' + counts.post + ' 篇记录'));
+      panel.appendChild(h('p', 'cx-panel-meta', counts.fragment + ' 片碎片'));
+
+      var go = h('a', 'cx-panel-go');
       go.href = '/archives/';
       go.innerHTML = '<span>全部记录</span><i class="arrow">→</i>';
       panel.appendChild(go);
@@ -974,25 +1443,31 @@
       drawIfStatic();
     }, { passive: false });
 
-    /* Double-click pulls a node to the front of the volume and holds it there;
-       double-clicking empty space gives the whole field back. */
+    /* Double-click is the doorway. On a topic it enters that orbit: camera
+       pushes in, everything else dims, the panel becomes that topic's own
+       archive. On anything else it just pulls the node forward. Double-clicking
+       empty space, or pressing Escape, gives the whole field back. */
     canvas.addEventListener('dblclick', function (e) {
       if (!graph) return;
       var p = local(e);
       var n = pick(p.x, p.y);
-      if (n) {
+      if (n && n.kind === 'topic') {
+        enter(n);
+      } else if (n) {
         selected = n;
         describe(n);
         focus(n, true);
+        drawIfStatic();
       } else {
+        exit();
         cam.tzoom = 1;
         cam.tyaw = 0.5;
         cam.tpitch = -0.2;
         selected = null;
         showDefault();
         holdSpin(12000);
+        drawIfStatic();
       }
-      drawIfStatic();
     });
 
     var modeBtns = els('[data-cx-mode]', root);
@@ -1011,7 +1486,6 @@
         b.classList.toggle('is-on', on);
         b.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
-      if (hud) hud.dataset.mode = mode;
       paintLens();
       drawIfStatic();
     }
@@ -1059,7 +1533,8 @@
         var target = selected || hover;
         if (target && target.href) location.href = target.href;
       } else if (e.key === 'Escape') {
-        reset();
+        if (entered) exit();
+        else reset();
       } else if (e.key === '+' || e.key === '=') {
         cam.tzoom = Math.min(2.6, cam.tzoom * 1.15); drawIfStatic();
       } else if (e.key === '-' || e.key === '_') {
@@ -1146,12 +1621,7 @@
         syncSpin();
         start();
         if (hud) {
-          hud.innerHTML = '<span>节点 <b></b> · 连线 <b></b></span>' +
-            '<span>拖动旋转 · 滚轮或双指缩放 · 单击选中 · 双击聚焦</span>' +
-            '<span data-cx-lens></span>';
-          var b = hud.querySelectorAll('b');
-          b[0].textContent = graph.nodes.length;
-          b[1].textContent = graph.links.length;
+          hud.innerHTML = '<span data-cx-lens></span><span data-cx-inside></span>';
           paintLens();
         }
       });

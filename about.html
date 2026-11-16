@@ -47,7 +47,7 @@
         <div class="about-body">
           <p>写代码、看文档、把事情做完之后写下来。做得比较多的是自动化和网络安全，最近在把 AI 用在具体的活儿上：写作、审核、发布、故障排查。</p>
           <p>不把自己写成专家。多数事情做完才明白哪里判断错了，所以记录里留着当时不知道的部分。</p>
-          <p>这个站点叫 <strong>Neural Orbit</strong>。它不是模板博客：「做过的东西」和「想过的事情」放在同一张图上，Create 与 Observe 两条主线，首页的节点由站内真实标签和仓库主题决定。</p>
+          <p>这个站点叫 <strong>Neural Orbit</strong>。「做过的东西」和「想过的事情」放在同一张图上，Create 与 Observe 两条主线。</p>
         </div>
       </section>
 
@@ -62,7 +62,7 @@
       <section class="about-section">
         <h2 class="about-label">Works</h2>
         <div class="about-body">
-          <p>下面这些是可以在仓库里核对的项目；状态、局限和未完成部分写在各自的项目页里。少数仓库还没有公开，页面上会直接说明，不放打不开的链接。</p>
+          <p>这些项目都可以在仓库里核对；状态和未完成的部分写在各自的项目页里。</p>
         </div>
         <div class="galaxy" data-fill="galaxy" data-limit="4" style="margin-top:18px;"></div>
         <p class="signal-note"><a href="/projects/">查看全部作品星系 →</a></p>
@@ -72,9 +72,8 @@
         <h2 class="about-label">How this site works</h2>
         <div class="about-body">
           <p>零构建静态站点：文章就是仓库里的 HTML 文件，GitHub Pages 直接部署分支根目录，没有数据库、没有服务端渲染。</p>
-          <p>首页的精选文章、思维星图、演化时间线、思想碎片、主题索引与搜索结果，都由浏览器在运行时从 <code>create.html</code>、<code>observe.html</code> 和 <code>archives/index.html</code> 汇总而来。新增一篇文章只需要出现在它所属的列表里，其他区块自动跟着更新。</p>
-          <p><strong>Auto Blog Agent</strong> 负责自动写作与发布：它用 GitHub API 在一次提交里同时写入文章与两处导航列表。这条链路是本站设计的一条硬约束——任何改版都不能破坏它的占位符与插入标记。发布状态与未完成联调的部分在<a href="/projects/auto-blog-agent/">项目页</a>如实列出。</p>
-          <p>实时信号区读取 GitHub 公开事件 API；拉取失败时自动显示最后核实的快照并标注原因，不伪造在线状态。</p>
+          <p>首页的星图、时间线和碎片不需要单独维护——新增一篇文章，只要它出现在所属列表里，这些地方会跟着更新。</p>
+          <p>本站的发布流程本身也是一个项目：<a href="/projects/auto-blog-agent/">Auto Blog Agent</a>。</p>
         </div>
       </section>
 
@@ -141,7 +140,7 @@
       <section class="about-section">
         <h2 class="about-label">Studio</h2>
         <div class="about-body">
-          <p>暖知工作室相关的产品（例如<a href="/projects/weidingyi/">未定义 UNDEFINED</a>）会在各自的项目页里标注归属与备案信息；这个站点本身由我个人维护。</p>
+          <p>暖知工作室相关的产品（例如<a href="/projects/weidingyi/">未定义 UNDEFINED</a>）在各自的项目页里标注归属。</p>
         </div>
       </section>
     </div>
