@@ -706,6 +706,20 @@
   color: var(--ink-mute);
 }
 
+/* Visual type badge — shows the topic's visual personality */
+.cx-panel-vtype {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--nebula-violet);
+  border: 1px solid rgba(143, 89, 247, 0.35);
+  background: rgba(143, 89, 247, 0.08);
+}
+
 .cx-panel-go {
   display: inline-flex;
   align-items: center;

@@ -32,6 +32,58 @@
     gold: '#E6CFA6'
   };
 
+  /* Visual personality types — each topic gets a distinct visual language.
+     The type decides shape, motion, color accents and interaction feel.
+     Assigned below from actual tag semantics; new tags auto-classify by keyword. */
+  var VISUAL_TYPES = {
+    // Orbit: orbital structures, dual rings, star cores
+    orbit: {
+      keywords: ['Agent', 'AI', '独立开发', '项目'],
+      colors: { primary: '#D9B3FF', secondary: '#9D70FF', accent: '#F29CCF' },
+      motion: { speed: 0.8, wobble: 0.12, pulse: 0.0004 }
+    },
+    // Constellation: branching structures, silver-blue paths
+    constellation: {
+      keywords: ['开源', '网络安全'],
+      colors: { primary: '#90BCEB', secondary: '#598BD8', accent: '#E6CFA6' },
+      motion: { speed: 0.6, wobble: 0.08, pulse: 0.0003 }
+    },
+    // Signal: data tracks, pulse lines, instrument scales
+    signal: {
+      keywords: ['Python', 'Java', '工具', '自动化'],
+      colors: { primary: '#8F59F7', secondary: '#9D70FF', accent: '#90BCEB' },
+      motion: { speed: 1.2, wobble: 0.15, pulse: 0.0006 }
+    },
+    // Nebula: soft clouds, text particles, pink-purple mist
+    nebula: {
+      keywords: ['写作', '思考', '博客', 'Observe', 'Create'],
+      colors: { primary: '#F29CCF', secondary: '#E8B1EC', accent: '#D9B3FF' },
+      motion: { speed: 0.4, wobble: 0.18, pulse: 0.00025 }
+    },
+    // Fragment: irregular crystals, broken geometry
+    fragment: {
+      keywords: ['游戏', '设计', '开发'],
+      colors: { primary: '#E8B1EC', secondary: '#F29CCF', accent: '#90BCEB' },
+      motion: { speed: 1.0, wobble: 0.2, pulse: 0.0005 }
+    }
+  };
+
+  function classifyTopic(tag) {
+    // Direct match first
+    for (var type in VISUAL_TYPES) {
+      if (VISUAL_TYPES[type].keywords.indexOf(tag) !== -1) return type;
+    }
+    // Keyword fallback
+    for (var t in VISUAL_TYPES) {
+      var kws = VISUAL_TYPES[t].keywords;
+      for (var i = 0; i < kws.length; i++) {
+        if (tag.indexOf(kws[i]) !== -1 || kws[i].indexOf(tag) !== -1) return t;
+      }
+    }
+    // Default to nebula for unknown tags (soft, neutral)
+    return 'nebula';
+  }
+
   function hash(str) {
     var h = 2166136261;
     for (var i = 0; i < str.length; i++) {
@@ -106,13 +158,15 @@
       });
       if (t.projects.length) sides.create = 1;
       var keys = Object.keys(sides);
+      var vtype = classifyTopic(t.tag);
       add({
         id: 'topic:' + t.tag, kind: 'topic', label: t.tag,
         weight: 1 + (t.hrefs.length + t.projects.length) * 0.6,
         count: t.hrefs.length + t.projects.length,
         world: keys.length > 1 ? 'both' : (keys[0] || 'both'),
         href: (WORLD_TAGS[t.tag] || {}).href || '/archives/#tag-' + encodeURIComponent(t.tag),
-        hrefs: t.hrefs, projects: t.projects
+        hrefs: t.hrefs, projects: t.projects,
+        vtype: vtype
       });
     });
 
@@ -261,7 +315,21 @@
       var v = hash(n.id + 'shape');
       if (n.kind === 'topic') {
         n.r = 5.6 + Math.min(7, (n.count || 1) * 1.1);
-        n.shape = (n.count || 1) >= 5 ? 'core' : v < 0.5 ? 'halo' : 'cluster';
+        // Visual personality types replace generic shapes
+        n.vtype = n.vtype || classifyTopic(n.label);
+        if (n.vtype === 'orbit') {
+          n.shape = 'orbit-core';
+        } else if (n.vtype === 'constellation') {
+          n.shape = 'constellation-node';
+        } else if (n.vtype === 'signal') {
+          n.shape = 'signal-node';
+        } else if (n.vtype === 'nebula') {
+          n.shape = 'nebula-core';
+        } else if (n.vtype === 'fragment') {
+          n.shape = 'fragment-crystal';
+        } else {
+          n.shape = (n.count || 1) >= 5 ? 'core' : v < 0.5 ? 'halo' : 'cluster';
+        }
       } else if (n.kind === 'project') {
         n.r = 6.6;
         n.shape = v < 0.4 ? 'crystal' : v < 0.72 ? 'prism' : 'hexagon';
@@ -627,6 +695,168 @@
       ctx.lineWidth = strong ? 1.3 : 1;
       var s = Math.max(1.4, r);
       switch (n.shape) {
+        // === Visual personality types for topics ===
+        case 'orbit-core':
+          // Dual orbital rings with central star core
+          var vtype = VISUAL_TYPES[n.vtype] || VISUAL_TYPES.orbit;
+          // Outer ring
+          ctx.beginPath();
+          ctx.arc(x, y, s * 1.1, 0, Math.PI * 2);
+          ctx.globalAlpha *= 0.35;
+          ctx.strokeStyle = vtype.colors.secondary;
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+          // Inner ring (offset angle)
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(n.phase * 0.3);
+          ctx.beginPath();
+          ctx.ellipse(0, 0, s * 0.75, s * 0.45, 0.4, 0, Math.PI * 2);
+          ctx.globalAlpha = Math.min(1, ctx.globalAlpha + 0.15) * 0.45;
+          ctx.strokeStyle = vtype.colors.accent;
+          ctx.stroke();
+          ctx.restore();
+          // Central core
+          ctx.globalAlpha = Math.min(1, ctx.globalAlpha + 0.2);
+          ctx.beginPath();
+          ctx.arc(x, y, s * 0.38, 0, Math.PI * 2);
+          ctx.fillStyle = vtype.colors.primary;
+          ctx.fill();
+          break;
+
+        case 'constellation-node':
+          // Branching constellation structure with silver-blue paths
+          var ctype = VISUAL_TYPES[n.vtype] || VISUAL_TYPES.constellation;
+          ctx.beginPath();
+          // Central point
+          ctx.arc(x, y, s * 0.32, 0, Math.PI * 2);
+          ctx.fillStyle = ctype.colors.primary;
+          ctx.fill();
+          // Branch lines (3-5 points)
+          var branches = 3 + (hash(n.id + 'br') % 3);
+          ctx.globalAlpha *= 0.6;
+          ctx.strokeStyle = ctype.colors.secondary;
+          ctx.lineWidth = 1.1;
+          for (var bi = 0; bi < branches; bi++) {
+            var ba = n.phase + bi * (Math.PI * 2 / branches);
+            var bl = s * (0.7 + hash(n.id + 'bl' + bi) * 0.4);
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + Math.cos(ba) * bl, y + Math.sin(ba) * bl);
+            ctx.stroke();
+            // End node
+            ctx.beginPath();
+            ctx.arc(x + Math.cos(ba) * bl, y + Math.sin(ba) * bl, s * 0.14, 0, Math.PI * 2);
+            ctx.fillStyle = ctype.colors.accent;
+            ctx.fill();
+          }
+          break;
+
+        case 'signal-node':
+          // Data tracks and pulse lines - instrument-like
+          var stype = VISUAL_TYPES[n.vtype] || VISUAL_TYPES.signal;
+          // Central gauge
+          ctx.beginPath();
+          ctx.arc(x, y, s * 0.42, 0, Math.PI * 2);
+          ctx.fillStyle = stype.colors.primary;
+          ctx.fill();
+          // Scale marks around edge
+          ctx.globalAlpha *= 0.55;
+          ctx.strokeStyle = stype.colors.accent;
+          ctx.lineWidth = 0.9;
+          for (var si = 0; si < 8; si++) {
+            var sa = n.phase + si * Math.PI / 4;
+            var sr = s * 0.58;
+            ctx.beginPath();
+            ctx.moveTo(x + Math.cos(sa) * s * 0.46, y + Math.sin(sa) * s * 0.46);
+            ctx.lineTo(x + Math.cos(sa) * sr, y + Math.sin(sa) * sr);
+            ctx.stroke();
+          }
+          // Pulse line through center
+          ctx.globalAlpha = Math.min(1, ctx.globalAlpha + 0.1);
+          ctx.beginPath();
+          ctx.moveTo(x - s * 0.65, y);
+          ctx.lineTo(x + s * 0.65, y);
+          ctx.strokeStyle = stype.colors.secondary;
+          ctx.lineWidth = 1.3;
+          ctx.stroke();
+          break;
+
+        case 'nebula-core':
+          // Soft cloud halo with text particle feel
+          var ntype = VISUAL_TYPES[n.vtype] || VISUAL_TYPES.nebula;
+          // Outer soft glow
+          var grad = ctx.createRadialGradient(x, y, 0, x, y, s * 1.4);
+          grad.addColorStop(0, ntype.colors.primary + 'cc');
+          grad.addColorStop(0.5, ntype.colors.secondary + '66');
+          grad.addColorStop(1, 'transparent');
+          ctx.globalAlpha = 0.7;
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(x, y, s * 1.4, 0, Math.PI * 2);
+          ctx.fill();
+          // Core
+          ctx.globalAlpha = 0.85;
+          ctx.beginPath();
+          ctx.arc(x, y, s * 0.36, 0, Math.PI * 2);
+          ctx.fillStyle = ntype.colors.accent;
+          ctx.fill();
+          // Scattered micro particles
+          ctx.globalAlpha *= 0.45;
+          for (var pi = 0; pi < 5; pi++) {
+            var pa = n.phase + pi * 1.26;
+            var pd = s * (0.55 + hash(n.id + 'p' + pi) * 0.5);
+            ctx.beginPath();
+            ctx.arc(x + Math.cos(pa) * pd, y + Math.sin(pa) * pd, s * 0.08, 0, Math.PI * 2);
+            ctx.fillStyle = ntype.colors.primary;
+            ctx.fill();
+          }
+          break;
+
+        case 'fragment-crystal':
+          // Irregular crystal with broken geometry
+          var ftype = VISUAL_TYPES[n.vtype] || VISUAL_TYPES.fragment;
+          ctx.save();
+          ctx.translate(x, y);
+          ctx.rotate(n.phase * 0.5);
+          // Main crystal body (irregular polygon)
+          ctx.beginPath();
+          ctx.moveTo(-s * 0.42, -s * 0.68);
+          ctx.lineTo(s * 0.28, -s * 0.78);
+          ctx.lineTo(s * 0.62, -s * 0.12);
+          ctx.lineTo(s * 0.38, s * 0.72);
+          ctx.lineTo(-s * 0.18, s * 0.82);
+          ctx.lineTo(-s * 0.68, s * 0.22);
+          ctx.closePath();
+          ctx.fillStyle = ftype.colors.primary;
+          ctx.globalAlpha = 0.75;
+          ctx.fill();
+          // Facet lines
+          ctx.globalAlpha *= 0.6;
+          ctx.strokeStyle = ftype.colors.accent;
+          ctx.lineWidth = 0.9;
+          ctx.beginPath();
+          ctx.moveTo(-s * 0.42, -s * 0.68);
+          ctx.lineTo(s * 0.38, s * 0.72);
+          ctx.moveTo(s * 0.28, -s * 0.78);
+          ctx.lineTo(-s * 0.18, s * 0.82);
+          ctx.moveTo(s * 0.62, -s * 0.12);
+          ctx.lineTo(-s * 0.68, s * 0.22);
+          ctx.stroke();
+          // Offset fragment piece
+          ctx.globalAlpha *= 0.5;
+          ctx.beginPath();
+          ctx.moveTo(s * 0.48, -s * 0.42);
+          ctx.lineTo(s * 0.82, -s * 0.28);
+          ctx.lineTo(s * 0.72, s * 0.18);
+          ctx.lineTo(s * 0.42, s * 0.08);
+          ctx.closePath();
+          ctx.fillStyle = ftype.colors.secondary;
+          ctx.fill();
+          ctx.restore();
+          break;
+
+        // === Original shapes (projects, records, fragments) ===
         case 'core':
           ctx.beginPath();
           ctx.arc(x, y, s * 0.46, 0, Math.PI * 2);
@@ -861,9 +1091,25 @@
           var k = (now - pulse.at) / 1100;
           if (k > 1) pulse = null;
           else {
+            // Use visual type colors for pulse if source is a topic
+            var pulseColor = 'rgba(242,156,207,1)';
+            if (ps.kind === 'topic' && ps.vtype && VISUAL_TYPES[ps.vtype]) {
+              var pc = VISUAL_TYPES[ps.vtype].colors;
+              pulseColor = pc.accent + 'ff';
+            } else if (pt.kind === 'topic' && pt.vtype && VISUAL_TYPES[pt.vtype]) {
+              var tc = VISUAL_TYPES[pt.vtype].colors;
+              pulseColor = tc.accent + 'ff';
+            }
             ctx.globalAlpha = 0.9 * Math.min(1, 1.2 - k);
             var gx = ps.sx + (pt.sx - ps.sx) * k, gy = ps.sy + (pt.sy - ps.sy) * k;
-            if (sprite.topic) ctx.drawImage(sprite.topic, gx - 16, gy - 16, 32, 32);
+            if (sprite.topic) {
+              // Draw pulse with type-specific color
+              var pSize = 32;
+              ctx.save();
+              ctx.globalCompositeOperation = 'screen';
+              ctx.drawImage(sprite.topic, gx - pSize/2, gy - pSize/2, pSize, pSize);
+              ctx.restore();
+            }
             ctx.globalAlpha = 1;
           }
         } else pulse = null;
@@ -891,21 +1137,30 @@
 
         // Major topics breathe: a ring that expands and fades on a slow cycle.
         if (n.kind === 'topic' && (n.count || 0) >= 5 && !reduced && side > 0.5) {
-          var cyc = ((now * 0.00022 + n.phase) % 1 + 1) % 1;
+          var vtypeCfg = n.vtype && VISUAL_TYPES[n.vtype] ? VISUAL_TYPES[n.vtype] : null;
+          var pulseRate = vtypeCfg ? vtypeCfg.motion.pulse : 0.00022;
+          var cyc = ((now * pulseRate + n.phase) % 1 + 1) % 1;
           ctx.beginPath();
           ctx.arc(n.sx, n.sy, r * (1.1 + cyc * 2.2), 0, Math.PI * 2);
-          ctx.strokeStyle = 'rgba(144,188,235,' + (0.3 * (1 - cyc) * fade).toFixed(3) + ')';
+          var ringColor = vtypeCfg ? vtypeCfg.colors.secondary : 'rgba(144,188,235,1)';
+          ctx.strokeStyle = ringColor.replace('1)', (0.3 * (1 - cyc) * fade).toFixed(3) + ')');
           ctx.lineWidth = 1;
           ctx.stroke();
         }
 
         ctx.globalAlpha = Math.min(1, (fade + (isLit ? 0.4 : 0.12)) * side);
-        drawBody(n, r,
-          isLit || isNear ? INK.core
+        // Use visual type colors for topics, original palette for others
+        var nodeColor;
+        if (n.kind === 'topic' && n.vtype && VISUAL_TYPES[n.vtype]) {
+          var vtc = VISUAL_TYPES[n.vtype].colors;
+          nodeColor = isLit || isNear ? INK.core : vtc.primary;
+        } else {
+          nodeColor = isLit || isNear ? INK.core
             : n.kind === 'topic' ? INK.topic
               : n.kind === 'project' ? INK.project
-                : n.kind === 'fragment' ? INK.fragment : INK.post,
-          isLit || isNear);
+                : n.kind === 'fragment' ? INK.fragment : INK.post;
+        }
+        drawBody(n, r, nodeColor, isLit || isNear);
         ctx.globalAlpha = 1;
 
         /* Topics name the structure. Projects name themselves when they are
@@ -966,7 +1221,16 @@
         spinHold = 0;
         if (!reduced) { spin = true; syncSpin(); }
       }
-      if (spin && !dragging) cam.tyaw += 0.058 * u;
+      // Base rotation speed, modulated by visual type diversity
+      var baseSpin = 0.058;
+      if (spin && !dragging) {
+        // Add slight variation based on entered topic's visual type
+        var typeSpeed = 1;
+        if (entered && entered.vtype && VISUAL_TYPES[entered.vtype]) {
+          typeSpeed = VISUAL_TYPES[entered.vtype].motion.speed;
+        }
+        cam.tyaw += baseSpin * u * typeSpeed;
+      }
       cam.tpitch = clamp(cam.tpitch, -PITCH_MAX, PITCH_MAX);
       cam.yaw += (cam.tyaw - cam.yaw) * 0.12;
       cam.pitch += (cam.tpitch - cam.pitch) * 0.12;
@@ -1108,6 +1372,15 @@
         var world = WORLD_TAGS[node.label];
         var first = hrefs.length ? T.content.find(hrefs[0]) : null;
         var text = world ? world.line : (notes[node.label] || '');
+        
+        // Visual type label for the panel
+        var vtypeLabel = node.vtype ? 
+          (node.vtype === 'orbit' ? 'Orbit · 轨道' :
+           node.vtype === 'constellation' ? 'Constellation · 星座' :
+           node.vtype === 'signal' ? 'Signal · 信号' :
+           node.vtype === 'nebula' ? 'Nebula · 星云' :
+           node.vtype === 'fragment' ? 'Fragment · 碎片' : '') : '';
+        
         // A topic panel ends with one of the author's own sentences, taken
         // verbatim from an article that actually carries this tag.
         var quote = null;
@@ -1128,6 +1401,7 @@
         });
         return {
           kind: '主题', cls: 'topic', name: node.label,
+          vtype: vtypeLabel,
           text: text,
           meta: hrefs.length + ' 篇记录 · ' + projs.length + ' 个项目',
           items: items,
@@ -1186,6 +1460,11 @@
       panel.innerHTML = '';
       panel.appendChild(h('span', 'cx-panel-kind is-' + d.cls, d.kind));
       panel.appendChild(h('h3', 'cx-panel-name', d.name));
+      // Show visual type label for topics
+      if (d.vtype) {
+        var vtypeChip = h('span', 'cx-panel-vtype', d.vtype);
+        panel.appendChild(vtypeChip);
+      }
       if (d.text) panel.appendChild(h('p', 'cx-panel-desc', d.text));
       if (d.meta) panel.appendChild(h('p', 'cx-panel-meta', d.meta));
 
@@ -1391,10 +1670,21 @@
       if (n !== hover) {
         hover = n;
         canvas.classList.toggle('is-target', !!n);
+        // Spatial feedback: when hovering a topic, show its visual type energy
+        if (n && n.kind === 'topic' && n.vtype && VISUAL_TYPES[n.vtype]) {
+          var vtc = VISUAL_TYPES[n.vtype].colors;
+          // Add subtle glow to canvas border
+          canvas.style.boxShadow = '0 0 40px -8px ' + vtc.primary + '66';
+        } else {
+          canvas.style.boxShadow = '';
+        }
         // Hover only narrates when nothing is pinned; clicking pins.
         if (!selected) {
           if (n) describe(n);
-          else showDefault();
+          else {
+            showDefault();
+            canvas.style.boxShadow = '';
+          }
         }
         drawIfStatic();
       }
@@ -1433,6 +1723,7 @@
       hover = null;
       par.tx = par.ty = 0;
       canvas.classList.remove('is-target');
+      canvas.style.boxShadow = '';
     });
 
     canvas.addEventListener('wheel', function (e) {
