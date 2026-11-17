@@ -144,11 +144,13 @@
     });
 
     var tagMap = content.tagMap();
+    // Every tag that actually has something behind it gets a star. Capping this
+    // list would make the field disagree with the topic count shown in the hero,
+    // and a visitor would read that as one of the two numbers being wrong.
     var topics = Object.keys(tagMap)
       .map(function (k) { return { tag: k, hrefs: tagMap[k].hrefs || [], projects: tagMap[k].projects || [] }; })
       .filter(function (t) { return (t.hrefs.length + t.projects.length) >= 1; })
-      .sort(function (a, b) { return (b.hrefs.length + b.projects.length) - (a.hrefs.length + a.projects.length); })
-      .slice(0, 22);
+      .sort(function (a, b) { return (b.hrefs.length + b.projects.length) - (a.hrefs.length + a.projects.length); });
 
     topics.forEach(function (t) {
       var sides = {};
