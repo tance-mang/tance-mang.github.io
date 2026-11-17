@@ -580,6 +580,9 @@
     var spin = !reduced;
     var vel = { yaw: 0, pitch: 0 };
     var hover = null, selected = null, pulse = null;
+    // The field lights one real topic before the visitor touches anything, so
+    // it never reads as decoration. It yields to the first interaction.
+    var idle = null;
     var pointers = {}, dragging = null, pinch = null;
     var raf = null, running = false, last = 0;
 
@@ -1031,7 +1034,10 @@
       ctx.clearRect(0, 0, w, h);
       project();
 
-      var lit = selected || hover;
+      var lit = selected || hover || idle;
+      // The opening emphasis is a hint, not a verdict: it draws the same shape
+      // a real selection would, at roughly half the weight.
+      var soft = !selected && !hover && !!lit;
       var litSet = {};
       neighbours(lit).forEach(function (n) { litSet[n.id] = 1; });
       if (lit) litSet[lit.id] = 1;
@@ -1070,10 +1076,15 @@
           ctx.moveTo(s.sx, s.sy);
           ctx.lineTo(t.sx, t.sy);
         }
-        ctx.lineWidth = on ? 1.5 : (l.kind === 'project' ? 0.9 : l.kind === 'co' ? 0.6 : 0.7);
+        ctx.lineWidth = on ? (soft ? 0.8 : 1.5) : (l.kind === 'project' ? 0.9 : l.kind === 'co' ? 0.6 : 0.7);
         ctx.setLineDash(l.kind === 'co' && !on ? [3, 6] : []);
+        // The opening hint must not trace a hub: kept violet and near the
+        // ambient link level, it reads as one star glowing brighter, not as a
+        // diagram of what connects to what.
         ctx.strokeStyle = on
-          ? 'rgba(242,156,207,' + (0.7 + fade * 0.25).toFixed(3) + ')'
+          ? (soft
+            ? 'rgba(166,108,249,' + (0.15 + fade * 0.10).toFixed(3) + ')'
+            : 'rgba(242,156,207,' + (0.7 + fade * 0.25).toFixed(3) + ')')
           : (l.kind === 'co'
             ? 'rgba(89,139,216,' + (0.32 * fade * breathe).toFixed(3) + ')'
             : l.kind === 'project'
@@ -1126,12 +1137,12 @@
         var isLit = lit && n.id === lit.id;
         var isNear = litSet[n.id] && lit && n.id !== lit.id;
         var amp = reduced ? 0 : 1 + Math.sin(now * 0.0009 + n.phase) * 0.12;
-        var r = n.r * n.sk * cam.zoom * amp * (isLit ? 1.7 : 1);
+        var r = n.r * n.sk * cam.zoom * amp * (isLit ? (soft ? 1.35 : 1.7) : 1);
         var sp = sprite[n.kind] || sprite.post;
 
         if (sp && side > 0.5) {
-          var halo = r * (isLit ? 7.5 : n.kind === 'post' ? 4 : n.kind === 'fragment' ? 3.2 : 5.2);
-          ctx.globalAlpha = Math.min(1, fade * side * (isLit ? 0.92 : n.kind === 'post' ? 0.5 : 0.68));
+          var halo = r * (isLit ? (soft ? 5.6 : 7.5) : n.kind === 'post' ? 4 : n.kind === 'fragment' ? 3.2 : 5.2);
+          ctx.globalAlpha = Math.min(1, fade * side * (isLit ? (soft ? 0.6 : 0.92) : n.kind === 'post' ? 0.5 : 0.68));
           ctx.drawImage(sp, n.sx - halo / 2, n.sy - halo / 2, halo, halo);
         }
 
@@ -1443,7 +1454,7 @@
       };
     }
 
-    function h(tag, cls, text) {
+    function mk(tag, cls, text) {
       var e = document.createElement(tag);
       if (cls) e.className = cls;
       if (text !== undefined && text !== null) e.textContent = text;
@@ -1458,32 +1469,32 @@
       var d = info(node);
       panel.hidden = false;
       panel.innerHTML = '';
-      panel.appendChild(h('span', 'cx-panel-kind is-' + d.cls, d.kind));
-      panel.appendChild(h('h3', 'cx-panel-name', d.name));
+      panel.appendChild(mk('span', 'cx-panel-kind is-' + d.cls, d.kind));
+      panel.appendChild(mk('h3', 'cx-panel-name', d.name));
       // Show visual type label for topics
       if (d.vtype) {
-        var vtypeChip = h('span', 'cx-panel-vtype', d.vtype);
+        var vtypeChip = mk('span', 'cx-panel-vtype', d.vtype);
         panel.appendChild(vtypeChip);
       }
-      if (d.text) panel.appendChild(h('p', 'cx-panel-desc', d.text));
-      if (d.meta) panel.appendChild(h('p', 'cx-panel-meta', d.meta));
+      if (d.text) panel.appendChild(mk('p', 'cx-panel-desc', d.text));
+      if (d.meta) panel.appendChild(mk('p', 'cx-panel-meta', d.meta));
 
       if (d.items && d.items.length) {
-        var list = h('div', 'cx-panel-items');
+        var list = mk('div', 'cx-panel-items');
         d.items.forEach(function (it) {
-          var a = h('a', 'cx-item');
+          var a = mk('a', 'cx-item');
           a.href = it.href;
-          a.appendChild(h('span', 'cx-item-tag', it.tag));
-          a.appendChild(h('span', 'cx-item-label', it.label));
+          a.appendChild(mk('span', 'cx-item-tag', it.tag));
+          a.appendChild(mk('span', 'cx-item-label', it.label));
           list.appendChild(a);
         });
         panel.appendChild(list);
       }
 
       if (d.quote) {
-        var q = h('blockquote', 'cx-panel-quote', d.quote.text);
-        var cite = h('cite');
-        var from = h('a', null, '出自《' + d.quote.title + '》');
+        var q = mk('blockquote', 'cx-panel-quote', d.quote.text);
+        var cite = mk('cite');
+        var from = mk('a', null, '出自《' + d.quote.title + '》');
         from.href = d.quote.href;
         cite.appendChild(from);
         q.appendChild(cite);
@@ -1491,24 +1502,24 @@
       }
 
       if (d.timeline && d.timeline.length) {
-        panel.appendChild(h('p', 'cx-panel-sub', '时间线'));
-        var tl = h('ol', 'cx-timeline');
+        panel.appendChild(mk('p', 'cx-panel-sub', '时间线'));
+        var tl = mk('ol', 'cx-timeline');
         d.timeline.slice(0, 12).forEach(function (e) {
-          var li = h('li', 'cx-tl-item');
-          li.appendChild(h('time', 'cx-tl-date', e.date));
-          li.appendChild(h('span', 'cx-tl-kind', e.kind));
-          var what = h('a', 'cx-tl-what', e.what);
+          var li = mk('li', 'cx-tl-item');
+          li.appendChild(mk('time', 'cx-tl-date', e.date));
+          li.appendChild(mk('span', 'cx-tl-kind', e.kind));
+          var what = mk('a', 'cx-tl-what', e.what);
           what.href = e.href;
           li.appendChild(what);
           tl.appendChild(li);
         });
         if (d.timeline.length > 12) {
-          tl.appendChild(h('li', 'cx-tl-more', '还有 ' + (d.timeline.length - 12) + ' 条'));
+          tl.appendChild(mk('li', 'cx-tl-more', '还有 ' + (d.timeline.length - 12) + ' 条'));
         }
         panel.appendChild(tl);
       }
 
-      var go = h('a', 'cx-panel-go');
+      var go = mk('a', 'cx-panel-go');
       go.href = d.cta.href;
       go.innerHTML = '<span></span><i class="arrow">→</i>';
       go.firstChild.textContent = d.cta.label;
@@ -1516,7 +1527,7 @@
 
       // A doorway needs a way back out, and double-tap is not reliable on touch.
       if (entered && node.kind === 'topic') {
-        var out = h('button', 'cx-panel-exit', '退出主题');
+        var out = mk('button', 'cx-panel-exit', '退出主题');
         out.type = 'button';
         out.addEventListener('click', exit);
         panel.appendChild(out);
@@ -1561,18 +1572,30 @@
       }
     }
 
+    // Chosen from the data, not hardcoded: whichever real topic carries the
+    // most records is the one the field shows first.
+    function flagship() {
+      if (!graph) return null;
+      var best = null;
+      graph.nodes.forEach(function (n) {
+        if (n.kind !== 'topic') return;
+        if (!best || (n.count || 0) > (best.count || 0)) best = n;
+      });
+      return best;
+    }
+
     function showDefault() {
       if (!graph) return;
       var counts = { topic: 0, project: 0, post: 0, fragment: 0 };
       graph.nodes.forEach(function (n) { counts[n.kind]++; });
       panel.hidden = false;
       panel.innerHTML = '';
-      panel.appendChild(h('span', 'cx-panel-kind', 'Celestial Archive'));
-      panel.appendChild(h('h3', 'cx-panel-name',
+      panel.appendChild(mk('span', 'cx-panel-kind', 'Celestial Archive'));
+      panel.appendChild(mk('h3', 'cx-panel-name',
         counts.topic + ' 个主题 · ' + counts.project + ' 个项目 · ' + counts.post + ' 篇记录'));
-      panel.appendChild(h('p', 'cx-panel-meta', counts.fragment + ' 片碎片'));
+      panel.appendChild(mk('p', 'cx-panel-meta', counts.fragment + ' 片碎片'));
 
-      var go = h('a', 'cx-panel-go');
+      var go = mk('a', 'cx-panel-go');
       go.href = '/archives/';
       go.innerHTML = '<span>全部记录</span><i class="arrow">→</i>';
       panel.appendChild(go);
@@ -1863,6 +1886,16 @@
     });
     if (home) home.addEventListener('click', reset);
 
+    /* The opening emphasis is only an invitation: the moment the visitor takes
+       over, anywhere inside the field, it steps out of the way. */
+    ['pointerdown', 'pointermove', 'keydown', 'wheel'].forEach(function (evt) {
+      root.addEventListener(evt, function () {
+        if (!idle) return;
+        idle = null;
+        drawIfStatic();
+      }, true);
+    });
+
     function renderFallback() {
       if (!fallback) return;
       fallback.innerHTML = '';
@@ -1908,6 +1941,7 @@
         byId = {};
         graph.nodes.forEach(function (n) { byId[n.id] = n; });
         renderFallback();
+        idle = flagship();
         showDefault();
         syncSpin();
         start();

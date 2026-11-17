@@ -52,6 +52,15 @@
     radial-gradient(42% 44% at 78% 56%, rgba(242, 156, 207, 0.09), transparent 74%);
 }
 
+/* The star field had no air of its own, which is what made it read as one flat
+   violet backdrop: blue holds the distance, pink the mood, violet the body. */
+#constellation-section::before {
+  background:
+    radial-gradient(44% 42% at 16% 28%, rgba(89, 139, 216, 0.11), transparent 76%),
+    radial-gradient(38% 36% at 84% 66%, rgba(242, 156, 207, 0.10), transparent 74%),
+    radial-gradient(58% 50% at 50% 50%, rgba(143, 89, 247, 0.10), transparent 78%);
+}
+
 #stories::before {
   background: radial-gradient(50% 38% at 68% 30%, rgba(166, 108, 249, 0.09), transparent 72%);
 }
@@ -169,6 +178,165 @@
   to   { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
+/* The one body with mass on this page: a ringed gas giant hanging off the
+   right edge, cropped by the viewport like a film frame. Pure gradients — no
+   asset, no blur filter, crisp at any zoom. Its night half faces the wordmark,
+   so the type never has to compete with it for contrast. */
+.hero-planet {
+  --psize: clamp(300px, 42vw, 720px);
+  position: absolute;
+  top: 55%;
+  right: clamp(-260px, -11vw, -56px);
+  width: var(--psize);
+  aspect-ratio: 1;
+  transform: translateY(-50%);
+  z-index: -2;
+  pointer-events: none;
+}
+
+.planet-halo {
+  position: absolute;
+  inset: -17%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side,
+    rgba(166, 108, 249, 0.20),
+    rgba(89, 139, 216, 0.09) 48%,
+    transparent 76%);
+  animation: planetBreathe 38s ease-in-out infinite;
+}
+
+@keyframes planetBreathe {
+  0%, 100% { opacity: 0.72; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.04); }
+}
+
+/* One elliptical band painted twice: the whole ring behind the planet, then
+   only its near half in front. clip-path runs in the element's own box, so the
+   split survives the tilt. */
+.planet-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 184%;
+  height: 63%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) rotate(-16deg);
+  background: radial-gradient(closest-side,
+    transparent 0 52%,
+    rgba(166, 108, 249, 0.10) 52% 56%,
+    rgba(214, 170, 255, 0.26) 56% 66%,
+    rgba(245, 240, 255, 0.30) 66% 70%,
+    transparent 70% 73%,
+    rgba(232, 177, 236, 0.20) 73% 84%,
+    rgba(245, 240, 255, 0.10) 84% 86%,
+    transparent 86% 88%,
+    rgba(144, 188, 235, 0.16) 88% 94%,
+    transparent 94%);
+}
+
+.planet-ring--front {
+  clip-path: inset(46% 0 0 0);
+  animation: ringLight 26s ease-in-out infinite;
+}
+
+@keyframes ringLight {
+  0%, 100% { opacity: 0.8; }
+  50%      { opacity: 1; }
+}
+
+.planet-body {
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  overflow: hidden;
+  background: radial-gradient(122% 118% at 70% 28%,
+    rgba(238, 222, 255, 0.66) 0%,
+    rgba(190, 138, 252, 0.60) 20%,
+    rgba(140, 84, 220, 0.58) 40%,
+    rgba(84, 46, 150, 0.62) 60%,
+    rgba(44, 26, 96, 0.74) 80%,
+    #1d1240 100%);
+}
+
+.planet-storm {
+  position: absolute;
+  border-radius: 50%;
+}
+
+/* The planet is cropped by the viewport, so only its left side is ever seen:
+   that is where the pink and blue belts have to sit, not under the light. */
+.planet-storm--pink {
+  width: 68%;
+  height: 44%;
+  left: 14%;
+  top: 46%;
+  background: radial-gradient(closest-side,
+    rgba(242, 156, 207, 0.40),
+    rgba(232, 177, 236, 0.13) 56%,
+    transparent 78%);
+  animation: stormPink 46s ease-in-out infinite alternate;
+}
+
+.planet-storm--blue {
+  width: 60%;
+  height: 40%;
+  left: 6%;
+  top: 12%;
+  background: radial-gradient(closest-side,
+    rgba(144, 188, 235, 0.34),
+    rgba(89, 139, 216, 0.14) 58%,
+    transparent 80%);
+  animation: stormBlue 62s ease-in-out infinite alternate;
+}
+
+@keyframes stormPink {
+  from { transform: translate3d(-8%, 5%, 0) scale(1); }
+  to   { transform: translate3d(7%, -6%, 0) scale(1.12); }
+}
+
+@keyframes stormBlue {
+  from { transform: translate3d(6%, -4%, 0) scale(1.06); }
+  to   { transform: translate3d(-8%, 6%, 0) scale(0.94); }
+}
+
+/* Cloud belts slide exactly one pattern width per loop so the seam is invisible.
+   The element carries the tilt; the keyframes only translate along its own axis. */
+.planet-bands {
+  position: absolute;
+  inset: -22%;
+  transform: rotate(-7deg);
+  background: repeating-linear-gradient(0deg,
+    rgba(245, 240, 255, 0.055) 0 14px,
+    rgba(143, 89, 247, 0.030) 14px 30px,
+    rgba(11, 19, 51, 0.070) 30px 52px,
+    rgba(232, 177, 236, 0.035) 52px 74px);
+  animation: beltDrift 74s linear infinite;
+}
+
+@keyframes beltDrift {
+  from { transform: rotate(-7deg) translate3d(0, 0, 0); }
+  to   { transform: rotate(-7deg) translate3d(-74px, 0, 0); }
+}
+
+/* specular → limb darkening → the cold blue of the shadow side → the night
+   half that sits behind the copy. Blue belongs to the dark, not the light. */
+.planet-shade {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(62% 58% at 76% 22%, rgba(245, 240, 255, 0.14), transparent 60%),
+    radial-gradient(closest-side at 68% 32%,
+      transparent 62%,
+      rgba(10, 8, 24, 0.18) 84%,
+      rgba(8, 6, 20, 0.46) 98%),
+    radial-gradient(58% 52% at 24% 76%, rgba(89, 139, 216, 0.26), transparent 66%),
+    linear-gradient(94deg,
+      rgba(12, 10, 30, 0.62) 0%,
+      rgba(13, 11, 34, 0.34) 26%,
+      rgba(12, 9, 30, 0.10) 46%,
+      transparent 62%);
+}
+
 .hero-frame {
   position: absolute;
   inset: clamp(66px, 11vh, 104px) clamp(14px, 3.4vw, 46px) clamp(24px, 5vh, 46px);
@@ -279,13 +447,15 @@
   margin-top: clamp(6px, 1.4vh, 14px);
 }
 
-/* The data strip is what makes the first screen a terminal, not a poster. */
+/* The data strip is what makes the first screen a terminal, not a poster.
+   The plate keeps the ring from running straight through the numbers. */
 .hero-data {
   margin: clamp(20px, 4vh, 40px) 0 0;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   border-top: 1px solid var(--hair);
   border-bottom: 1px solid var(--hair);
+  background: rgba(8, 6, 18, 0.46);
 }
 
 .hd-cell {
@@ -1801,6 +1971,12 @@
 
   .hero-word { letter-spacing: 0.18em; padding-left: 0.18em; }
   .hero-rings { opacity: 0.4; }
+  .hero-planet {
+    --psize: clamp(230px, 74vw, 420px);
+    top: 27%;
+    right: clamp(-170px, -24vw, -40px);
+    opacity: 0.86;
+  }
   .hero-frame { inset: clamp(58px, 9vh, 80px) 14px 18px; }
   .hero-data { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hd-cell:nth-child(3) { border-left: none; }
@@ -1820,6 +1996,11 @@
 @media (prefers-reduced-motion: reduce) {
   .hero-word .glyph { animation: none; opacity: 1; transform: none; }
   .hero-rings { animation: none; }
+  .planet-halo,
+  .planet-ring--front,
+  .planet-bands,
+  .planet-storm--pink,
+  .planet-storm--blue { animation: none; }
   .club-ring { animation: none; }
   .bg-veil { animation: none; }
   .frag,

@@ -6,49 +6,62 @@
 
 /* ---------- 1. Design tokens ---------- */
 :root {
-  /* Brand palette — violet carries identity, pink carries mood,
-     indigo only ever appears far back, never on a button. */
-  --void-black: #07050D;
-  --deep-violet: #180D30;
-  --royal-purple: #6738CE;
-  --nebula-violet: #9D70FF;
-  --starlight: #D6AAFF;
-  --dream-pink: #F2A8EC;
-  --moon-white: #F4EEFF;
-  --card-surface: #242035;
+  /* Violet Nebula — colour is placed by distance, not mixed evenly.
+     Violet holds identity (near field), blue is how far things look (deep
+     space, security themes), pink is mood and dust (Observe, Fragments,
+     haze edges), star-white only ever marks the hottest point. */
+  --void-black: #080612;
+  --deep-violet: #201047;
+  --royal-purple: #8F59F7;
+  --nebula-violet: #A66CF9;
+  --starlight: #D9B3FF;
+  --dream-pink: #F29CCF;
+  --moon-white: #F5F0FF;
+  --card-surface: #221B38;
+
+  /* Second and third voice — deliberately stronger than they used to be */
+  --moon-pink: #E8B1EC;
+  --galaxy-blue: #598BD8;
+  --ice-blue: #90BCEB;
+  --silver-violet: #A5A4C3;
 
   /* Depth palette — the distance in the field, not decoration */
-  --indigo-void: #0B1130;   /* far space */
-  --indigo-haze: #2B3A72;   /* galactic band, low alpha only */
-  --far-blue: #7C9BD6;      /* the coldest starlight at the rim */
-  --mist-pink: #E7B6E2;     /* softer than dream-pink, for haze edges */
+  --indigo-void: #0B1333;    /* far space */
+  --indigo-haze: #33488A;    /* galactic band, low alpha only */
+  --far-blue: #7FA6E8;       /* the coldest starlight at the rim */
+  --mist-pink: #E8B1EC;      /* softer than dream-pink, for haze edges */
+
+  /* Rarity — champagne appears only as a tiny mark on a key project or a
+     dated archive entry. Never a fill, never a button. */
+  --archive-gold: #E6CFA6;
 
   /* Legacy aliases — kept so old markup and new code share one scale */
   --bg-0: var(--void-black);
-  --bg-1: #100B1C;
+  --bg-1: #14092B;
   --bg-2: var(--card-surface);
   --p-0: var(--royal-purple);
   --p-1: var(--nebula-violet);
   --p-2: var(--starlight);
   --t-0: var(--moon-white);
-  --t-1: #C9C2DE;
-  --t-2: #8B84A8;
+  --t-1: #CFC9E4;
+  --t-2: var(--silver-violet);
 
   /* Text roles */
   --ink: var(--moon-white);
-  --ink-soft: #C9C2DE;
-  --ink-mute: #8B84A8;
+  --ink-soft: #CFC9E4;
+  --ink-mute: var(--silver-violet);
 
-  /* Lines and surfaces */
-  --hair: rgba(157, 112, 255, 0.18);
-  --hair-strong: rgba(214, 170, 255, 0.42);
-  --surface: rgba(36, 32, 53, 0.55);
-  --surface-solid: #140F22;
-  --veil: rgba(12, 8, 22, 0.72);
+  /* Lines and surfaces — silver-violet hairlines, cold where it is far */
+  --hair: rgba(165, 164, 195, 0.20);
+  --hair-strong: rgba(217, 179, 255, 0.45);
+  --surface: rgba(34, 27, 56, 0.55);
+  --surface-solid: #150F26;
+  --veil: rgba(11, 7, 24, 0.72);
 
   /* Glows */
-  --glow-violet: 0 0 24px rgba(157, 112, 255, 0.35);
-  --glow-pink: 0 0 24px rgba(242, 168, 236, 0.28);
+  --glow-violet: 0 0 24px rgba(166, 108, 249, 0.38);
+  --glow-pink: 0 0 24px rgba(242, 156, 207, 0.30);
+  --glow-blue: 0 0 26px rgba(89, 139, 216, 0.32);
 
   /* Motion */
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -189,11 +202,15 @@ a:hover { color: var(--starlight); }
   inset: 0;
   z-index: -3;
   pointer-events: none;
-  /* L1 / deep space: near-black with a cold rim, never flat black */
+  /* L1 / deep space: near-black with a cold rim, never flat black.
+     Violet stays the body colour; blue owns the far corner, pink the near one,
+     so the depth reads as a place rather than one flat tint. */
   background:
-    radial-gradient(120% 88% at 80% -12%, rgba(103, 56, 206, 0.17), transparent 56%),
-    radial-gradient(105% 82% at 6% 110%, rgba(11, 17, 48, 0.9), transparent 62%),
-    linear-gradient(180deg, #07050D 0%, #0A0714 40%, #0A0A1C 68%, #07050D 100%);
+    radial-gradient(120% 88% at 80% -12%, rgba(143, 89, 247, 0.17), transparent 56%),
+    radial-gradient(78% 64% at 8% 4%, rgba(89, 139, 216, 0.14), transparent 60%),
+    radial-gradient(70% 58% at 94% 96%, rgba(242, 156, 207, 0.10), transparent 62%),
+    radial-gradient(105% 82% at 6% 110%, rgba(11, 19, 51, 0.9), transparent 62%),
+    linear-gradient(180deg, #080612 0%, #0B0718 40%, #0A0C22 68%, #080612 100%);
 }
 
 /* L2 / one wide galactic plane running diagonally across the viewport */
@@ -206,12 +223,14 @@ a:hover { color: var(--starlight); }
   height: 124%;
   background:
     linear-gradient(101deg,
-      transparent 10%,
-      rgba(124, 155, 214, 0.05) 26%,
-      rgba(214, 170, 255, 0.075) 42%,
-      rgba(231, 182, 226, 0.045) 58%,
-      transparent 78%),
-    radial-gradient(56% 20% at 44% 46%, rgba(43, 58, 114, 0.34), transparent 72%);
+      transparent 8%,
+      rgba(127, 166, 232, 0.085) 24%,
+      rgba(166, 108, 249, 0.10) 40%,
+      rgba(232, 177, 236, 0.075) 56%,
+      rgba(89, 139, 216, 0.055) 68%,
+      transparent 80%),
+    radial-gradient(48% 17% at 41% 45%, rgba(51, 72, 138, 0.44), transparent 74%),
+    radial-gradient(30% 13% at 63% 52%, rgba(242, 156, 207, 0.13), transparent 72%);
   transform: rotate(-9deg);
   animation: bandDrift 110s ease-in-out infinite alternate;
   will-change: transform, opacity;
@@ -403,7 +422,7 @@ a:hover { color: var(--starlight); }
   letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--moon-white);
-  background: rgba(103, 56, 206, 0.22);
+  background: rgba(143, 89, 247, 0.22);
   border: 1px solid var(--hair-strong);
   clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
   transition: background var(--t) var(--ease), transform var(--t) var(--ease), box-shadow var(--t) var(--ease);
@@ -413,7 +432,7 @@ a:hover { color: var(--starlight); }
   background: var(--royal-purple);
   color: var(--moon-white);
   transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(103, 56, 206, 0.35);
+  box-shadow: 0 10px 30px rgba(143, 89, 247, 0.35);
 }
 
 .btn--ghost {
@@ -422,7 +441,7 @@ a:hover { color: var(--starlight); }
   color: var(--ink-soft);
 }
 
-.btn--ghost:hover { background: rgba(157, 112, 255, 0.14); box-shadow: none; }
+.btn--ghost:hover { background: rgba(166, 108, 249, 0.14); box-shadow: none; }
 
 .btn .arrow { font-style: normal; color: var(--starlight); transition: transform var(--t) var(--ease); }
 .btn:hover .arrow { transform: translateX(5px); }
@@ -451,7 +470,7 @@ button.chip { cursor: pointer; }
 .chip.is-active {
   color: var(--moon-white);
   border-color: var(--nebula-violet);
-  background: rgba(103, 56, 206, 0.34);
+  background: rgba(143, 89, 247, 0.34);
 }
 
 .chip .count { color: var(--nebula-violet); }
@@ -483,7 +502,7 @@ button.chip { cursor: pointer; }
 }
 
 .entry:hover {
-  background: linear-gradient(90deg, rgba(103, 56, 206, 0.16), transparent 72%);
+  background: linear-gradient(90deg, rgba(143, 89, 247, 0.16), transparent 72%);
   padding-left: 14px;
 }
 
@@ -616,7 +635,7 @@ body.has-rail .post-foot { grid-column: 1 / -1; grid-row: 2; }
   transform: scaleX(0);
   transform-origin: 0 50%;
   background: linear-gradient(90deg, var(--royal-purple), var(--nebula-violet) 55%, var(--dream-pink));
-  box-shadow: 0 0 12px rgba(157, 112, 255, 0.7);
+  box-shadow: 0 0 12px rgba(166, 108, 249, 0.7);
   pointer-events: none;
 }
 
@@ -805,8 +824,8 @@ body.has-rail .post-foot { grid-column: 1 / -1; grid-row: 2; }
 .tok-key { color: var(--dream-pink); }
 .tok-str { color: #A8E6C9; }
 .tok-num { color: var(--starlight); }
-.tok-com { color: #6F6788; font-style: italic; }
-.tok-fn  { color: #9DCBFF; }
+.tok-com { color: #8E88AD; font-style: italic; }
+.tok-fn  { color: #90BCEB; }
 
 .code-bar {
   position: absolute;
@@ -832,7 +851,7 @@ body.has-rail .post-foot { grid-column: 1 / -1; grid-row: 2; }
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--ink-mute);
-  background: rgba(36, 32, 53, 0.7);
+  background: rgba(34, 27, 56, 0.7);
   border: 1px solid var(--hair);
   cursor: pointer;
   transition: color var(--t) var(--ease), border-color var(--t) var(--ease);
@@ -903,7 +922,7 @@ body.has-rail .post-foot { grid-column: 1 / -1; grid-row: 2; }
   background: rgba(24, 13, 48, 0.5);
 }
 
-.post-body tr:hover td { background: rgba(103, 56, 206, 0.08); }
+.post-body tr:hover td { background: rgba(143, 89, 247, 0.08); }
 
 /* Callout (script.js turns marked blockquotes into these) */
 .callout {
@@ -933,7 +952,7 @@ body.has-rail .post-foot { grid-column: 1 / -1; grid-row: 2; }
   margin: 26px 0;
   padding: 16px 18px;
   border: 1px solid var(--hair);
-  background: rgba(36, 32, 53, 0.4);
+  background: rgba(34, 27, 56, 0.4);
   transition: border-color var(--t) var(--ease), transform var(--t) var(--ease);
 }
 
@@ -1087,7 +1106,7 @@ body.variant-observe .post-body pre { font-family: var(--font-mono); }
   max-width: 100%;
   max-height: 88vh;
   border: 1px solid var(--hair-strong);
-  box-shadow: 0 0 60px rgba(103, 56, 206, 0.4);
+  box-shadow: 0 0 60px rgba(143, 89, 247, 0.4);
 }
 
 .lightbox-close {
