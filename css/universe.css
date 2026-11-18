@@ -178,163 +178,180 @@
   to   { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-/* The one body with mass on this page: a ringed gas giant hanging off the
-   right edge, cropped by the viewport like a film frame. Pure gradients — no
-   asset, no blur filter, crisp at any zoom. Its night half faces the wordmark,
-   so the type never has to compete with it for contrast. */
-.hero-planet {
-  --psize: clamp(300px, 42vw, 720px);
+/* Not a poster planet. The frame crops something enormous: only the limb of a
+   gas giant survives inside the hero — its edge, its atmosphere, its turning
+   cloud belts. The body therefore reads as a place the page is floating above
+   instead of an object placed on it. Pure gradients, no asset, no blur filter,
+   crisp at any zoom. */
+.hero-limb {
+  --lsize: clamp(1000px, 165vw, 2450px);
   position: absolute;
-  top: 55%;
-  right: clamp(-260px, -11vw, -56px);
-  width: var(--psize);
-  aspect-ratio: 1;
-  transform: translateY(-50%);
+  width: var(--lsize);
+  height: var(--lsize);
+  right: calc(var(--lsize) * -0.75);
+  bottom: calc(var(--lsize) * -0.80);
   z-index: -2;
   pointer-events: none;
 }
 
-.planet-halo {
+/* Only the outer skin of this thing is lit. At 1440x900 the visible cap spans
+   70%-100% of the disc radius, so the tonal range has to live in that last
+   third: dark gas almost to the edge, then one thin blaze of atmosphere. */
+.limb-body {
   position: absolute;
-  inset: -17%;
-  border-radius: 50%;
-  background: radial-gradient(closest-side,
-    rgba(166, 108, 249, 0.20),
-    rgba(89, 139, 216, 0.09) 48%,
-    transparent 76%);
-  animation: planetBreathe 38s ease-in-out infinite;
-}
-
-@keyframes planetBreathe {
-  0%, 100% { opacity: 0.72; transform: scale(1); }
-  50%      { opacity: 1; transform: scale(1.04); }
-}
-
-/* One elliptical band painted twice: the whole ring behind the planet, then
-   only its near half in front. clip-path runs in the element's own box, so the
-   split survives the tilt. */
-.planet-ring {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 184%;
-  height: 63%;
-  border-radius: 50%;
-  transform: translate(-50%, -50%) rotate(-16deg);
-  background: radial-gradient(closest-side,
-    transparent 0 52%,
-    rgba(166, 108, 249, 0.10) 52% 56%,
-    rgba(214, 170, 255, 0.26) 56% 66%,
-    rgba(245, 240, 255, 0.30) 66% 70%,
-    transparent 70% 73%,
-    rgba(232, 177, 236, 0.20) 73% 84%,
-    rgba(245, 240, 255, 0.10) 84% 86%,
-    transparent 86% 88%,
-    rgba(144, 188, 235, 0.16) 88% 94%,
-    transparent 94%);
-}
-
-.planet-ring--front {
-  clip-path: inset(46% 0 0 0);
-  animation: ringLight 26s ease-in-out infinite;
-}
-
-@keyframes ringLight {
-  0%, 100% { opacity: 0.8; }
-  50%      { opacity: 1; }
-}
-
-.planet-body {
-  position: absolute;
-  inset: 12%;
+  inset: 0;
   border-radius: 50%;
   overflow: hidden;
-  background: radial-gradient(122% 118% at 70% 28%,
-    rgba(238, 222, 255, 0.66) 0%,
-    rgba(190, 138, 252, 0.60) 20%,
-    rgba(140, 84, 220, 0.58) 40%,
-    rgba(84, 46, 150, 0.62) 60%,
-    rgba(44, 26, 96, 0.74) 80%,
-    #1d1240 100%);
+  background: radial-gradient(closest-side,
+    #080412 0%,
+    #0a0618 44%,
+    #0c071e 62%,
+    #0e0822 70%,
+    #170e35 80%,
+    #2a1856 88%,
+    #4a2c86 94%,
+    #7d55b4 97.5%,
+    #c3a3ea 99.3%,
+    #efe0ff 100%);
 }
 
-.planet-storm {
+/* Atmospheric shells, concentric with the limb itself. Belts centred on any
+   other point cross the edge at an angle and read as stripes painted on the
+   hero instead of layers of this body. Stops are placed by hand because only
+   70%-100% of the radius is ever on screen. */
+.limb-bands {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(closest-side,
+    transparent 0 66%,
+    rgba(9, 6, 20, 0.30) 71% 74%,
+    rgba(238, 220, 255, 0.05) 76.5% 78.5%,
+    rgba(11, 19, 51, 0.26) 81% 85%,
+    rgba(232, 177, 236, 0.055) 87% 88.5%,
+    rgba(8, 6, 18, 0.30) 91% 93.5%,
+    rgba(217, 179, 255, 0.06) 95% 96.2%,
+    rgba(6, 4, 14, 0.34) 97.6% 98.5%,
+    transparent 99.4%);
+  animation: shellDrift 88s ease-in-out infinite alternate;
+}
+
+/* The shells swell and settle: the same radius breathing outward, as slow as
+   the thing looks. */
+@keyframes shellDrift {
+  from { transform: scale(1); }
+  to   { transform: scale(1.016); }
+}
+
+/* The storm field: a shear of brightness that turns once every four minutes.
+   This is what makes the body a rotating object rather than a gradient disc. */
+.limb-swirl {
+  position: absolute;
+  inset: -4%;
+  border-radius: 50%;
+  background: conic-gradient(from 210deg,
+    rgba(255, 248, 255, 0.10) 0deg 22deg,
+    rgba(89, 139, 216, 0.085) 61deg,
+    rgba(11, 8, 26, 0.16) 118deg 172deg,
+    rgba(232, 177, 236, 0.085) 214deg,
+    rgba(255, 248, 255, 0.065) 256deg,
+    rgba(11, 8, 26, 0.14) 302deg 340deg,
+    rgba(255, 248, 255, 0.10) 360deg);
+  animation: limbTurn 236s linear infinite;
+}
+
+@keyframes limbTurn {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Two belts riding the visible arc. The cap faces up-left, so its tangent runs
+   at -45deg: anything less parallel reads as a stripe painted across the body
+   instead of weather inside it. */
+.limb-storm {
   position: absolute;
   border-radius: 50%;
 }
 
-/* The planet is cropped by the viewport, so only its left side is ever seen:
-   that is where the pink and blue belts have to sit, not under the light. */
-.planet-storm--pink {
-  width: 68%;
-  height: 44%;
-  left: 14%;
-  top: 46%;
+.limb-storm--pink {
+  width: 40%;
+  height: 21%;
+  left: 0%;
+  top: 9.5%;
+  transform: rotate(-46deg);
   background: radial-gradient(closest-side,
-    rgba(242, 156, 207, 0.40),
-    rgba(232, 177, 236, 0.13) 56%,
-    transparent 78%);
-  animation: stormPink 46s ease-in-out infinite alternate;
+    rgba(242, 156, 207, 0.30),
+    rgba(232, 177, 236, 0.10) 58%,
+    transparent 80%);
+  animation: stormPink 58s ease-in-out infinite alternate;
 }
 
-.planet-storm--blue {
-  width: 60%;
-  height: 40%;
-  left: 6%;
-  top: 12%;
+.limb-storm--blue {
+  width: 34%;
+  height: 18%;
+  left: 9%;
+  top: 7%;
+  transform: rotate(-44deg);
   background: radial-gradient(closest-side,
-    rgba(144, 188, 235, 0.34),
-    rgba(89, 139, 216, 0.14) 58%,
-    transparent 80%);
-  animation: stormBlue 62s ease-in-out infinite alternate;
+    rgba(144, 188, 235, 0.26),
+    rgba(89, 139, 216, 0.10) 60%,
+    transparent 82%);
+  animation: stormBlue 74s ease-in-out infinite alternate;
 }
 
 @keyframes stormPink {
-  from { transform: translate3d(-8%, 5%, 0) scale(1); }
-  to   { transform: translate3d(7%, -6%, 0) scale(1.12); }
+  from { transform: rotate(-46deg) translate3d(-3%, -4%, 0) scale(1); }
+  to   { transform: rotate(-46deg) translate3d(4%, 5%, 0) scale(1.08); }
 }
 
 @keyframes stormBlue {
-  from { transform: translate3d(6%, -4%, 0) scale(1.06); }
-  to   { transform: translate3d(-8%, 6%, 0) scale(0.94); }
+  from { transform: rotate(-44deg) translate3d(4%, 3%, 0) scale(1.05); }
+  to   { transform: rotate(-44deg) translate3d(-5%, -4%, 0) scale(0.94); }
 }
 
-/* Cloud belts slide exactly one pattern width per loop so the seam is invisible.
-   The element carries the tilt; the keyframes only translate along its own axis. */
-.planet-bands {
-  position: absolute;
-  inset: -22%;
-  transform: rotate(-7deg);
-  background: repeating-linear-gradient(0deg,
-    rgba(245, 240, 255, 0.055) 0 14px,
-    rgba(143, 89, 247, 0.030) 14px 30px,
-    rgba(11, 19, 51, 0.070) 30px 52px,
-    rgba(232, 177, 236, 0.035) 52px 74px);
-  animation: beltDrift 74s linear infinite;
-}
-
-@keyframes beltDrift {
-  from { transform: rotate(-7deg) translate3d(0, 0, 0); }
-  to   { transform: rotate(-7deg) translate3d(-74px, 0, 0); }
-}
-
-/* specular → limb darkening → the cold blue of the shadow side → the night
-   half that sits behind the copy. Blue belongs to the dark, not the light. */
-.planet-shade {
+/* The terminator line itself — the brightest thing in the hero, and the only
+   hard edge. It sits exactly on the clip circle, so it always traces the limb. */
+.limb-rim {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(62% 58% at 76% 22%, rgba(245, 240, 255, 0.14), transparent 60%),
-    radial-gradient(closest-side at 68% 32%,
-      transparent 62%,
-      rgba(10, 8, 24, 0.18) 84%,
-      rgba(8, 6, 20, 0.46) 98%),
-    radial-gradient(58% 52% at 24% 76%, rgba(89, 139, 216, 0.26), transparent 66%),
-    linear-gradient(94deg,
-      rgba(12, 10, 30, 0.62) 0%,
-      rgba(13, 11, 34, 0.34) 26%,
-      rgba(12, 9, 30, 0.10) 46%,
-      transparent 62%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side,
+    transparent 0 93%,
+    rgba(238, 220, 255, 0.08) 96.5%,
+    rgba(250, 244, 255, 0.30) 99.4%,
+    rgba(214, 170, 255, 0.15) 100%);
+  animation: limbRim 27s ease-in-out infinite;
+}
+
+@keyframes limbRim {
+  0%, 100% { opacity: 0.78; }
+  50%      { opacity: 1; }
+}
+
+/* Air the size of the disc, plus three shells that keep going past it. The
+   gaps are hard-edged so they read as separate lanes rather than one haze.
+   With the box 132% wide, the body radius lands on 75.8% of the gradient. */
+.limb-haze {
+  position: absolute;
+  inset: -16%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side,
+    transparent 0 54%,
+    rgba(166, 108, 249, 0.035) 63%,
+    rgba(190, 138, 252, 0.06) 71%,
+    rgba(226, 190, 255, 0.105) 75.6%,
+    transparent 76.4% 78%,
+    rgba(217, 179, 255, 0.075) 79.4%,
+    transparent 81% 84%,
+    rgba(144, 188, 235, 0.06) 86%,
+    transparent 89% 92.5%,
+    rgba(232, 177, 236, 0.048) 95%,
+    transparent 99%);
+  animation: limbBreathe 39s ease-in-out infinite;
+}
+
+@keyframes limbBreathe {
+  0%, 100% { opacity: 0.66; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.012); }
 }
 
 .hero-frame {
@@ -394,7 +411,11 @@
   transform: rotate(45deg);
 }
 
+/* The opening word is the doorway: the brightest thing on the page and the only
+   one with a light of its own behind it. The footer's TANCE is a stamp; this one
+   is where you enter. */
 .hero-word {
+  position: relative;
   font-weight: 200;
   font-size: clamp(58px, 14.5vw, 188px);
   letter-spacing: 0.3em;
@@ -402,14 +423,35 @@
   line-height: 0.95;
   color: var(--ink);
   /* one text-shadow instead of a drop-shadow filter: same read, no extra layer */
-  text-shadow: 0 0 46px rgba(166, 108, 249, 0.38);
+  text-shadow: 0 0 30px rgba(232, 214, 255, 0.22), 0 0 78px rgba(166, 108, 249, 0.44);
+}
+
+.hero-word::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 128%;
+  height: 300%;
+  translate: -50% -50%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(42% 34% at 50% 50%, rgba(166, 108, 249, 0.3), transparent 72%),
+    radial-gradient(24% 18% at 50% 50%, rgba(245, 240, 255, 0.14), transparent 78%);
+  animation: wordHalo 17s ease-in-out infinite;
+}
+
+@keyframes wordHalo {
+  0%, 100% { opacity: 0.66; scale: 1 1; }
+  50%      { opacity: 1; scale: 1.05 1.12; }
 }
 
 /* The gradient has to live on each glyph: background-clip:text on the parent
    does not paint text that lives inside child elements. */
 .hero-word .glyph {
   display: inline-block;
-  background: linear-gradient(174deg, #FFFFFF 0%, var(--starlight) 54%, var(--nebula-violet) 88%, var(--far-blue) 100%);
+  background: linear-gradient(174deg, #FFFFFF 0%, #FFFDFE 24%, var(--starlight) 52%, var(--nebula-violet) 86%, var(--far-blue) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -660,40 +702,166 @@
 }
 
 /* ---------- 04 STAR FIELD (3D) ---------- */
+/* The region, not the panel. A dark rectangle with dots and lines in it reads
+   as a chart; a chart has nowhere to be. So the archive gets a plane of its
+   own: a galactic band with a bulge, nebulae the light passes through, three
+   gravity curves it drifts along, a dust lane and a floor that falls away at
+   the edges. None of it is data, so none of it may compete with data — every
+   alpha here stays below the dimmest node in the field. */
 .constellation {
   position: relative;
   border: 1px solid var(--hair);
   background:
-    radial-gradient(ellipse 74% 62% at 50% 42%, rgba(24, 13, 48, 0.92), transparent 72%),
-    linear-gradient(160deg, rgba(11, 19, 51, 0.55), transparent 46%),
-    #090712;
+    radial-gradient(ellipse 58% 68% at 50% 46%, rgba(40, 19, 82, 0.8), transparent 70%),
+    radial-gradient(ellipse 128% 74% at 50% 128%, rgba(11, 19, 51, 0.86), transparent 60%),
+    linear-gradient(168deg, rgba(11, 19, 51, 0.6) 0%, rgba(9, 7, 18, 0.15) 40%, rgba(31, 13, 64, 0.55) 100%),
+    #080611;
   overflow: hidden;
   isolation: isolate;
 }
 
-/* the galactic plane running behind the field, same language as the site bg */
+/* the galactic plane, seen almost edge-on: one long lens with a bright core */
 .constellation::before {
   content: "";
   position: absolute;
-  left: -20%;
-  top: 8%;
-  width: 140%;
-  height: 84%;
+  left: -26%;
+  top: -8%;
+  width: 152%;
+  height: 116%;
   z-index: 0;
   pointer-events: none;
   background:
-    linear-gradient(96deg,
-      transparent 14%,
-      rgba(127, 166, 232, 0.07) 34%,
-      rgba(232, 177, 236, 0.06) 52%,
-      transparent 76%);
-  transform: rotate(-5deg);
+    radial-gradient(ellipse 34% 9% at 54% 46%, rgba(245, 240, 255, 0.11), transparent 72%),
+    radial-gradient(ellipse 62% 17% at 50% 48%, rgba(186, 158, 255, 0.09), transparent 74%),
+    linear-gradient(99deg,
+      transparent 8%,
+      rgba(89, 139, 216, 0.05) 22%,
+      rgba(186, 158, 255, 0.085) 38%,
+      rgba(245, 240, 255, 0.085) 48%,
+      rgba(232, 177, 236, 0.07) 58%,
+      rgba(127, 166, 232, 0.045) 74%,
+      transparent 90%);
+  transform: rotate(-7deg);
+  animation: planeDrift 96s ease-in-out infinite alternate;
+}
+
+@keyframes planeDrift {
+  from { transform: rotate(-7deg) scale(1); opacity: 0.82; }
+  to   { transform: rotate(-5deg) scale(1.055); opacity: 1; }
+}
+
+/* depth: the volume has a floor and the frame falls away from the field */
+.constellation::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 44% 52% at 50% 44%, rgba(143, 89, 247, 0.07), transparent 68%),
+    radial-gradient(ellipse 76% 70% at 50% 46%, transparent 38%, rgba(6, 4, 15, 0.46) 82%, rgba(5, 3, 12, 0.78) 100%);
 }
 
 .cx-canvas-wrap {
   position: relative;
   z-index: 1;
   height: clamp(520px, 74vh, 820px);
+}
+
+/* the air between the camera and the field. Elongated along the plane on
+   purpose: four round blooms read as fog on a lens, flattened ones read as
+   nebulae the field sits behind. */
+.cx-veil {
+  position: absolute;
+  inset: -12% -8%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(46% 13% at 26% 34%, rgba(143, 89, 247, 0.15), rgba(89, 139, 216, 0.045) 58%, transparent 78%),
+    radial-gradient(32% 10% at 75% 62%, rgba(242, 156, 207, 0.115), transparent 76%),
+    radial-gradient(24% 8% at 58% 21%, rgba(89, 139, 216, 0.125), transparent 74%),
+    radial-gradient(18% 7% at 39% 74%, rgba(214, 170, 255, 0.10), transparent 76%);
+  -webkit-mask-image: radial-gradient(ellipse 74% 84% at 50% 48%, #000 0%, rgba(0, 0, 0, 0.55) 64%, transparent 90%);
+  mask-image: radial-gradient(ellipse 74% 84% at 50% 48%, #000 0%, rgba(0, 0, 0, 0.55) 64%, transparent 90%);
+  animation: veilWeather 82s ease-in-out infinite alternate;
+}
+
+@keyframes veilWeather {
+  from { transform: rotate(-9deg) translate3d(-1.4%, 1%, 0) scale(1); opacity: 0.84; }
+  to   { transform: rotate(-6deg) translate3d(1.6%, -1.4%, 0) scale(1.07); opacity: 1; }
+}
+
+/* gravity curves — the paths this region is organised along. Each one leaves
+   the frame and comes back, so the field is inside something larger. */
+.cx-orbit {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 0;
+  pointer-events: none;
+  border: 1px solid rgba(217, 179, 255, 0.13);
+  border-radius: 50%;
+  translate: -50% -50%;
+}
+
+.cx-orbit--a {
+  width: 172%;
+  height: 76%;
+  rotate: -17deg;
+  animation: orbitPulse 19s ease-in-out infinite;
+}
+
+.cx-orbit--b {
+  width: 128%;
+  height: 108%;
+  border-style: dashed;
+  border-color: rgba(144, 188, 235, 0.13);
+  animation: orbitTurn 320s linear infinite;
+}
+
+.cx-orbit--c {
+  width: 212%;
+  height: 54%;
+  border-top-color: transparent;
+  border-left-color: rgba(232, 177, 236, 0.10);
+  rotate: 9deg;
+  animation: orbitPulse 27s ease-in-out 4s infinite;
+}
+
+/* the tilt lives in the same property the animation drives, so the two never
+   fight and the dashes crawl along the path instead of jumping at loop start */
+@keyframes orbitTurn {
+  from { rotate: 26deg; }
+  to   { rotate: 386deg; }
+}
+
+@keyframes orbitPulse {
+  0%, 100% { opacity: 0.42; }
+  50%      { opacity: 1; }
+}
+
+/* a dust lane crossing at a different angle, drifting one tile per loop */
+.cx-dust {
+  position: absolute;
+  left: -20%;
+  top: 22%;
+  width: 140%;
+  height: 52%;
+  z-index: 0;
+  pointer-events: none;
+  transform: rotate(-12deg);
+  background-image:
+    radial-gradient(circle, rgba(245, 240, 255, 0.55) 0 0.7px, transparent 1.3px),
+    radial-gradient(circle, rgba(214, 170, 255, 0.4) 0 0.6px, transparent 1.2px);
+  background-size: 47px 47px, 83px 83px;
+  -webkit-mask-image: radial-gradient(ellipse 58% 88% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.3) 56%, transparent 78%);
+  mask-image: radial-gradient(ellipse 58% 88% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.3) 56%, transparent 78%);
+  animation: dustDrift 58s linear infinite;
+}
+
+@keyframes dustDrift {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 47px 0, -83px 0; }
 }
 
 #cx-canvas {
@@ -1763,17 +1931,98 @@
 
 .endmark-canvas { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; }
 
-.endmark-word {
+/* The close is a signature, not the title a second time: small, monospaced,
+   boxed, pressed on after the writing. The hero stays the only place the name
+   is said out loud. */
+.coda {
   position: relative;
   z-index: 1;
+  max-width: 60ch;
+  text-align: center;
+}
+
+.coda-close {
+  font-size: clamp(21px, 2.9vw, 33px);
   font-weight: 200;
-  font-size: clamp(54px, 17vw, 260px);
-  letter-spacing: 0.3em;
-  padding-left: 0.3em;
-  line-height: 1;
-  color: transparent;
-  -webkit-text-stroke: 1px rgba(217, 179, 255, 0.55);
-  text-shadow: 0 0 60px rgba(143, 89, 247, 0.5);
+  line-height: 1.5;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.coda-note {
+  margin-top: clamp(15px, 2.4vh, 24px);
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.coda-note p {
+  max-width: 38em;
+  text-wrap: balance;
+  margin: 0 auto;
+  font-size: clamp(13.5px, 1.35vw, 15.5px);
+  font-weight: 300;
+  line-height: 1.85;
+  color: var(--ink-mute);
+  text-wrap: pretty;
+}
+
+.coda-note b {
+  font-weight: 400;
+  color: var(--silver-violet);
+}
+
+.coda-go {
+  margin-top: clamp(20px, 3.4vh, 32px);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px clamp(15px, 2.4vw, 26px);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.coda-go a {
+  color: var(--ink-soft);
+  padding-bottom: 3px;
+  border-bottom: 1px solid transparent;
+  transition: color var(--t) var(--ease), border-color var(--t) var(--ease);
+}
+
+.coda-go a:hover { color: var(--starlight); border-bottom-color: var(--hair-strong); }
+.coda-go .arrow { color: var(--nebula-violet); font-style: normal; }
+
+.endmark-seal {
+  position: relative;
+  z-index: 1;
+  margin-top: clamp(28px, 5.4vh, 54px);
+  padding: 11px 20px 10px calc(20px + 0.58em);
+  font-family: var(--font-mono);
+  font-size: clamp(10px, 1.25vw, 12.5px);
+  letter-spacing: 0.58em;
+  color: rgba(217, 179, 255, 0.78);
+  border: 1px solid var(--hair);
+  animation: sealBreathe 13s ease-in-out infinite;
+}
+
+.endmark-seal::before,
+.endmark-seal::after {
+  content: "";
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border: 1px solid rgba(217, 179, 255, 0.45);
+}
+
+.endmark-seal::before { top: -5px; left: -5px; border-right: none; border-bottom: none; }
+.endmark-seal::after { bottom: -5px; right: -5px; border-left: none; border-top: none; }
+
+@keyframes sealBreathe {
+  0%, 100% { opacity: 0.62; }
+  50%      { opacity: 1; }
 }
 
 .endmark-foot {
@@ -1971,17 +2220,20 @@
 
   .hero-word { letter-spacing: 0.18em; padding-left: 0.18em; }
   .hero-rings { opacity: 0.4; }
-  .hero-planet {
-    --psize: clamp(230px, 74vw, 420px);
-    top: 27%;
-    right: clamp(-170px, -24vw, -40px);
-    opacity: 0.86;
+  /* A limb this cropped needs to be smaller relative to the frame or nothing
+     above it stays visible; 240vw keeps the arc inside the lower third. */
+  .hero-limb {
+    --lsize: clamp(760px, 240vw, 1200px);
+    right: calc(var(--lsize) * -0.72);
+    bottom: calc(var(--lsize) * -0.76);
+    opacity: 0.9;
   }
+  .limb-haze { opacity: 0.75; }
   .hero-frame { inset: clamp(58px, 9vh, 80px) 14px 18px; }
   .hero-data { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hd-cell:nth-child(3) { border-left: none; }
   .hd-cell:nth-child(n + 3) { border-top: 1px solid var(--hair); }
-  .endmark-word { letter-spacing: 0.12em; padding-left: 0.12em; -webkit-text-stroke-width: 0.7px; }
+  .endmark-seal { letter-spacing: 0.4em; padding: 10px 14px 9px calc(14px + 0.4em); }
   .evo-item { grid-template-columns: 1fr; gap: 6px; }
   .frag { transform: none !important; }
   .frags { grid-template-columns: 1fr; }
@@ -1995,12 +2247,19 @@
 
 @media (prefers-reduced-motion: reduce) {
   .hero-word .glyph { animation: none; opacity: 1; transform: none; }
+  .hero-word::before { animation: none; }
   .hero-rings { animation: none; }
-  .planet-halo,
-  .planet-ring--front,
-  .planet-bands,
-  .planet-storm--pink,
-  .planet-storm--blue { animation: none; }
+  .constellation::before,
+  .cx-veil,
+  .cx-orbit,
+  .cx-dust,
+  .endmark-seal,
+  .limb-haze,
+  .limb-swirl,
+  .limb-rim,
+  .limb-bands,
+  .limb-storm--pink,
+  .limb-storm--blue { animation: none; }
   .club-ring { animation: none; }
   .bg-veil { animation: none; }
   .frag,

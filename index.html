@@ -58,16 +58,15 @@
   <!-- ============ 01 / HERO ============ -->
   <header class="hero" id="top">
     <canvas class="hero-canvas" id="hero-canvas" aria-hidden="true"></canvas>
-    <div class="hero-planet" aria-hidden="true">
-      <span class="planet-halo"></span>
-      <span class="planet-ring planet-ring--back"></span>
-      <span class="planet-body">
-        <span class="planet-storm planet-storm--pink"></span>
-        <span class="planet-storm planet-storm--blue"></span>
-        <span class="planet-bands"></span>
-        <span class="planet-shade"></span>
+    <div class="hero-limb" aria-hidden="true">
+      <span class="limb-body">
+        <span class="limb-bands"></span>
+        <span class="limb-swirl"></span>
+        <span class="limb-storm limb-storm--pink"></span>
+        <span class="limb-storm limb-storm--blue"></span>
+        <span class="limb-rim"></span>
       </span>
-      <span class="planet-ring planet-ring--front"></span>
+      <span class="limb-haze"></span>
     </div>
     <div class="hero-rings" aria-hidden="true"></div>
     <div class="hero-frame" aria-hidden="true">
@@ -157,6 +156,11 @@
         </div>
         <div class="constellation" id="constellation">
           <div class="cx-canvas-wrap">
+            <span class="cx-veil" aria-hidden="true"></span>
+            <span class="cx-orbit cx-orbit--a" aria-hidden="true"></span>
+            <span class="cx-orbit cx-orbit--b" aria-hidden="true"></span>
+            <span class="cx-orbit cx-orbit--c" aria-hidden="true"></span>
+            <span class="cx-dust" aria-hidden="true"></span>
             <canvas id="cx-canvas" tabindex="0"
                     aria-label="立体星域：拖动旋转，滚轮或双指缩放，方向键换节点，回车打开选中节点，双击主题进入，Esc 退出。"></canvas>
             <div class="cx-hud" aria-hidden="true"></div>
@@ -250,7 +254,22 @@
     <!-- ============ 08 / 收尾 ============ -->
     <footer class="endmark" id="end">
       <canvas class="endmark-canvas" aria-hidden="true"></canvas>
-      <p class="endmark-word">TANCE</p>
+      <div class="coda">
+        <p class="coda-close">绕完一圈，落回已经写下的那些。</p>
+        <div class="coda-note">
+          <p>这里放做过的项目和没想完的观察：能跑起来的记在 <b>Create</b>，还没想明白的记在 <b>Observe</b>。</p>
+          <p>页面改版过很多次，旧文章的地址和正文一直没动——写过的话得能被翻回来。</p>
+          <p>不是作品集，更像一本还在写的现场笔记。</p>
+        </div>
+        <nav class="coda-go" aria-label="收尾入口">
+          <a href="/archives/">全部记录 <i class="arrow">→</i></a>
+          <a href="/projects/">作品 <i class="arrow">→</i></a>
+          <a href="https://github.com/tance-mang" target="_blank" rel="noopener">GitHub <i class="arrow">→</i></a>
+          <a href="/about.html#contact">联系方式 <i class="arrow">→</i></a>
+          <a href="#top">回到星核 <i class="arrow">↑</i></a>
+        </nav>
+      </div>
+      <p class="endmark-seal" aria-hidden="true">TANCE</p>
       <div class="endmark-foot">
         <div class="endmark-col">
           <h3>Navigate</h3>
@@ -293,7 +312,6 @@
       <p class="endmark-legal">
         <span>© 2026 tance-mang</span>
         <span>GitHub Pages · 静态托管</span>
-        <span><a href="#top">回到星核 ↑</a></span>
       </p>
     </footer>
   </main>

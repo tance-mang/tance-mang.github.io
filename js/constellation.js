@@ -353,7 +353,9 @@
       topic: ['rgba(245,240,255,0.9)', 'rgba(217,179,255,0.28)', 'rgba(143,89,247,0)'],
       project: ['rgba(255,236,251,0.86)', 'rgba(242,156,207,0.24)', 'rgba(242,156,207,0)'],
       post: ['rgba(217,179,255,0.8)', 'rgba(143,89,247,0.2)', 'rgba(89,139,216,0)'],
-      fragment: ['rgba(232,177,236,0.72)', 'rgba(242,156,207,0.16)', 'rgba(232,177,236,0)']
+      fragment: ['rgba(232,177,236,0.72)', 'rgba(242,156,207,0.16)', 'rgba(232,177,236,0)'],
+      // the only sprite that is atmosphere rather than a thing in it
+      haze: ['rgba(184,156,255,0.5)', 'rgba(92,128,212,0.16)', 'rgba(11,19,51,0)']
     };
     var out = {};
     Object.keys(spec).forEach(function (k) {
@@ -554,6 +556,189 @@
     CORE: CORE, mkView: mkView, proj: proj, rings: coreRings,
     strokes: strokeCore, nucleus: paintNucleus, sprites: sprites
   };
+
+  /* ------------------------------------------------------------------ */
+  /* 2d. Deep sky — the region the archive is suspended in               */
+  /* ------------------------------------------------------------------ */
+  /* The nodes turn, so a background that does not turn with them makes   */
+  /* the whole thing a diagram on a dark page. This is a sphere of fixed   */
+  /* directions at infinity: it rotates with the camera and never          */
+  /* parallaxes, which is how a real far sky behaves. It carries one       */
+  /* galactic band, one dust lane, a scatter of field stars and three      */
+  /* gravitational curves the archive drifts along. Same camera as the     */
+  /* data, computed from it — not a picture laid underneath.               */
+
+  function norm3(x, y, z) {
+    var l = Math.sqrt(x * x + y * y + z * z) || 1;
+    return { x: x / l, y: y / l, z: z / l };
+  }
+
+  // A basis for the plane whose normal is `pole`.
+  function planeBasis(pole) {
+    var n = norm3(pole[0], pole[1], pole[2]);
+    var ref = Math.abs(n.y) > 0.9 ? { x: 1, y: 0, z: 0 } : { x: 0, y: 1, z: 0 };
+    var u = norm3(ref.y * n.z - ref.z * n.y, ref.z * n.x - ref.x * n.z, ref.x * n.y - ref.y * n.x);
+    return {
+      n: n, u: u,
+      v: { x: n.y * u.z - n.z * u.y, y: n.z * u.x - n.x * u.z, z: n.x * u.y - n.y * u.x }
+    };
+  }
+
+  /* Points ringed around a plane and pushed off it by `thick`. A small       */
+  /* thickness gives a band; something near 1 fills the sphere, which is how  */
+  /* the ordinary field stars are distributed without a second generator.     */
+  function skyScatter(count, pole, thick, seed, clump) {
+    var b = planeBasis(pole);
+    var step = TAU / count;
+    var out = [];
+    for (var i = 0; i < count; i++) {
+      var a = i * step + (hash(seed + 'a' + i) - 0.5) * step * 1.6;
+      var ca = Math.cos(a), sa = Math.sin(a);
+      var g = (hash(seed + 'b' + i) + hash(seed + 'c' + i) + hash(seed + 'd' + i)) / 3 - 0.5;
+      var lat = g * thick * 2;
+      var dens = clump ? 0.4 + Math.abs(Math.sin(a * 2.4 + hash(seed + 'p') * TAU)) : 1;
+      out.push({
+        d: norm3(b.u.x * ca + b.v.x * sa + b.n.x * lat,
+          b.u.y * ca + b.v.y * sa + b.n.y * lat,
+          b.u.z * ca + b.v.z * sa + b.n.z * lat),
+        r: 0.45 + hash(seed + 's' + i) * 0.85 * dens,
+        a: 0.1 + hash(seed + 'e' + i) * 0.34 * (clump ? dens : 1),
+        ph: hash(seed + 'f' + i) * TAU,
+        warm: hash(seed + 'w' + i)
+      });
+    }
+    return out;
+  }
+
+  function skyCurve(steps, pole, phase, wobble, seed) {
+    var b = planeBasis(pole);
+    var lobes = 2 + Math.floor(hash(seed + 'k') * 3);
+    var out = [];
+    for (var i = 0; i <= steps; i++) {
+      var a = (i / steps) * TAU;
+      var k = 1 + Math.sin(a * lobes + phase) * wobble;
+      out.push(norm3(
+        (b.u.x * Math.cos(a) + b.v.x * Math.sin(a)) * k,
+        (b.u.y * Math.cos(a) + b.v.y * Math.sin(a)) * k,
+        (b.u.z * Math.cos(a) + b.v.z * Math.sin(a)) * k + Math.sin(a * 3 + phase) * wobble * 0.5
+      ));
+    }
+    return out;
+  }
+
+  var SKY = (function () {
+    return {
+      band: skyScatter(240, [0.30, 0.90, -0.32], 0.075, 'sky-band', true),
+      lane: skyScatter(130, [0.66, -0.42, 0.62], 0.05, 'sky-lane', true),
+      field: skyScatter(180, [0.11, 0.35, 0.93], 0.98, 'sky-field', false),
+      glow: skyScatter(9, [0.30, 0.90, -0.32], 0.05, 'sky-glow', false),
+      curves: [
+        skyCurve(132, [0.22, 0.95, -0.22], 0.0, 0.05, 'sky-c0'),
+        skyCurve(132, [-0.55, 0.50, 0.66], 0.9, 0.075, 'sky-c1'),
+        skyCurve(132, [0.72, -0.28, 0.63], 2.1, 0.04, 'sky-c2')
+      ]
+    };
+  })();
+
+  // Directions do not parallax, so the only thing that matters is the angle
+  // between them and the view axis. Anything behind the camera is dropped.
+  function skyProj(view, f, d, out) {
+    var x1 = d.x * view.cy + d.z * view.sy;
+    var z1 = -d.x * view.sy + d.z * view.cy;
+    out.y = d.y * view.cp - z1 * view.sp;
+    var z2 = d.y * view.sp + z1 * view.cp;
+    out.ok = z2 > 0.1;
+    if (!out.ok) return out;
+    var k = f / z2;
+    out.x = view.ox + x1 * k;
+    out.y = view.oy + out.y * k;
+    out.k = k;
+    return out;
+  }
+
+  function paintSky(ctx, view, f, haze, now, gain, still) {
+    var p = { x: 0, y: 0, k: 0, ok: false }, i, s;
+
+    if (haze) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'screen';
+      for (i = 0; i < SKY.glow.length; i++) {
+        s = SKY.glow[i];
+        skyProj(view, f, s.d, p);
+        if (!p.ok) continue;
+        var gr = f * (0.5 + s.r * 0.34);
+        ctx.globalAlpha = 0.042 * gain * (0.7 + s.a);
+        ctx.drawImage(haze, p.x - gr, p.y - gr * 0.62, gr * 2, gr * 1.24);
+      }
+      ctx.restore();
+    }
+
+    // curves first: they are structure, and the stars should read as being
+    // nearer than the paths the archive travels along
+    var seg0 = { x: 0, y: 0, ok: false }, seg1 = { x: 0, y: 0, ok: false };
+    ctx.lineCap = 'round';
+    SKY.curves.forEach(function (pts, ci) {
+      ctx.beginPath();
+      var pen = false, lastY = 0;
+      for (i = 0; i < pts.length; i++) {
+        skyProj(view, f, pts[i], p);
+        if (!p.ok || Math.abs(p.y - lastY) > f * 0.7) pen = false;
+        lastY = p.y;
+        if (!p.ok) continue;
+        if (pen) ctx.lineTo(p.x, p.y); else { ctx.moveTo(p.x, p.y); pen = true; }
+      }
+      ctx.globalAlpha = (0.14 + ci * 0.02) * gain;
+      ctx.strokeStyle = ci === 1 ? 'rgba(144,188,235,1)' : ci === 2 ? 'rgba(232,177,236,1)' : 'rgba(217,179,255,1)';
+      ctx.lineWidth = 0.7;
+      ctx.setLineDash(ci === 0 ? [2, 9] : ci === 1 ? [14, 10] : [3, 7]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // one travelling compression per curve — the only movement out here
+      if (still) return;
+      var n = pts.length - 1;
+      var head = Math.floor((((now * (0.000018 + ci * 0.000007)) + ci * 0.37) % 1) * n);
+      for (var q = 0; q < 16; q++) {
+        skyProj(view, f, pts[(head - q + n) % n], seg0);
+        skyProj(view, f, pts[(head - q + 1) % n], seg1);
+        if (!seg0.ok || !seg1.ok) continue;
+        ctx.globalAlpha = 0.34 * gain * (1 - q / 16);
+        ctx.strokeStyle = ci === 1 ? 'rgba(144,188,235,1)' : 'rgba(245,240,255,1)';
+        ctx.lineWidth = 1.3 - q * 0.05;
+        ctx.beginPath();
+        ctx.moveTo(seg0.x, seg0.y);
+        ctx.lineTo(seg1.x, seg1.y);
+        ctx.stroke();
+      }
+    });
+
+    function scatter(list, scale) {
+      for (var j = 0; j < list.length; j++) {
+        var st = list[j];
+        skyProj(view, f, st.d, p);
+        if (!p.ok) continue;
+        var al = st.a * scale * (still ? 1 : 0.72 + Math.sin(now * 0.0011 + st.ph) * 0.28) * gain;
+        if (al < 0.015) continue;
+        var rr = st.r * scale * 0.85;
+        ctx.globalAlpha = al;
+        ctx.fillStyle = st.warm > 0.72 ? 'rgba(232,177,236,1)'
+          : st.warm > 0.46 ? 'rgba(217,179,255,1)'
+            : st.warm > 0.2 ? 'rgba(144,188,235,1)' : 'rgba(245,240,255,1)';
+        if (rr > 0.95) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, rr, 0, TAU);
+          ctx.fill();
+        } else {
+          ctx.fillRect(p.x - rr / 2, p.y - rr / 2, rr + 0.4, rr + 0.4);
+        }
+      }
+    }
+
+    scatter(SKY.field, 0.85);
+    scatter(SKY.lane, 1.05);
+    scatter(SKY.band, 1.25);
+    ctx.globalAlpha = 1;
+  }
 
   /* ------------------------------------------------------------------ */
   /* 3. Mount                                                            */
@@ -1046,6 +1231,12 @@
 
       // Painter's order: far shell first so the near nodes sit on top of it.
       var order = graph.nodes.slice().sort(function (a, b) { return b.sz - a.sz; });
+
+      // The sky is a sphere of directions, so it turns with the camera and
+      // never shifts with the pointer. Without it the field is a diagram on a
+      // dark page: the nodes would be moving and nothing around them would be.
+      paintSky(ctx, view, h * 0.62 * cam.zoom,
+        cam.zoom < 1.55 ? sprite.haze : null, now, entered ? 0.34 : 1, reduced);
 
       // The back half of the core goes under everything, so nodes and links can
       // cross in front of it the way they would in a real volume.

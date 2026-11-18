@@ -83,21 +83,35 @@
     // One compositor for the hero: L3 scroll recession + L2 mouse parallax.
     // Both write the same transform, so they must not live in two handlers.
     var stack = $('.hero-stack');
-    if (stack) {
-      var scrollP = 0, nx = 0, ny = 0, pending = false;
+    var limb = $('.hero-limb');
+    if (stack || limb) {
+      var scrollP = 0, nx = 0, ny = 0, lx = 0, ly = 0, pending = false;
 
       function compose() {
         pending = false;
         if (T.reduced) {
-          stack.style.transform = 'none';
-          stack.style.opacity = '1';
+          if (stack) { stack.style.transform = 'none'; stack.style.opacity = '1'; }
+          if (limb) { limb.style.transform = 'none'; limb.style.opacity = ''; }
           return;
         }
-        var y = -scrollP * 44 + ny * 10;
-        var x = nx * 14;
-        stack.style.transform =
-          'translate3d(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px,0) scale(' + (1 - scrollP * 0.08).toFixed(4) + ')';
-        stack.style.opacity = (1 - scrollP * 0.8).toFixed(3);
+        if (stack) {
+          var y = -scrollP * 44 + ny * 10;
+          var x = nx * 14;
+          stack.style.transform =
+            'translate3d(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px,0) scale(' + (1 - scrollP * 0.08).toFixed(4) + ')';
+          stack.style.opacity = (1 - scrollP * 0.8).toFixed(3);
+        }
+        if (limb) {
+          // The limb is the heaviest thing in the frame, so it answers last and
+          // travels least, and it slides away underneath you as you scroll. That
+          // difference — not the arc itself — is what makes it feel occupied.
+          lx += (nx - lx) * 0.06;
+          ly += (ny - ly) * 0.06;
+          limb.style.transform = 'translate3d(' + (-lx * 26).toFixed(2) + 'px,' +
+            (-ly * 15 + scrollP * 120).toFixed(2) + 'px,0)';
+          limb.style.opacity = (1 - scrollP * 0.35).toFixed(3);
+          if (Math.abs(nx - lx) > 0.002 || Math.abs(ny - ly) > 0.002) schedule();
+        }
       }
 
       function schedule() {
