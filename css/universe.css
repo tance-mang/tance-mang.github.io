@@ -33,17 +33,19 @@
 .sec--tight { padding-top: clamp(40px, 6vh, 72px); }
 
 /* One continuous galaxy, but not the same air everywhere: each chapter pulls
-   a different amount of haze into its own rectangle. Local, cheap, and it
-   stops the page reading as one flat backdrop with text on top. The box stays
-   inside the section horizontally — bleeding past it would add a scrollbar. */
+   a different amount of haze toward its own middle. The box stays inside its
+   section and is masked on all four edges, so the tint reads as a change of
+   weather rather than a rectangle. Letting it bleed upward veiled the bottom
+   of the hero planet, which is the very seam it was meant to hide. */
 .sec::before {
   content: '';
   position: absolute;
-  inset: -8% 0 auto;
-  height: 116%;
+  inset: 0;
   z-index: -1;
   pointer-events: none;
-  opacity: 0.85;
+  opacity: 0.9;
+  -webkit-mask-image: radial-gradient(ellipse 76% 58% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.62) 52%, transparent 84%);
+  mask-image: radial-gradient(ellipse 76% 58% at 50% 50%, #000 0%, rgba(0, 0, 0, 0.62) 52%, transparent 84%);
 }
 
 #worlds::before {
@@ -151,6 +153,11 @@
   z-index: -1;
   width: 100%;
   height: 100%;
+  /* The hero is a window onto the same sky the rest of the page floats in.
+     Clipped at the box edge, its wash ends in a horizontal line and the first
+     chapter reads as one rectangle stacked on another, so it dissolves. */
+  -webkit-mask-image: linear-gradient(180deg, #000 0 56%, rgba(0, 0, 0, 0.62) 80%, transparent 98%);
+  mask-image: linear-gradient(180deg, #000 0 56%, rgba(0, 0, 0, 0.62) 80%, transparent 98%);
 }
 
 /* The orbits the brand name sits inside. One CSS layer, one slow rotation:
@@ -178,180 +185,245 @@
   to   { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-/* Not a poster planet. The frame crops something enormous: only the limb of a
-   gas giant survives inside the hero — its edge, its atmosphere, its turning
-   cloud belts. The body therefore reads as a place the page is floating above
-   instead of an object placed on it. Pure gradients, no asset, no blur filter,
-   crisp at any zoom. */
-.hero-limb {
-  --lsize: clamp(1000px, 165vw, 2450px);
+/* ---------- 01 HERO / the anchor body: a ringed gas giant ----------
+   The previous attempt pushed the sphere so far out of frame that only a
+   glowing sliver survived, and the hero box then cut that sliver on a straight
+   horizontal line — a texture on a container, not a body in a sky. This one
+   keeps the whole sphere inside the hero vertically, so the only edge that can
+   ever cross it is the browser window, and it leaves enough of the disc on
+   screen to read the curvature, the day/night terminator and the rings.
+   Pure gradients, no asset, no blur filter, crisp at any zoom. */
+.hero-planet {
+  --pd: clamp(420px, 72svh, 980px);
   position: absolute;
-  width: var(--lsize);
-  height: var(--lsize);
-  right: calc(var(--lsize) * -0.75);
-  bottom: calc(var(--lsize) * -0.80);
+  width: var(--pd);
+  height: var(--pd);
+  /* Four tenths of the body stays on screen and the centre sits just outside
+     the right edge; the lower limb stops 16% of its own diameter above the
+     hero's bottom edge. That leaves room for the rings and the outermost of
+     the atmospheric scatter to finish inside the box, so no chapter boundary
+     can ever cut the body — and it keeps the bright side clear of the word. */
+  left: calc(100% - var(--pd) * 0.4);
+  top: calc(100% - var(--pd) * 1.16);
   z-index: -2;
   pointer-events: none;
+  /* Written by the hero compositor: --px/--py is the frame's drift, and each
+     layer takes its own share of it, so the body, the rings and the air do not
+     travel as one picture. */
+  transform: translate3d(var(--px, 0px), var(--py, 0px), 0);
 }
 
-/* Only the outer skin of this thing is lit. At 1440x900 the visible cap spans
-   70%-100% of the disc radius, so the tonal range has to live in that last
-   third: dark gas almost to the edge, then one thin blaze of atmosphere. */
-.limb-body {
+.planet-disc {
   position: absolute;
   inset: 0;
   border-radius: 50%;
   overflow: hidden;
-  background: radial-gradient(closest-side,
-    #080412 0%,
-    #0a0618 44%,
-    #0c071e 62%,
-    #0e0822 70%,
-    #170e35 80%,
-    #2a1856 88%,
-    #4a2c86 94%,
-    #7d55b4 97.5%,
-    #c3a3ea 99.3%,
-    #efe0ff 100%);
+  /* The heaviest thing in the frame answers last and travels least. */
+  transform: translate3d(calc(var(--px, 0px) * -0.22), calc(var(--py, 0px) * -0.22), 0);
 }
 
-/* Atmospheric shells, concentric with the limb itself. Belts centred on any
-   other point cross the edge at an angle and read as stripes painted on the
-   hero instead of layers of this body. Stops are placed by hand because only
-   70%-100% of the radius is ever on screen. */
-.limb-bands {
+/* The sub-solar point sits up-left, inside the part of the body we can see, and
+   the radius is one body radius plus a quarter, so every colour stop is a
+   distance from that point: bright at the top of the atmosphere, dark where the
+   surface curves away at the limb. That falloff — not the circle — carries the
+   volume, and the cold blue patch keeps the night half reading as a place. */
+.planet-surface {
   position: absolute;
   inset: 0;
-  background: radial-gradient(closest-side,
-    transparent 0 66%,
-    rgba(9, 6, 20, 0.30) 71% 74%,
-    rgba(238, 220, 255, 0.05) 76.5% 78.5%,
-    rgba(11, 19, 51, 0.26) 81% 85%,
-    rgba(232, 177, 236, 0.055) 87% 88.5%,
-    rgba(8, 6, 18, 0.30) 91% 93.5%,
-    rgba(217, 179, 255, 0.06) 95% 96.2%,
-    rgba(6, 4, 14, 0.34) 97.6% 98.5%,
-    transparent 99.4%);
-  animation: shellDrift 88s ease-in-out infinite alternate;
+  background:
+    radial-gradient(circle at 26% 21%, rgba(238, 220, 255, 0.16), transparent 17%),
+    radial-gradient(ellipse 72% 62% at 33% 76%, rgba(89, 139, 216, 0.17), transparent 72%),
+    radial-gradient(circle calc(var(--pd) * 0.62) at 28% 25%,
+      #8f6fd0 0%,
+      #7450bd 12%,
+      #52308f 26%,
+      #33196b 42%,
+      #1d0f47 58%,
+      #0e0729 72%,
+      #060316 84%,
+      #030110 100%);
 }
 
-/* The shells swell and settle: the same radius breathing outward, as slow as
-   the thing looks. */
-@keyframes shellDrift {
-  from { transform: scale(1); }
-  to   { transform: scale(1.016); }
-}
-
-/* The storm field: a shear of brightness that turns once every four minutes.
-   This is what makes the body a rotating object rather than a gradient disc. */
-.limb-swirl {
+/* Latitude belts. Concentric ellipses tilted with the rotation axis, because
+   parallel circles on a sphere project to nested ellipses — straight stripes
+   would read as paint on the hero, not weather inside the body. The mask is
+   limb darkening: belts compress and fade where the surface turns away. */
+.planet-bands {
   position: absolute;
-  inset: -4%;
-  border-radius: 50%;
-  background: conic-gradient(from 210deg,
-    rgba(255, 248, 255, 0.10) 0deg 22deg,
-    rgba(89, 139, 216, 0.085) 61deg,
-    rgba(11, 8, 26, 0.16) 118deg 172deg,
-    rgba(232, 177, 236, 0.085) 214deg,
-    rgba(255, 248, 255, 0.065) 256deg,
-    rgba(11, 8, 26, 0.14) 302deg 340deg,
-    rgba(255, 248, 255, 0.10) 360deg);
-  animation: limbTurn 236s linear infinite;
+  inset: -2%;
+  transform: rotate(-13deg);
+  background: radial-gradient(ellipse 96% 42% at 50% 50%,
+    rgba(255, 246, 255, 0.13) 0 7%,
+    rgba(10, 7, 24, 0.30) 13% 18%,
+    rgba(232, 177, 236, 0.11) 24% 29%,
+    rgba(9, 6, 22, 0.34) 35% 42%,
+    rgba(144, 188, 235, 0.13) 49% 56%,
+    rgba(8, 5, 20, 0.30) 63% 71%,
+    rgba(226, 190, 255, 0.09) 78% 85%,
+    rgba(5, 3, 15, 0.38) 92% 100%);
+  -webkit-mask-image: radial-gradient(closest-side, #000 0 62%, rgba(0, 0, 0, 0.8) 82%, rgba(0, 0, 0, 0.4) 96%, transparent 100%);
+  mask-image: radial-gradient(closest-side, #000 0 62%, rgba(0, 0, 0, 0.8) 82%, rgba(0, 0, 0, 0.4) 96%, transparent 100%);
 }
 
-@keyframes limbTurn {
+/* The cloud field turning once every three and a half minutes: this is what
+   makes the body a rotating object rather than a shaded ball. */
+.planet-sheen {
+  position: absolute;
+  inset: -5%;
+  border-radius: 50%;
+  background: conic-gradient(from 200deg,
+    rgba(255, 248, 255, 0.06) 0deg 20deg,
+    rgba(89, 139, 216, 0.05) 58deg,
+    rgba(11, 8, 26, 0.11) 116deg 168deg,
+    rgba(232, 177, 236, 0.055) 212deg,
+    rgba(255, 248, 255, 0.045) 252deg,
+    rgba(11, 8, 26, 0.09) 300deg 342deg,
+    rgba(255, 248, 255, 0.06) 360deg);
+  animation: planetTurn 214s linear infinite;
+}
+
+@keyframes planetTurn {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
 }
 
-/* Two belts riding the visible arc. The cap faces up-left, so its tangent runs
-   at -45deg: anything less parallel reads as a stripe painted across the body
-   instead of weather inside it. */
-.limb-storm {
+/* Two storms sitting on belts, on the side of the body that faces us. */
+.planet-storm {
   position: absolute;
   border-radius: 50%;
 }
 
-.limb-storm--pink {
-  width: 40%;
-  height: 21%;
-  left: 0%;
-  top: 9.5%;
-  transform: rotate(-46deg);
+.planet-storm--rose {
+  width: 31%;
+  height: 13%;
+  left: 6%;
+  top: 56%;
+  transform: rotate(-12deg);
   background: radial-gradient(closest-side,
-    rgba(242, 156, 207, 0.30),
-    rgba(232, 177, 236, 0.10) 58%,
-    transparent 80%);
-  animation: stormPink 58s ease-in-out infinite alternate;
+    rgba(242, 156, 207, 0.42),
+    rgba(232, 177, 236, 0.16) 52%,
+    transparent 76%);
+  animation: stormRose 64s ease-in-out infinite alternate;
 }
 
-.limb-storm--blue {
-  width: 34%;
-  height: 18%;
-  left: 9%;
-  top: 7%;
-  transform: rotate(-44deg);
+.planet-storm--ice {
+  width: 23%;
+  height: 9%;
+  left: 19%;
+  top: 28%;
+  transform: rotate(-9deg);
   background: radial-gradient(closest-side,
-    rgba(144, 188, 235, 0.26),
-    rgba(89, 139, 216, 0.10) 60%,
-    transparent 82%);
-  animation: stormBlue 74s ease-in-out infinite alternate;
+    rgba(160, 200, 245, 0.36),
+    rgba(89, 139, 216, 0.13) 55%,
+    transparent 78%);
+  animation: stormIce 82s ease-in-out infinite alternate;
 }
 
-@keyframes stormPink {
-  from { transform: rotate(-46deg) translate3d(-3%, -4%, 0) scale(1); }
-  to   { transform: rotate(-46deg) translate3d(4%, 5%, 0) scale(1.08); }
+@keyframes stormRose {
+  from { transform: rotate(-12deg) translate3d(-3%, -4%, 0) scale(1); }
+  to   { transform: rotate(-12deg) translate3d(5%, 4%, 0) scale(1.07); }
 }
 
-@keyframes stormBlue {
-  from { transform: rotate(-44deg) translate3d(4%, 3%, 0) scale(1.05); }
-  to   { transform: rotate(-44deg) translate3d(-5%, -4%, 0) scale(0.94); }
+@keyframes stormIce {
+  from { transform: rotate(-9deg) translate3d(4%, 3%, 0) scale(1.05); }
+  to   { transform: rotate(-9deg) translate3d(-5%, -3%, 0) scale(0.95); }
 }
 
-/* The terminator line itself — the brightest thing in the hero, and the only
-   hard edge. It sits exactly on the clip circle, so it always traces the limb. */
-.limb-rim {
+/* The night half. Its boundary is an ellipse, not a line, which is what a
+   terminator looks like from outside: it crosses the visible cap and leaves
+   the lower right of the body in shadow. */
+.planet-night {
   position: absolute;
   inset: 0;
-  border-radius: 50%;
-  background: radial-gradient(closest-side,
-    transparent 0 93%,
-    rgba(238, 220, 255, 0.08) 96.5%,
-    rgba(250, 244, 255, 0.30) 99.4%,
-    rgba(214, 170, 255, 0.15) 100%);
-  animation: limbRim 27s ease-in-out infinite;
+  background: radial-gradient(ellipse 88% 94% at 84% 88%,
+    rgba(3, 2, 10, 0.97) 0 24%,
+    rgba(4, 2, 12, 0.86) 42%,
+    rgba(6, 3, 18, 0.50) 58%,
+    rgba(8, 4, 22, 0.18) 70%,
+    transparent 84%);
 }
 
-@keyframes limbRim {
-  0%, 100% { opacity: 0.78; }
+/* Sunlit atmosphere along the limb. The mask keeps it on the half facing the
+   light, so the edge brightens where the air is thin against the sky and stops
+   where the body turns into night. */
+.planet-rim {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(closest-side,
+    transparent 0 94%,
+    rgba(238, 220, 255, 0.10) 97%,
+    rgba(250, 244, 255, 0.46) 99.5%,
+    rgba(214, 170, 255, 0.22) 100%);
+  -webkit-mask-image: radial-gradient(circle at 28% 23%, #000 0 32%, rgba(0, 0, 0, 0.55) 56%, transparent 74%);
+  mask-image: radial-gradient(circle at 28% 23%, #000 0 32%, rgba(0, 0, 0, 0.55) 56%, transparent 74%);
+  animation: planetRim 26s ease-in-out infinite;
+}
+
+@keyframes planetRim {
+  0%, 100% { opacity: 0.8; }
   50%      { opacity: 1; }
 }
 
-/* Air the size of the disc, plus three shells that keep going past it. The
-   gaps are hard-edged so they read as separate lanes rather than one haze.
-   With the box 132% wide, the body radius lands on 75.8% of the gradient. */
-.limb-haze {
+/* Air. This is the layer that decides whether the body is inside the scene or
+   pasted onto it: scattered light that starts at the limb and keeps going out
+   into the sky, strongest on the side facing the light. It sits behind the
+   disc, which is opaque, so the part of the glow that falls on the body is
+   hidden by the body and the silhouette never ends on a hard circle. */
+.planet-air {
   position: absolute;
-  inset: -16%;
+  inset: -22%;
+  z-index: -2;
   border-radius: 50%;
-  background: radial-gradient(closest-side,
-    transparent 0 54%,
-    rgba(166, 108, 249, 0.035) 63%,
-    rgba(190, 138, 252, 0.06) 71%,
-    rgba(226, 190, 255, 0.105) 75.6%,
-    transparent 76.4% 78%,
-    rgba(217, 179, 255, 0.075) 79.4%,
-    transparent 81% 84%,
-    rgba(144, 188, 235, 0.06) 86%,
-    transparent 89% 92.5%,
-    rgba(232, 177, 236, 0.048) 95%,
-    transparent 99%);
-  animation: limbBreathe 39s ease-in-out infinite;
+  background:
+    radial-gradient(circle calc(var(--pd) * 0.6) at 30% 26%,
+      rgba(196, 150, 250, 0.11),
+      rgba(140, 110, 210, 0.055) 48%,
+      transparent 88%),
+    radial-gradient(closest-side,
+      transparent 0 66.5%,
+      rgba(190, 138, 252, 0.07) 69%,
+      rgba(226, 190, 255, 0.15) 71.5%,
+      rgba(166, 108, 249, 0.09) 76%,
+      rgba(144, 188, 235, 0.05) 82%,
+      transparent 92%);
+  animation: planetBreathe 41s ease-in-out infinite;
 }
 
-@keyframes limbBreathe {
-  0%, 100% { opacity: 0.66; transform: scale(1); }
-  50%      { opacity: 1; transform: scale(1.012); }
+@keyframes planetBreathe {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.014); }
+}
+
+/* The ring system, seen close to edge-on. One element drawn twice: the copy
+   behind the disc supplies the far arc, the copy in front is masked to its own
+   lower half, which is the near arc crossing the body. The disc is opaque, so
+   it hides the part of the far ring that passes behind it without any extra
+   bookkeeping. */
+.planet-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--pd) * 1.86);
+  height: calc(var(--pd) * 0.5);
+  margin-left: calc(var(--pd) * -0.93);
+  margin-top: calc(var(--pd) * -0.25);
+  transform: translate3d(calc(var(--px, 0px) * 0.34), calc(var(--py, 0px) * 0.34), 0) rotate(-15deg);
+  background: radial-gradient(ellipse closest-side,
+    transparent 0 65%,
+    rgba(214, 170, 255, 0.11) 68% 70%,
+    transparent 71.5% 73%,
+    rgba(238, 220, 255, 0.20) 75% 78%,
+    transparent 80% 82%,
+    rgba(226, 190, 255, 0.13) 84% 88%,
+    rgba(144, 188, 235, 0.05) 91% 94%,
+    transparent 97%);
+}
+
+.planet-ring--back { z-index: -1; }
+
+.planet-ring--front {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0 49.5%, #000 52%);
+  mask-image: linear-gradient(to bottom, transparent 0 49.5%, #000 52%);
 }
 
 .hero-frame {
@@ -464,23 +536,6 @@
   to { opacity: 1; transform: none; }
 }
 
-.hero-claim {
-  margin: clamp(16px, 2.6vh, 26px) auto 0;
-  max-width: 44ch;
-  font-size: clamp(15px, 1.6vw, 19px);
-  line-height: 1.7;
-  font-weight: 300;
-  color: var(--ink-soft);
-  letter-spacing: 0.02em;
-  text-wrap: balance;
-}
-
-.hero-claim em {
-  color: var(--starlight);
-  font-style: italic;
-  font-family: var(--font-serif);
-}
-
 .hero-cta {
   display: flex;
   flex-wrap: wrap;
@@ -572,10 +627,23 @@
   border-bottom: 1px solid transparent;
 }
 
+/* Solid, but not a slab: the fill fades out at its own lower edge and the
+   separator is one hairline that dissolves at both ends. A full-width opaque
+   bar with a hard rule across it reads as a second container glued to the top
+   of the page, which is the opposite of a continuous sky. */
 .orbit-nav.is-solid {
-  background: rgba(7, 5, 13, 0.82);
+  background: linear-gradient(180deg, rgba(7, 5, 13, 0.86), rgba(7, 5, 13, 0.62) 62%, rgba(7, 5, 13, 0));
   backdrop-filter: blur(12px);
-  border-bottom-color: var(--hair);
+}
+
+.orbit-nav.is-solid::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--hair) 16% 84%, transparent);
 }
 
 .orbit-nav .nav-mark { color: var(--ink); letter-spacing: 0.34em; padding-left: 0.34em; font-size: 12px; }
@@ -1926,7 +1994,6 @@
   min-height: clamp(420px, 78vh, 780px);
   padding: clamp(40px, 8vh, 90px) var(--gutter) 40px;
   overflow: hidden;
-  border-top: 1px solid var(--hair);
 }
 
 .endmark-canvas { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; }
@@ -1941,7 +2008,17 @@
   text-align: center;
 }
 
+.coda-eyebrow {
+  margin: 0 0 clamp(12px, 2vh, 18px);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
 .coda-close {
+  margin: 0;
   font-size: clamp(21px, 2.9vw, 33px);
   font-weight: 200;
   line-height: 1.5;
@@ -1966,11 +2043,6 @@
   line-height: 1.85;
   color: var(--ink-mute);
   text-wrap: pretty;
-}
-
-.coda-note b {
-  font-weight: 400;
-  color: var(--silver-violet);
 }
 
 .coda-go {
@@ -2220,15 +2292,16 @@
 
   .hero-word { letter-spacing: 0.18em; padding-left: 0.18em; }
   .hero-rings { opacity: 0.4; }
-  /* A limb this cropped needs to be smaller relative to the frame or nothing
-     above it stays visible; 240vw keeps the arc inside the lower third. */
-  .hero-limb {
-    --lsize: clamp(760px, 240vw, 1200px);
-    right: calc(var(--lsize) * -0.72);
-    bottom: calc(var(--lsize) * -0.76);
-    opacity: 0.9;
+  /* On a 390px frame the body shrinks and drops into the free zone under the
+     data cells, far enough left that the sunlit limb stays on screen: what is
+     visible is the lit edge, the belts, the night side and the near rings. */
+  .hero-planet {
+    --pd: clamp(260px, 36svh, 330px);
+    left: calc(100% - var(--pd) * 0.44);
+    top: calc(100% - var(--pd) * 1.05);
   }
-  .limb-haze { opacity: 0.75; }
+  .planet-air { opacity: 0.85; }
+  .planet-ring { width: calc(var(--pd) * 1.7); margin-left: calc(var(--pd) * -0.85); }
   .hero-frame { inset: clamp(58px, 9vh, 80px) 14px 18px; }
   .hero-data { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hd-cell:nth-child(3) { border-left: none; }
@@ -2254,12 +2327,11 @@
   .cx-orbit,
   .cx-dust,
   .endmark-seal,
-  .limb-haze,
-  .limb-swirl,
-  .limb-rim,
-  .limb-bands,
-  .limb-storm--pink,
-  .limb-storm--blue { animation: none; }
+  .planet-air,
+  .planet-sheen,
+  .planet-rim,
+  .planet-storm--rose,
+  .planet-storm--ice { animation: none; }
   .club-ring { animation: none; }
   .bg-veil { animation: none; }
   .frag,

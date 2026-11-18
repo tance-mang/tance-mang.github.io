@@ -700,7 +700,7 @@
       var head = Math.floor((((now * (0.000018 + ci * 0.000007)) + ci * 0.37) % 1) * n);
       for (var q = 0; q < 16; q++) {
         skyProj(view, f, pts[(head - q + n) % n], seg0);
-        skyProj(view, f, pts[(head - q + 1) % n], seg1);
+        skyProj(view, f, pts[(head - q + 1 + n) % n], seg1);
         if (!seg0.ok || !seg1.ok) continue;
         ctx.globalAlpha = 0.34 * gain * (1 - q / 16);
         ctx.strokeStyle = ci === 1 ? 'rgba(144,188,235,1)' : 'rgba(245,240,255,1)';
@@ -803,8 +803,8 @@
     }
 
     function project() {
-      if (!graph) return;
       syncView();
+      if (!graph) return;
       graph.nodes.forEach(function (n) { toScreen(n.vx, n.vy, n.vz, n); });
     }
 
@@ -1217,9 +1217,23 @@
     }
 
     function draw(now) {
-      if (!graph) return;
       ctx.clearRect(0, 0, w, h);
       project();
+
+      // The sky is a sphere of directions, so it turns with the camera and
+      // never shifts with the pointer. Without it the field is a diagram on a
+      // dark page: the nodes would be moving and nothing around them would be.
+      // It also needs no content, so it paints the frame while the articles are
+      // still being read: the section is never an empty box, and nothing fades
+      // the field in once the nodes arrive.
+      paintSky(ctx, view, h * 0.62 * cam.zoom,
+        cam.zoom < 1.55 ? sprite.haze : null, now, entered ? 0.34 : 1, reduced);
+
+      // The back half of the core goes under everything, so nodes and links can
+      // cross in front of it the way they would in a real volume.
+      drawCoreFar(now);
+
+      if (!graph) return;
 
       var lit = selected || hover || idle;
       // The opening emphasis is a hint, not a verdict: it draws the same shape
@@ -1231,16 +1245,6 @@
 
       // Painter's order: far shell first so the near nodes sit on top of it.
       var order = graph.nodes.slice().sort(function (a, b) { return b.sz - a.sz; });
-
-      // The sky is a sphere of directions, so it turns with the camera and
-      // never shifts with the pointer. Without it the field is a diagram on a
-      // dark page: the nodes would be moving and nothing around them would be.
-      paintSky(ctx, view, h * 0.62 * cam.zoom,
-        cam.zoom < 1.55 ? sprite.haze : null, now, entered ? 0.34 : 1, reduced);
-
-      // The back half of the core goes under everything, so nodes and links can
-      // cross in front of it the way they would in a real volume.
-      drawCoreFar(now);
 
       // edges first, so nodes read as objects floating in front of them
       graph.links.forEach(function (l) {
@@ -1451,8 +1455,7 @@
     }
 
     function start() {
-      if (!graph) return;
-      if (reduced) { project(); draw(performance.now()); return; }
+      if (reduced) { draw(performance.now()); return; }
       if (running) return;
       running = true;
       last = 0;
@@ -1466,7 +1469,7 @@
     }
 
     function drawIfStatic() {
-      if (reduced || !running) { project(); draw(performance.now()); }
+      if (reduced || !running) draw(performance.now());
     }
 
     /* Bring a node to the front of the volume: solve yaw/pitch that put it on
@@ -2111,19 +2114,29 @@
         });
     }
 
+    /* The loop only runs near the section, but a frame is always painted before
+       the visitor gets here: the field is never assembled on arrival. */
+    var visible = true;
+
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(function (entries) {
-        entries.forEach(function (en) { if (en.isIntersecting) start(); else stop(); });
-      }, { rootMargin: '100px' }).observe(root);
+        entries.forEach(function (en) {
+          visible = en.isIntersecting;
+          if (visible) start(); else stop();
+        });
+      }, { rootMargin: '100% 0px' }).observe(root);
     }
 
     document.addEventListener('visibilitychange', function () {
-      if (document.hidden) stop(); else start();
+      if (document.hidden) stop(); else if (visible) start();
     });
 
     new ResizeObserver(function () { resize(); drawIfStatic(); }).observe(root);
 
     resize();
+    // The deep sky and the core need no content, so the box stops being an
+    // empty rectangle the instant the page is laid out.
+    draw(performance.now());
 
     // Wait until the articles are enriched: the shells are made of real tags,
     // so building them from the bare lists would draw a sparser, wrong shape.
@@ -2137,7 +2150,7 @@
         idle = flagship();
         showDefault();
         syncSpin();
-        start();
+        if (visible) start(); else draw(performance.now());
         if (hud) {
           hud.innerHTML = '<span data-cx-lens></span><span data-cx-inside></span>';
           paintLens();

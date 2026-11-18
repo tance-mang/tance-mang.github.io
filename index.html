@@ -58,15 +58,20 @@
   <!-- ============ 01 / HERO ============ -->
   <header class="hero" id="top">
     <canvas class="hero-canvas" id="hero-canvas" aria-hidden="true"></canvas>
-    <div class="hero-limb" aria-hidden="true">
-      <span class="limb-body">
-        <span class="limb-bands"></span>
-        <span class="limb-swirl"></span>
-        <span class="limb-storm limb-storm--pink"></span>
-        <span class="limb-storm limb-storm--blue"></span>
-        <span class="limb-rim"></span>
+    <div class="hero-planet" aria-hidden="true">
+      <span class="planet-air"></span>
+      <span class="planet-ring planet-ring--back"></span>
+      <span class="planet-disc">
+        <span class="planet-surface"></span>
+        <span class="planet-bands"></span>
+        <span class="planet-sheen"></span>
+        <span class="planet-storm planet-storm--rose"></span>
+        <span class="planet-storm planet-storm--ice"></span>
+        <span class="planet-night"></span>
+        <span class="planet-rim"></span>
       </span>
-      <span class="limb-haze"></span>
+      <span class="planet-ring planet-ring--front"></span>
+      <span class="planet-air"></span>
     </div>
     <div class="hero-rings" aria-hidden="true"></div>
     <div class="hero-frame" aria-hidden="true">
@@ -85,10 +90,6 @@
         <span>Create × Observe</span>
       </p>
       <h1 class="hero-word">TANCE</h1>
-      <p class="hero-claim">
-        我先把它做出来，然后回头怀疑它。<br>
-        <em>有些记录是项目，有些只是痕迹。</em>
-      </p>
       <div class="hero-cta">
         <a class="btn" href="#constellation">进入星域 <i class="arrow">→</i></a>
         <a class="btn btn--ghost" href="#stories">最近记录 <i class="arrow">↓</i></a>
@@ -255,18 +256,16 @@
     <footer class="endmark" id="end">
       <canvas class="endmark-canvas" aria-hidden="true"></canvas>
       <div class="coda">
-        <p class="coda-close">绕完一圈，落回已经写下的那些。</p>
+        <p class="coda-eyebrow">TANCE / End of page</p>
+        <h2 class="coda-close">就先写到这里。</h2>
         <div class="coda-note">
-          <p>这里放做过的项目和没想完的观察：能跑起来的记在 <b>Create</b>，还没想明白的记在 <b>Observe</b>。</p>
-          <p>页面改版过很多次，旧文章的地址和正文一直没动——写过的话得能被翻回来。</p>
-          <p>不是作品集，更像一本还在写的现场笔记。</p>
+          <p>还有很多东西没做完，也有不少问题没有答案。</p>
+          <p>之后想到什么、做了什么，再慢慢往这里放。</p>
         </div>
         <nav class="coda-go" aria-label="收尾入口">
-          <a href="/archives/">全部记录 <i class="arrow">→</i></a>
-          <a href="/projects/">作品 <i class="arrow">→</i></a>
-          <a href="https://github.com/tance-mang" target="_blank" rel="noopener">GitHub <i class="arrow">→</i></a>
-          <a href="/about.html#contact">联系方式 <i class="arrow">→</i></a>
-          <a href="#top">回到星核 <i class="arrow">↑</i></a>
+          <a href="/archives/">全部记录 <i class="arrow">↗</i></a>
+          <a href="https://github.com/tance-mang" target="_blank" rel="noopener">GitHub <i class="arrow">↗</i></a>
+          <a href="/about.html#contact">联系 <i class="arrow">↗</i></a>
         </nav>
       </div>
       <p class="endmark-seal" aria-hidden="true">TANCE</p>

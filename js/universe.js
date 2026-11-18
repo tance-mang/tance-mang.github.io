@@ -83,15 +83,15 @@
     // One compositor for the hero: L3 scroll recession + L2 mouse parallax.
     // Both write the same transform, so they must not live in two handlers.
     var stack = $('.hero-stack');
-    var limb = $('.hero-limb');
-    if (stack || limb) {
+    var planet = $('.hero-planet');
+    if (stack || planet) {
       var scrollP = 0, nx = 0, ny = 0, lx = 0, ly = 0, pending = false;
 
       function compose() {
         pending = false;
         if (T.reduced) {
           if (stack) { stack.style.transform = 'none'; stack.style.opacity = '1'; }
-          if (limb) { limb.style.transform = 'none'; limb.style.opacity = ''; }
+          if (planet) { planet.style.setProperty('--px', '0px'); planet.style.setProperty('--py', '0px'); }
           return;
         }
         if (stack) {
@@ -101,15 +101,15 @@
             'translate3d(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px,0) scale(' + (1 - scrollP * 0.08).toFixed(4) + ')';
           stack.style.opacity = (1 - scrollP * 0.8).toFixed(3);
         }
-        if (limb) {
-          // The limb is the heaviest thing in the frame, so it answers last and
-          // travels least, and it slides away underneath you as you scroll. That
-          // difference — not the arc itself — is what makes it feel occupied.
+        if (planet) {
+          // The body recedes slower than the page, which is what puts it behind
+          // the text. It travels downward by less than the gap CSS leaves
+          // between its own limb and the hero's bottom edge, so the drift can
+          // never push the sphere into that edge and cut it.
           lx += (nx - lx) * 0.06;
           ly += (ny - ly) * 0.06;
-          limb.style.transform = 'translate3d(' + (-lx * 26).toFixed(2) + 'px,' +
-            (-ly * 15 + scrollP * 120).toFixed(2) + 'px,0)';
-          limb.style.opacity = (1 - scrollP * 0.35).toFixed(3);
+          planet.style.setProperty('--px', (-lx * 26).toFixed(2) + 'px');
+          planet.style.setProperty('--py', (-ly * 15 + scrollP * 30).toFixed(2) + 'px');
           if (Math.abs(nx - lx) > 0.002 || Math.abs(ny - ly) > 0.002) schedule();
         }
       }
